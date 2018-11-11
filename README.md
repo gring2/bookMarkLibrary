@@ -8,7 +8,7 @@
 5. basic authentification for user.
 
 ## option.
-1. set custom thumbnail to replace ""reqiured 4.""
+1. set custom thumbnail to replace ""reqiured 4."".
 2. import bookmarks from browsers using bookmark-api [chrome, sapari, firefox etc...]. * requirement: OAuth
 
 
