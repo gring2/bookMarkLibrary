@@ -1,0 +1,22 @@
+html {
+  height: 100vh;
+  overflow: auto;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+}
+body nav {
+  height: 10%;
+  background-color: #2e3131;
+  padding-top: 1%;
+}
+body nav h1 {
+  color: #fff;
+}
+body section.content {
+  height: 70%;
+}
+
+/*# sourceMappingURL=init.css.map */

@@ -1,0 +1,19 @@
+html {
+   height:100vh;
+	overflow: auto;
+}
+body {
+	height: 100%;
+  	margin: 0;
+  nav{
+	height: 10%;
+	background-color: #2e3131;
+	padding-top: 1%;
+	h1{
+	  color: #fff;
+	}
+  }
+  section.content{
+	height:70%;
+  }
+}

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>bookMarkLibrary</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='init.css') }}">
+    {% block static%}{% endblock %}
+</head>
+<body>
+<nav>
+    <h1>BookMarkLibrary</h1>
+</nav>
+<section class="content">
+    {% block content %}{% endblock %}
+</section>
+</body>
+</html>
