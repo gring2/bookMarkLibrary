@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block static %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='library/urls.css') }}">
+
+{% endblock %}
+{% block content %}
+<div class="content">
+    <ul>
+        {% for key in urls['url']  %}
+            <li>
+                <img src="{{url_for('storage', filename=urls['url'][key]) }}" alt="" width="200px" height="200px">
+                {{ key }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

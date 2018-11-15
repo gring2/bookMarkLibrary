@@ -1,5 +1,8 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
+from bookMarkLibrary.send_storage_file import SendStorageFileHandler
+
+send_storage_handler = SendStorageFileHandler()
 
 
 def create_app(test_config=None):
@@ -31,6 +34,14 @@ def create_app(test_config=None):
 
     import library
     app.register_blueprint(library.bp)
+
+    def send_storage_file(filename):
+        cache_timeout = send_storage_handler.get_send_file_max_age(filename)
+        return send_from_directory(app.config['STORAGE_PATH'], filename,
+                                   cache_timeout=cache_timeout)
+
+    app.add_url_rule('/storage/<path:filename>', endpoint='storage',
+                     view_func=send_storage_file)
     return app
 
 

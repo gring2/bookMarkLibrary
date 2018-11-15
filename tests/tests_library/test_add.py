@@ -4,6 +4,7 @@ import os
 import shutil
 from library.json_handler import get_data_obj
 
+
 class AddTestCase(BaseTestCase):
 
     def test_get_add_page(self):
@@ -19,6 +20,10 @@ class AddTestCase(BaseTestCase):
         json_data = get_data_obj(app.config['STORAGE_PATH'] + "/test.json")
         assert 'url' in json_data
         assert 'http://twitter.com' in json_data['url']
+        self.client.post(url_for('library.add'), data={'url': 'http://google.com'})
+        json_data = get_data_obj(app.config['STORAGE_PATH'] + "/test.json")
+
+        self.assertIn('http://google.com', json_data['url'])
 
     def tearDown(self):
         shutil.rmtree(app.config['STORAGE_PATH'])
