@@ -1,7 +1,9 @@
 from . import bp
 from flask import (current_app as app, render_template, abort, request, redirect, url_for)
-from library import json_handler
-from library.snapshot_handler import SnapShotHandler
+from utils import json_handler
+from utils.snapshot_handler import SnapShotHandler
+from library.models import SnapShot
+from library import thumbnail
 
 
 @bp.route('/add', methods=('GET', 'POST'))
@@ -14,16 +16,13 @@ def add():
             abort(503)
         url = request.form['url']
         snapshot_handler = SnapShotHandler()
-        result = snapshot_handler.make_snapshot(url)
-        if result is not False:
-            path = app.config['STORAGE_PATH'] + '/test.json'
-            data = json_handler.get_data_obj(path)
-            bookmark_obj = {url: result}
+        img_name = snapshot_handler.make_snapshot(url)
 
-            if 'url' in data and type(data['url']) is dict:
-                data['url'].update(bookmark_obj)
-            elif 'url' not in data:
-                data['url'] = bookmark_obj
+        if img_name is not False:
+            bookmark_obj = SnapShot(url, img_name)
+            path = app.config['STORAGE_PATH'] + '/test.json'
+            data = json_handler.fetch_data_obj(path)
+            thumbnail.create_or_update(data['thumbnails'], bookmark_obj)
             json_handler.write_json_file(path, data)
 
         return redirect(url_for('library.urls'))
@@ -32,7 +31,7 @@ def add():
 @bp.route('/urls')
 def urls():
     path = app.config['STORAGE_PATH'] + '/test.json'
-    data = json_handler.get_data_obj(path)
-    for idx, url in enumerate(data['url']):
+    data = json_handler.fetch_data_obj(path)
+    for idx, url in enumerate(data['thumbnails']):
         pass
     return render_template('library/urls.html', urls=data)
