@@ -20,6 +20,8 @@ class AddTestCase(BaseTestCase):
             # stubbing functions with dummy returns
             driver.return_value.get.return_value = 'testing'
             driver.return_value.save_screenshot.return_value = 'save_screenshot'
+            json_data_defulat = fetch_data_obj(app.config['STORAGE_PATH'] + "/test.json")
+            assert 'thumbnails' in json_data_defulat
 
             self.client.post(url_for('library.add'), data={'url': 'http://twitter.com'})
             exists = os.path.exists(app.config['STORAGE_PATH'] + "/test.json")
