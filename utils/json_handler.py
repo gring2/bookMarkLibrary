@@ -1,6 +1,6 @@
 import json
 import traceback
-from library.models import SnapShot
+from library.models import SnapShot, Category
 
 
 def fetch_data_obj(path):
@@ -17,13 +17,32 @@ def fetch_data_obj(path):
 
     def __object_hook_mapping(o: dict)->dict:
         try:
-            for idx, thumbnail in enumerate(o['thumbnails']):
-                tmp = SnapShot(**thumbnail)
-                o['thumbnails'][idx] = tmp
+            if 'thumbnails' in o:
+                tmp = Category(**o['thumbnails'])
+                o['thumbnails'] = tmp
+            elif 'sub' in o:
+                o['sub'] = __mapping_to_sub_object(o['sub'])
         except KeyError:
             print(traceback.format_exc())  #
         finally:
             return o
+
+    def __mapping_to_sub_object(l: list)->list:
+        try:
+            for idx, item in enumerate(l):
+                tmp = None
+                if 'url' in item:
+                    tmp = SnapShot(**item)
+                elif 'sub' in item:
+                    tmp = Category(**item)
+
+                if tmp is not None:
+                    l[idx] = tmp
+        except KeyError:
+            print(traceback.format_exc())  #
+        finally:
+            return l
+
 
     try:
         with open(path, "rt") as file:
@@ -34,7 +53,7 @@ def fetch_data_obj(path):
     finally:
         # if thumbnails is not in data initialize thumbnails list
         if 'thumbnails' not in data:
-            data['thumbnails'] = []
+            data['thumbnails'] = Category(id='0', name='root', sub=[])
 
     return data
 

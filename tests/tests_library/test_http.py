@@ -23,18 +23,18 @@ class AddTestCase(BaseTestCase):
             json_data_defulat = fetch_data_obj(app.config['STORAGE_PATH'] + "/test.json")
             assert 'thumbnails' in json_data_defulat
 
-            self.client.post(url_for('library.add'), data={'url': 'http://twitter.com'})
+            self.client.post(url_for('library.add'), data={'url': 'http://twitter.com', 'parent': '0'})
             exists = os.path.exists(app.config['STORAGE_PATH'] + "/test.json")
             assert exists is True
 
             json_data = fetch_data_obj(app.config['STORAGE_PATH'] + "/test.json")
             assert 'thumbnails' in json_data
-            assert 'http://twitter.com' in json_data['thumbnails'][0].url
-            self.client.post(url_for('library.add'), data={'url': 'http://google.com'})
+            assert 'http://twitter.com' in json_data['thumbnails'].sub[0].url
+            self.client.post(url_for('library.add'), data={'url': 'http://google.com', 'parent': '0'})
             json_data = fetch_data_obj(app.config['STORAGE_PATH'] + "/test.json")
 
-            self.assertIn('http://google.com', json_data['thumbnails'][1].url)
-            self.assertIn('google.com', json_data['thumbnails'][1].img)
+            self.assertIn('http://google.com', json_data['thumbnails'].sub[1].url)
+            self.assertIn('google.com', json_data['thumbnails'].sub[1].img)
 
     def tearDown(self):
         shutil.rmtree(app.config['STORAGE_PATH'])
@@ -46,7 +46,7 @@ class ShowTestCase(BaseTestCase):
 
     def test_show_thumbnails(self):
         # mocking selenium dependency
-        with mock.patch('library.view.json_handler.fetch_data_obj', return_value={'thumbnails': [SnapShot(**{'url':'http://test.com', 'img': 'test.com.png'})]}) as json_handler:
+        with mock.patch('library.view.json_handler.fetch_data_obj', return_value={'thumbnails': [SnapShot(**{'id':'01', 'url':'http://test.com', 'img': 'test.com.png'})]}) as json_handler:
             result = self.client.get(url_for('library.urls'))
             content = result.data.decode('utf-8')
             assert 'test.com.png' in content

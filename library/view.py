@@ -15,14 +15,15 @@ def add():
         if 'url' not in request.form:
             abort(503)
         url = request.form['url']
+        parent_id = request.form['parent']
         snapshot_handler = SnapShotHandler()
         img_name = snapshot_handler.make_snapshot(url)
 
         if img_name is not False:
-            bookmark_obj = SnapShot(url, img_name)
+            bookmark_obj = SnapShot(None, url=url, img=img_name)
             path = app.config['STORAGE_PATH'] + '/test.json'
             data = json_handler.fetch_data_obj(path)
-            thumbnail.create_or_update(data['thumbnails'], bookmark_obj)
+            thumbnail.create_or_update(data['thumbnails'], bookmark_obj, parent_id)
             json_handler.write_json_file(path, data)
 
         return redirect(url_for('library.urls'))
