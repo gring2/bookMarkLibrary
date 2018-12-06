@@ -3,17 +3,18 @@ import traceback
 from library.models import SnapShot, Category
 
 
+# make dicts from json file
 def fetch_data_obj(path):
     data = {}
-    """Example function with types documented in the docstring.
-
-        `PEP 484`_ type annotations are supported. If attribute, parameter, and
-        return types are annotated according to `PEP 484`_, they do not need to be
-        included in the docstring:
-
-        inner_function:
-            __object_hook_mapping (dicts): return object mapped dicts
-        """
+    """
+        return dicts :
+            # root node's name of thumbnails is 'root'
+            # sub can have SnapShotObj and CategoryObj
+            
+            {'thumbnails': CategoryObj{'id': str, 'name':str, sub: list }}
+            
+        __object_hook_mapping (dicts): return object mapped dicts
+    """
 
     def __object_hook_mapping(o: dict)->dict:
         try:

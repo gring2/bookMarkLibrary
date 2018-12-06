@@ -7,7 +7,7 @@
 {% block content %}
 <div class="content">
     <ul>
-        {% for thumbnail in urls['thumbnails']  %}
+        {% for thumbnail in thumbnails %}
             <li>
                 <img src="{{url_for('storage', filename=thumbnail['img']) }}" alt="" width="200px" height="200px">
                 {{ thumbnail['url'] }}</li>
