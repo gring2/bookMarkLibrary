@@ -34,3 +34,8 @@ class JsonHandlerTest(BaseTestCase):
 
     def tearDown(self):
         shutil.rmtree(self.test_dir)
+
+
+class LibraryTest(BaseTestCase):
+    def test_use_same_sequenced_id(self):
+        self.fail('snap shot and directory use same sequence')
