@@ -1,13 +1,16 @@
 import os
 from flask import Flask, render_template, send_from_directory
 from bookMarkLibrary.send_storage_file import SendStorageFileHandler
+from flask_wtf.csrf import CSRFProtect
 
 send_storage_handler = SendStorageFileHandler()
+csrf = CSRFProtect()
 
 
 def create_app(test_config=None):
     # create and configure the app
     app: Flask = Flask(__name__, instance_relative_config=True)
+    csrf.init_app(app)
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'bookmark.sqlite'),

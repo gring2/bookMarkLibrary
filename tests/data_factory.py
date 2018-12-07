@@ -2,7 +2,7 @@ from library.models import Category, SnapShot
 
 
 def test_library_dict_factory():
-    thumbnails = Category('0,', 'root', [])
+    thumbnails = Category('0', 'root', [])
     movie_category = Category('root1', 'Movie', [])
     root_snapShot = SnapShot(**{'id': 'root2', 'url': 'http://test.com', 'img': 'test.com.png'})
 

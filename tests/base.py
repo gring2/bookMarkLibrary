@@ -8,7 +8,9 @@ app = bookMarkLibrary.create_app()
 class BaseTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.app = bookMarkLibrary.create_app()
+        self.app = bookMarkLibrary.create_app({
+            'WTF_CSRF_ENABLED': False
+        })
 
         self.app.testing = True
         self.app_context = self.app.test_request_context()
