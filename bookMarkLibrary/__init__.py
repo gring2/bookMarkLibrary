@@ -2,7 +2,8 @@ import os
 from flask import Flask, render_template, send_from_directory
 from bookMarkLibrary.send_storage_file import SendStorageFileHandler
 from flask_wtf.csrf import CSRFProtect
-
+from bookMarkLibrary.db import init_db
+import bookMarkLibrary.models
 send_storage_handler = SendStorageFileHandler()
 csrf = CSRFProtect()
 
@@ -16,6 +17,8 @@ def create_app(test_config=None):
         DATABASE=os.path.join(app.instance_path, 'bookmark.sqlite'),
         STORAGE_PATH=app.root_path + '/storage'
     )
+
+    init_db(app)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
