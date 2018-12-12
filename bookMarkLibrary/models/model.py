@@ -1,13 +1,42 @@
 from datetime import datetime
-from bookMarkLibrary.db import db
+from flask_security import UserMixin
+from sqlalchemy.ext.hybrid import hybrid_property
+from flask_security.utils import hash_password
+
+from bookMarkLibrary.database import db
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
 
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), unique=True)
+    __password = db.Column(db.String(255), name='password')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
     next_id = db.Column(db.Integer, autoincrement=True)
+
+    @hybrid_property
+    def roles(self):
+        return []
+
+    @roles.setter
+    def roles(self, role):
+        pass
+
+    @hybrid_property
+    def active(self):
+        return True
+
+    @active.setter
+    def active(self, active):
+        pass
+
+    @hybrid_property
+    def password(self):
+        return self.__password
+
+    @password.setter
+    def password(self, password):
+        self.__password = hash_password(password)

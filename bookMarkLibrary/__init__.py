@@ -1,16 +1,20 @@
 import os
 from flask import Flask, render_template, send_from_directory
+from flask_migrate import Migrate
+from flask_security import Security, SQLAlchemyUserDatastore
+from bookMarkLibrary.models import User
 from bookMarkLibrary.send_storage_file import SendStorageFileHandler
 from flask_wtf.csrf import CSRFProtect
-from bookMarkLibrary.db import init_db
+from bookMarkLibrary.database import init_db, db
 import bookMarkLibrary.models
 send_storage_handler = SendStorageFileHandler()
 csrf = CSRFProtect()
+app: Flask = Flask(__name__, instance_relative_config=True)
+user_datastore = SQLAlchemyUserDatastore(db, User, None)
 
 
 def create_app(test_config=None):
     # create and configure the app
-    app: Flask = Flask(__name__, instance_relative_config=True)
     csrf.init_app(app)
     app.config.from_mapping(
         SECRET_KEY='dev',
@@ -18,7 +22,8 @@ def create_app(test_config=None):
         STORAGE_PATH=app.root_path + '/storage'
     )
 
-    init_db(app)
+    db = init_db(app)
+    Migrate(app, db)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -40,6 +45,8 @@ def create_app(test_config=None):
 
     import library
     app.register_blueprint(library.bp)
+    import auth
+    app.register_blueprint(auth.bp)
 
     def send_storage_file(filename):
         cache_timeout = send_storage_handler.get_send_file_max_age(filename)
@@ -48,9 +55,14 @@ def create_app(test_config=None):
 
     app.add_url_rule('/storage/<path:filename>', endpoint='storage',
                      view_func=send_storage_file)
+    # Setup Flask-Security
+    security = Security(app, user_datastore)
+
     return app
 
 
 def graceful_create_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+
