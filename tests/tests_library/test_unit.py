@@ -2,6 +2,7 @@ import os
 import shutil
 import tempfile
 import json
+from flask import url_for
 from tests.base import BaseTestCase
 from library.models import Category, SnapShot
 from tests.data_factory import test_library_dict_factory
@@ -38,4 +39,12 @@ class JsonHandlerTest(BaseTestCase):
 
 class LibraryTest(BaseTestCase):
     def test_use_same_sequenced_id(self):
+        self.client.post(url_for('auth.login'), data={'email':'test@test.com', 'password':'test123'})
+        self.client.post(url_for('auth.register'), data={'email':'test@test.com', 'password':'test123'})
+
+        # create sub-directories
+        # assert they use sequential_id
+
+        #create thumbnails 
+        #assert they share sequential_id with directories above
         self.fail('snap shot and directory use same sequence')

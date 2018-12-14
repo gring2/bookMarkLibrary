@@ -1,5 +1,5 @@
 from library.models import SnapShot, Category
-
+from flask_security import current_user
 
 def create_or_update(category: Category, bookmark_obj: SnapShot, parent_id: str):
     if type(category) is Category:
@@ -14,6 +14,7 @@ def create_or_update(category: Category, bookmark_obj: SnapShot, parent_id: str)
 
 
 def __make_next_id(category)->str:
+    # return current_user.nextId++
     last_id = '0'
     if len(category.sub) > 0:
         last_id = category.sub[-1].id.replace(category.name, '')
