@@ -1,6 +1,5 @@
 import os
 from flask import Flask, render_template, send_from_directory
-from flask_migrate import Migrate
 from flask_security import Security, SQLAlchemyUserDatastore
 from bookMarkLibrary.models import User
 from bookMarkLibrary.send_storage_file import SendStorageFileHandler
@@ -19,11 +18,18 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'bookmark.sqlite'),
-        STORAGE_PATH=app.root_path + '/storage'
+        STORAGE_PATH=app.root_path + '/storage',
+        SECURITY_REGISTERABLE=True,
+        SECURITY_SEND_REGISTER_EMAIL= False
     )
 
-    db = init_db(app)
-    Migrate(app, db)
+    # flask-security configuration mapping
+    app.config.from_mapping(
+        SECURITY_REGISTERABLE=True,
+        SECURITY_SEND_REGISTER_EMAIL=False
+    )
+
+    init_db(app)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -45,8 +51,6 @@ def create_app(test_config=None):
 
     import library
     app.register_blueprint(library.bp)
-    import auth
-    app.register_blueprint(auth.bp)
 
     def send_storage_file(filename):
         cache_timeout = send_storage_handler.get_send_file_max_age(filename)
@@ -64,5 +68,6 @@ def create_app(test_config=None):
 def graceful_create_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
 
 

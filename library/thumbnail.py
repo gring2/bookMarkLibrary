@@ -1,11 +1,14 @@
+from bookMarkLibrary.database import db
 from library.models import SnapShot, Category
 from flask_security import current_user
+from bookMarkLibrary.models import User
+
 
 def create_or_update(category: Category, bookmark_obj: SnapShot, parent_id: str):
     if type(category) is Category:
         category = __find_parent(category, parent_id)
         if category is not None:
-            bookmark_obj.id = __make_next_id(category)
+            bookmark_obj.id = get_next_id(current_user)
     else:
         # init root category
         category = Category('0', 'root', [])
@@ -13,12 +16,11 @@ def create_or_update(category: Category, bookmark_obj: SnapShot, parent_id: str)
     category.sub.append(bookmark_obj)
 
 
-def __make_next_id(category)->str:
+def get_next_id(user)->str:
     # return current_user.nextId++
-    last_id = '0'
-    if len(category.sub) > 0:
-        last_id = category.sub[-1].id.replace(category.name, '')
-    return category.name + str(int(last_id) + 1)
+    next_id = user.next_id
+    user.next_id = next_id +1
+    return next_id
 
 
 def __find_parent(category: Category, parent_id: str)->Category or None:

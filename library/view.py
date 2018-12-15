@@ -1,7 +1,9 @@
+from flask_security import current_user, login_required
+
 from . import bp
 from flask import (current_app as app, render_template, abort, request, redirect, url_for)
-from utils import json_handler
-from utils.snapshot_handler import SnapShotHandler
+from handlers import category_handler
+from handlers.snapshot_handler import SnapShotHandler
 from library.models import SnapShot, Category
 from library import thumbnail
 
@@ -26,10 +28,8 @@ def input_url():
 
         if img_name is not False:
             bookmark_obj = SnapShot(None, url=url, img=img_name)
-            path = dummy_path()
-            data = json_handler.fetch_data_obj(path)
+            data = category_handler.fetch_bookmark_elem(current_user)
             thumbnail.create_or_update(data['thumbnails'], bookmark_obj, parent_id)
-            json_handler.write_json_file(path, data)
 
         return redirect(url_for('library.urls'))
 
@@ -37,8 +37,7 @@ def input_url():
 @bp.route('/category')
 def input_category():
     if request.method == 'GET':
-        path = dummy_path()
-        fetch_obj = json_handler.fetch_data_obj(path)
+        fetch_obj = category_handler.fetch_bookmark_elem(current_user)
         categorys = __get_category_list(fetch_obj['thumbnails'])
         return render_template('library/input_category.html', categorys=categorys)
     if request.method == "POST":
@@ -57,8 +56,8 @@ def __get_category_list(data: Category)->list:
     return result
 
 @bp.route('/urls')
+@login_required
 def urls():
-    path = dummy_path()
-    fetch_obj = json_handler.fetch_data_obj(path)
-    data = fetch_obj['thumbnails'].sub
-    return render_template('library/urls.html', thumbnails=data)
+    fetch_obj = category_handler.fetch_bookmark_elem(current_user)
+    #data = fetch_obj['thumbnails'].sub
+    return render_template('library/urls.html', thumbnails={})

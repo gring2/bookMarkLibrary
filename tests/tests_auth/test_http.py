@@ -1,15 +1,15 @@
 
-from flask import url_for, current_app as app
-from flask_migrate import downgrade, Config
-from bookMarkLibrary import User, db
+from flask import url_for
+
+from bookMarkLibrary.database import db
+from bookMarkLibrary.models import User
 from tests.base import BaseTestCase
-from flask_security import login_user, current_user, AnonymousUser
-import unittest
+from flask_security import login_user, current_user, AnonymousUser, url_for_security
+
 
 class AuthTest(BaseTestCase):
     def test_register(self):
-        print("Test Register")
-        self.client.post(url_for('auth.register'), data={'email':'test@test.com', 'password':'test123'})
+        res = self.client.post(url_for_security('register'), data={'email':'test@test.com', 'password':'test123', 'password_confirm':'test123'})
         user=User.query.first()
         self.assertEqual('test@test.com', user.email, 'email  equals')
         login_user(user)
@@ -19,17 +19,21 @@ class AuthTest(BaseTestCase):
         db.drop_all(bind=None)
 
     def test_login(self):
-        zero = User.query.count()
-        self.assertEqual(0,zero)
-        self.client.post(url_for('auth.login'), data={'email':'test@test.com', 'password':'test123'})
-        self.assertTrue(current_user.is_anonymous)
-        self.client.post(url_for('auth.register'), data={'email':'test@test.com', 'password':'test123'})
+        with self.client:
+            zero = User.query.count()
+            self.assertEqual(0, zero)
+            self.client.post(url_for_security('login'), data={'email':'test@test.com', 'password':'test123'})
+            self.assertTrue(current_user.is_anonymous)
 
-        cnt = User.query.count()
-        self.assertEqual(1,cnt)
+            self.client.post(url_for_security('register'), data={'email': 'test@test.com', 'password': 'test123',
+                                                                       'password_confirm': 'test123'})
+            cnt = User.query.count()
+            self.assertEqual(1,cnt)
 
-        self.client.post(url_for('auth.login'), data={'email':'test@test.com', 'password':'test123'})
-        self.assertIsNotNone(current_user)
+            self.client.post(url_for_security('login'), data={'email':'test@test.com', 'password':'test123'})
+            t = current_user
+            self.assertIsNotNone(t)
+            self.assertEqual('test@test.com', t.email)
 
     def tearDown(self):
         super().tearDown()

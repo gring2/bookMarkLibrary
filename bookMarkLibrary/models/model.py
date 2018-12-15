@@ -8,14 +8,14 @@ from bookMarkLibrary.database import db
 
 class User(db.Model, UserMixin):
 
-    __tablename__ = 'users'
+    __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True)
     __password = db.Column(db.String(255), name='password')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
-    next_id = db.Column(db.Integer, autoincrement=True)
+    next_id = db.Column(db.Integer, default=0)
 
     @hybrid_property
     def roles(self):
@@ -40,3 +40,4 @@ class User(db.Model, UserMixin):
     @password.setter
     def password(self, password):
         self.__password = hash_password(password)
+
