@@ -1,5 +1,4 @@
-from bookMarkLibrary.app import app
-
+from bookMarkLibrary.app import create_app
 
 if __name__ == '__main__':
-    app.run()
+    create_app()
