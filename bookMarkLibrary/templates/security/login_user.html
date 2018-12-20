@@ -11,8 +11,41 @@
 <div class="content">
     <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form" >
       {{ login_user_form.hidden_tag() }}
-      {{ render_field_with_errors(login_user_form.email, class='test') }}
-      {{ render_field_with_errors(login_user_form.password) }}
+        <div>
+            <div class="label">
+            {{ login_user_form.email.label }}
+            {% if login_user_form.email.errors %}
+                {% for error in login_user_form.email.errors %}
+                    <span>
+                    {{ error }}
+                    </span>
+                {% endfor %}
+            {% endif %}
+
+            </div>
+            <div>
+                {{ login_user_form.email|safe }}
+            </div>
+        </div>
+        <div>
+            <div class="label">
+            {{ login_user_form.password.label }}
+            {% if login_user_form.password.errors %}
+                {% for error in login_user_form.email.errors %}
+                    <span>
+                    {{ error }}
+                    </span>
+                {% endfor %}
+            {% endif %}
+
+            </div>
+            <div>
+                {{ login_user_form.password|safe }}
+            </div>
+        </div>
+
+{#      {{ render_field_with_errors(login_user_form.email, class='test') }}#}
+{#      {{ render_field_with_errors(login_user_form.password) }}#}
       {{ render_field(login_user_form.submit) }}
     </form>
 </div>

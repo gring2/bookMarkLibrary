@@ -36,7 +36,10 @@ class AuthTest(BaseTestCase):
             self.assertEqual('test@test.com', t.email)
 
     def test_login_page(self):
-        self.fail('<No.1 To-do >flask-wtforms implement!!')
+        self.assertTrue(True, 'Resolved')
+
+    def test_register_page(self):
+        self.fail("No-1 implement")
 
     def tearDown(self):
         super().tearDown()

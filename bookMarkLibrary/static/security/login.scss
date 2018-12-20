@@ -1,15 +1,26 @@
-form{
-  width: 100%;
-  div {
+.content > div {
+  display: flex;
+}
+
+div.content > form{
+  width: 50%;
+  div.label{
+	justify-content: space-between;
+
+	label{
+//	  width: 100%;
+	}
+  }
+  div:not(.label){
 	  margin-bottom: 3%;
-	  height: 50px;
+//	  height: 50px;
+	  display: block;
 	label {
 	  margin-right: 2%;
-	  width: 13.3%;
 	  display: block;
 	}
 	input{
-	  width: 50%;
+	  width: 100%;
 	}
   }
 }

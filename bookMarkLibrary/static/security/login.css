@@ -1,17 +1,23 @@
-form {
-  width: 100%;
+.content > div {
+  display: flex;
 }
-form div {
+
+div.content > form {
+  width: 50%;
+}
+div.content > form div.label {
+  justify-content: space-between;
+}
+div.content > form div:not(.label) {
   margin-bottom: 3%;
-  height: 50px;
-}
-form div label {
-  margin-right: 2%;
-  width: 13.3%;
   display: block;
 }
-form div input {
-  width: 50%;
+div.content > form div:not(.label) label {
+  margin-right: 2%;
+  display: block;
+}
+div.content > form div:not(.label) input {
+  width: 100%;
 }
 
 /*# sourceMappingURL=login.css.map */
