@@ -39,5 +39,5 @@ class User(db.Model, UserMixin):
 
     @password.setter
     def password(self, password):
-        self.__password = hash_password(password)
+        self.__password = password
 

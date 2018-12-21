@@ -19,18 +19,18 @@ class AuthTest(BaseTestCase):
         db.drop_all(bind=None)
 
     def test_login(self):
+        zero = User.query.count()
+        self.assertEqual(0, zero)
+        self.client.post(url_for_security('login'), data={'email':'test@test.com', 'password':'test123'})
+        self.assertTrue(current_user.is_anonymous)
+
+        self.client.post(url_for_security('register'), data={'email': 'test@test.com', 'password': 'test123',
+                                                                   'password_confirm': 'test123'})
+        cnt = User.query.count()
+        self.assertEqual(1,cnt)
+        self.client.get(url_for_security('logout'))
         with self.client:
-            zero = User.query.count()
-            self.assertEqual(0, zero)
-            self.client.post(url_for_security('login'), data={'email':'test@test.com', 'password':'test123'})
-            self.assertTrue(current_user.is_anonymous)
-
-            self.client.post(url_for_security('register'), data={'email': 'test@test.com', 'password': 'test123',
-                                                                       'password_confirm': 'test123'})
-            cnt = User.query.count()
-            self.assertEqual(1,cnt)
-
-            self.client.post(url_for_security('login'), data={'email':'test@test.com', 'password':'test123'})
+            it = self.client.post(url_for_security('login'), data={'email':'test@test.com', 'password':'test123'})
             t = current_user
             self.assertIsNotNone(t)
             self.assertEqual('test@test.com', t.email)
