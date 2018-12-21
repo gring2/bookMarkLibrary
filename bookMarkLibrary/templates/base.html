@@ -8,7 +8,45 @@
 </head>
 <body>
 <nav>
-    <h1>BookMarkLibrary</h1>
+    <div>
+        <div class="home-logo">
+            <a  class="link-style-none" href="{{ url_for('home')}}"><h1>BookMarkLibrary</h1></a>
+
+        </div>
+        <div>
+            <ul class="list-style-none flex flex-items-center">
+                <li><a class="manu" href="{{ url_for('library.urls') }}">library</a></li>
+                <li><a class="manu" href="{{ url_for('library.input_url') }}">add-library</a></li>
+
+            </ul>
+        </div>
+
+    </div>
+
+
+    <div class="authenticate flex-items-center">
+        {% if current_user.is_authenticated %}
+
+        <div>
+            <p>
+               Hi!<br/> {{ current_user.email }}
+            </p>
+
+        </div>
+        <div class="logout-box">
+                <a class="logout" href="{{ url_for_security('logout') }}">Log out</a>
+        </div>
+        {% else %}
+            <div>
+                    <a class="register" href="{{ url_for_security('register') }}">Sign Up</a>
+
+            </div>
+            <div>
+                    <a class="login" href="{{ url_for_security('login') }}">Sign In</a>
+
+            </div>
+        </div>
+    {% endif %}
 </nav>
 <section class="content">
     {% block content %}{% endblock %}
