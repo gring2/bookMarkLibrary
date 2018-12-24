@@ -12,10 +12,11 @@ from library import thumbnail
 def dummy_path():
     return app.config['STORAGE_PATH'] + '/test.json'
 
-
+@login_required
 @bp.route('/url', methods=('GET', 'POST'))
 def input_url():
     if request.method == "GET":
+#        category = category_handler.fetch_bookmark_elem(current_user)
         return render_template('library/input_url.html')
 
     if request.method == "POST":

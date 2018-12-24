@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>bookMarkLibrary</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='init.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/init.css') }}">
     {% block static%}{% endblock %}
 </head>
 <body>
@@ -51,5 +51,7 @@
 <section class="content">
     {% block content %}{% endblock %}
 </section>
+{% block modal %}{% endblock %}
+{% block script%}{% endblock %}
 </body>
 </html>

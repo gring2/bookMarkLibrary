@@ -3,3 +3,4 @@ venv
 */__pycache__
 instance
 */*/__pycache__
+node_modules
