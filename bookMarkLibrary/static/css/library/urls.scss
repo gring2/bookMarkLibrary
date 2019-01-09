@@ -15,3 +15,18 @@
 	height: 10%;
   }
 }
+
+#addEleModal> div > div{
+
+  @media screen and (min-width: 700px) {
+
+    width: 500px;
+
+    input, select{
+      height: 30px
+    }
+    input[type="text"]{
+        width: 340px;
+    }
+  }
+}

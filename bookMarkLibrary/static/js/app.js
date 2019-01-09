@@ -5,5 +5,5 @@ MicroModal.init();
 
 const btn = document.querySelector('#btn');
 btn.addEventListener('click', () => {
-    MicroModal.show('modal-1')
+    MicroModal.show('addEleModal');
 })

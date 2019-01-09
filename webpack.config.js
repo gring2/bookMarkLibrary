@@ -19,4 +19,5 @@ module.exports = {
     modules: ['node_modules'],
     extensions: ['.js', '.json', '.jsx', '.css'],
   },
+  watch: true
 };
