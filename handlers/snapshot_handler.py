@@ -23,7 +23,7 @@ class SnapShotHandler():
         if os.path.exists(self.__dir) is not True:
             os.makedirs(self.__dir)
 
-    def make_snapshot(self, url: str)->str:
+    def make_snapshot(self, url: str)->str or False:
         """
 
         :param url:
@@ -54,4 +54,5 @@ class SnapShotHandler():
         :return: uri (http[s]:// and www must not included )
         """
         return re.sub("https?://[www]?", '', url)
+
 
