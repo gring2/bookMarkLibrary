@@ -1,27 +1,20 @@
-from flask_security import login_user, url_for_security
+from time import sleep
 
 from bookMarkLibrary.database import db
 from bookMarkLibrary.models import User
-from library.models import Category, SnapShot
+from library.models import Category, BookMark
 from tests.base import BaseTestCase
-from library.thumbnail import get_next_id
-from handlers.category_handler import fetch_bookmark_elem
+from handlers.category_handler import fetch_sub_category
 
 
-class JsonHandlerTest(BaseTestCase):
+class HandlerTest(BaseTestCase):
     def setUp(self):
         super().setUp()
-        self.user = User(id=0,email='test@test.com', next_id=0)
-        
-    def test_fetch_default_category(self):
-        data = fetch_bookmark_elem(self.user)
-        self.assertIsNotNone(data)
-        self.assertEqual(2, self.user.next_id)
+        self.user = User(id=0, email='test@test.com')
 
     def test_fetch_category_with_sub_list(self):
-        data = fetch_bookmark_elem(self.user)
+        data = fetch_sub_category(self.user)
         self.assertIsNotNone(data)
-        self.assertEqual(2, self.user.next_id)
 
         # add sub objects
         # Category
@@ -34,65 +27,55 @@ class JsonHandlerTest(BaseTestCase):
         # SnapShot{'url':http://ironman1.com', img: 'ironman1.png', id: 7, , parent_id: 4}
         # SnapShot{'url':http://ironman1.com', img: 'ironman1.png', id: 8, parent_id: 4}
 
-        movie_category = Category(id=get_next_id(self.user), name="Movie", parent_id=data.id, user_id=self.user.id)
+        movie_category = Category(name="Movie", parent_id=data.id, user_id=self.user.id)
         db.session.add(movie_category)
-        first_snapshot = SnapShot(id=get_next_id(self.user), url='http://test.com', img='test.com.png', parent_id=data.id)
-        hero_movie_category = Category(id=get_next_id(self.user), name="Hero", parent_id=movie_category.id, user_id=self.user.id)
-        documentary_movie_category = Category(id=get_next_id(self.user), name="Documentary", parent_id=movie_category.id, user_id=self.user.id)
-        ironman_1 = SnapShot(id=get_next_id(self.user), url='http://ironman1.com', img='ironman1.com.png', parent_id=hero_movie_category.id)
-        ironman_2 = SnapShot(id=get_next_id(self.user), url='http://ironman2.com', img='ironman2.com.png', parent_id=hero_movie_category.id)
-        ironman_3 = SnapShot(id=get_next_id(self.user), url='http://ironman3.com', img='ironman3.com.png', parent_id=hero_movie_category.id)
+        db.session.commit()
+        sleep(1)
+        first_snapshot = BookMark( url='http://test.com', img='test.com.png', parent_id=data.id)
 
+        hero_movie_category = Category(name="Hero", parent_id=movie_category.id, user_id=self.user.id)
+        documentary_movie_category = Category(name="Documentary", parent_id=movie_category.id, user_id=self.user.id)
         db.session.add_all(
             [
-                movie_category,
                 first_snapshot,
                 hero_movie_category,
                 documentary_movie_category,
+            ]
+            )
+        db.session.commit()
+        hero_movie_category = Category.query.filter_by(name="Hero", user_id=self.user.id).first()
+        ironman_1 = BookMark(url='http://ironman1.com', img='ironman1.com.png', parent_id=hero_movie_category.id)
+        ironman_2 = BookMark(url='http://ironman2.com', img='ironman2.com.png', parent_id=hero_movie_category.id)
+        ironman_3 = BookMark(url='http://ironman3.com', img='ironman3.com.png', parent_id=hero_movie_category.id)
+
+        db.session.add_all(
+            [
                 ironman_1,
                 ironman_2,
                 ironman_3
             ]
             )
         db.session.commit()
-        self.assertEqual(9, self.user.next_id)
-        root_with_sub_list = fetch_bookmark_elem(self.user)
+        root_with_sub_list = fetch_sub_category(self.user)
         self.assertEqual(2, len(root_with_sub_list.sub))
         self.assertTrue(type(root_with_sub_list.sub[0]) == Category)
         self.assertEqual('Movie', root_with_sub_list.sub[0].name)
-        self.assertTrue(type(root_with_sub_list.sub[1]) == SnapShot)
+        self.assertTrue(type(root_with_sub_list.sub[1]) == BookMark)
         self.assertTrue(hasattr(root_with_sub_list.sub[1], 'url'))
         self.assertEqual('http://test.com', root_with_sub_list.sub[1].url)
 
-        hero_category_with_snapshots_only = fetch_bookmark_elem(self.user, movie_category.id)
+        hero_category_with_snapshots_only = fetch_sub_category(self.user, movie_category.id)
         self.assertEqual(3, len(hero_category_with_snapshots_only.sub))
-        self.assertTrue(type(hero_category_with_snapshots_only.sub[0]) == SnapShot)
+        self.assertTrue(type(hero_category_with_snapshots_only.sub[0]) == BookMark)
         self.assertEqual('http://ironman1.com', hero_category_with_snapshots_only.sub[0].url)
 
-        self.assertTrue(type(hero_category_with_snapshots_only.sub[1]) == SnapShot)
+        self.assertTrue(type(hero_category_with_snapshots_only.sub[1]) == BookMark)
         self.assertEqual('http://ironman2.com', hero_category_with_snapshots_only.sub[1].url)
 
-        self.assertTrue(type(hero_category_with_snapshots_only.sub[2]) == SnapShot)
+        self.assertTrue(type(hero_category_with_snapshots_only.sub[2]) == BookMark)
         self.assertEqual('http://ironman3.com', hero_category_with_snapshots_only.sub[2].url)
 
     def tearDown(self):
         super().tearDown()
 
 
-class LibraryTest(BaseTestCase):
-    def setUp(self):
-        super().setUp()
-        self.user = User(id=0,email='test@test.com', next_id=0)
-
-    def test_next_id_updated(self):
-        user=self.user
-        login_user(user)
-        self.assertEqual(0, user.next_id)
-        get_next_id(self.user)
-        self.assertEqual(1, user.next_id)
-
-        # create sub-directories
-        # assert they use sequential_id
-
-        #create thumbnails 
-        #assert they share sequential_id with directories above

@@ -1,5 +1,7 @@
 import json
 from bookMarkLibrary.database import db
+from bookMarkLibrary.models import User
+from handlers.snapshot_handler import SnapShotHandler
 
 
 class Category(db.Model):
@@ -10,10 +12,12 @@ class Category(db.Model):
     """
     __tablename__ = "categories"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
     parent_id = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
     @property
     def sub(self):
@@ -27,16 +31,30 @@ class Category(db.Model):
         self.__sub = sub_list
 
 
-class SnapShot(db.Model):
+class BookMark(db.Model):
 
-    __tablename__ = "snapshots"
+    __tablename__ = "bookmarks"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=False)
+    id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(255))
     img = db.Column(db.String(255))
     parent_id = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
-    def __repr__(self):
-        return json.dumps(self.__dict__)
+    def save(self):
+        handler = SnapShotHandler()
+        file_name = handler.make_snapshot(self.url)
+        try:
+            if file_name is not False:
+                self.img = file_name
+                db.session.add(self)
+                db.session.commit()
+                return self
 
+            else:
+                raise Exception
 
+        except Exception:
+            db.session.rollback()
+            return False

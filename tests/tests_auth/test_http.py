@@ -36,10 +36,18 @@ class AuthTest(BaseTestCase):
             self.assertEqual('test@test.com', t.email)
 
     def test_login_page(self):
-        self.assertTrue(True, 'Resolved')
+        with self.client:
+            res = self.client.get(url_for_security('login'),)
+
+            self.assert_template_used('security/login_user.html')
+
 
     def test_register_page(self):
-        self.fail("No-1 implement")
+        with self.client:
+            res = self.client.get(url_for_security('register'),)
+
+            self.assert_template_used('security/register_user.html')
+
 
     def tearDown(self):
         super().tearDown()

@@ -5,9 +5,11 @@ from bookMarkLibrary.models import User
 from bookMarkLibrary.send_storage_file import SendStorageFileHandler
 from flask_wtf.csrf import CSRFProtect
 from bookMarkLibrary.database import init_db, db, set_db_config
+from bookMarkLibrary.const import register_const
 
 send_storage_handler = SendStorageFileHandler()
 csrf = CSRFProtect()
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app: Flask = Flask(__name__, instance_relative_config=True)
 user_datastore = SQLAlchemyUserDatastore(db, User, None)
 
@@ -43,6 +45,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    @app.before_request
+    def register_g_value():
+        register_const()
+
     @app.route('/')
     def home():
         return render_template('index.html')
@@ -59,6 +65,7 @@ def create_app(test_config=None):
                      view_func=send_storage_file)
     # Setup Flask-Security
     security = Security(app, user_datastore)
+
 
     return app
 

@@ -15,7 +15,6 @@ class User(db.Model, UserMixin):
     __password = db.Column(db.String(255), name='password')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
-    next_id = db.Column(db.Integer, default=0)
 
     @hybrid_property
     def roles(self):
@@ -40,4 +39,12 @@ class User(db.Model, UserMixin):
     @password.setter
     def password(self, password):
         self.__password = password
+
+
+class IDPublisher(db.Model):
+
+    __tablename__ = 'id_publisher'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
 

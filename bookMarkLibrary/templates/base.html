@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>bookMarkLibrary</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/init.css') }}">
     {% block static%}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+
 </head>
 <body>
 <nav>
@@ -16,7 +19,6 @@
         <div>
             <ul class="list-style-none flex flex-items-center">
                 <li><a class="manu" href="{{ url_for('library.urls') }}">library</a></li>
-                <li><a class="manu" href="{{ url_for('library.input_url') }}">add-library</a></li>
 
             </ul>
         </div>
@@ -53,5 +55,7 @@
 </section>
 {% block modal %}{% endblock %}
 {% block script%}{% endblock %}
+    <script src="{{ url_for('static', filename='dist/js/dist.js') }}"></script>
+
 </body>
 </html>

@@ -1,48 +1,29 @@
+import os
+
 from flask_security import current_user, login_required
 
+from bookMarkLibrary.app import ALLOWED_EXTENSIONS
+from handlers.category_handler import save_category
 from . import bp
-from flask import (current_app as app, render_template, abort, request, redirect, url_for)
+from flask import (current_app as app, render_template, request, g, redirect, url_for)
 from handlers import category_handler
-from handlers.snapshot_handler import SnapShotHandler
-from library.models import SnapShot, Category
-from library import thumbnail
+from library.models import BookMark, Category
 
-
-#dummy json path
-def dummy_path():
-    return app.config['STORAGE_PATH'] + '/test.json'
 
 @login_required
-@bp.route('/url', methods=('GET', 'POST'))
-def input_url():
-    if request.method == "GET":
-#        category = category_handler.fetch_bookmark_elem(current_user)
-        return render_template('library/input_url.html')
-
+@bp.route('/add', methods=['POST'])
+def add_ele():
     if request.method == "POST":
-        if 'url' not in request.form:
-            abort(503)
-        url = request.form['url']
-        parent_id = request.form['parent']
-        snapshot_handler = SnapShotHandler()
-        img_name = snapshot_handler.make_snapshot(url)
-
-        if img_name is not False:
-            bookmark_obj = SnapShot(None, url=url, img=img_name)
-            data = category_handler.fetch_bookmark_elem(current_user)
-            thumbnail.create_or_update(data['thumbnails'], bookmark_obj, parent_id)
-
+        kind = g.kind
+        cat_kind = kind['category']
+        book_mark_kind = kind['book_mark']
+        kind_code = request.form['kind']
+        if kind_code == cat_kind['code']:
+            cat = save_category(current_user, parent_id=request.form['parent_id'], name=request.form['path'])
+        elif kind_code == book_mark_kind['code']:
+            book_mark = BookMark(parent_id=request.form['parent_id'], url=request.form['path'])
+            book_mark.save()
         return redirect(url_for('library.urls'))
-
-
-@bp.route('/category')
-def input_category():
-    if request.method == 'GET':
-        fetch_obj = category_handler.fetch_bookmark_elem(current_user)
-        categorys = __get_category_list(fetch_obj['thumbnails'])
-        return render_template('library/input_category.html', categorys=categorys)
-    if request.method == "POST":
-        pass
 
 
 def __get_category_list(data: Category)->list:
@@ -56,9 +37,27 @@ def __get_category_list(data: Category)->list:
     result = result + sub
     return result
 
+
 @bp.route('/urls')
 @login_required
 def urls():
-    fetch_obj = category_handler.fetch_bookmark_elem(current_user)
-    #data = fetch_obj['thumbnails'].sub
-    return render_template('library/urls.html', thumbnails={})
+    category = category_handler.fetch_sub_category(current_user)
+
+    return render_template('library/urls.html', category=category)
+
+
+@bp.route('/thumbnail', methods=['POST'])
+@login_required
+def change_thumbnail():
+    file = request.files['thumbnail']
+    if file and allowed_file(file.filename):
+        id = request.form['id']
+        bookmark = BookMark.query.get(id)
+        img_name = bookmark.img
+        file.save(os.path.join(app.config['STORAGE_PATH'], img_name))
+        return redirect(url_for('library.urls'))
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
