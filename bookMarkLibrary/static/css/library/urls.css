@@ -14,4 +14,16 @@
   height: 10%;
 }
 
+@media screen and (min-width: 700px) {
+  #addEleModal > div > div {
+    width: 500px;
+  }
+  #addEleModal > div > div input, #addEleModal > div > div select {
+    height: 30px;
+  }
+  #addEleModal > div > div input[type=text] {
+    width: 340px;
+  }
+}
+
 /*# sourceMappingURL=urls.css.map */
