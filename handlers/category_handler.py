@@ -3,7 +3,7 @@ from bookMarkLibrary.models import User
 from library.models import BookMark, Category
 
 
-def fetch_sub_category(user: User, parent_id=0) -> Category:
+def fetch_sub_category(user: User, id=0) -> Category:
     """
         return Category obj :
             if not exists:
@@ -11,9 +11,13 @@ def fetch_sub_category(user: User, parent_id=0) -> Category:
             if exists:
                 return with sub list
     """
-    category = Category.query.filter_by(parent_id=parent_id, user_id=user.id).first()
+    if id == 0 :
+        category = Category.query.filter_by(parent_id=id, user_id=user.id).first()
+
+    else:
+        category = Category.query.filter_by(id=id, user_id=user.id).first()
     if category is None:
-        category = save_category(user, parent_id, 'root')
+        category = save_category(user, id, 'root')
     else:
         sub_category = Category.query.filter_by(parent_id=category.id, user_id=user.id).all()
         snapshots = BookMark.query.filter_by(parent_id=category.id).all()

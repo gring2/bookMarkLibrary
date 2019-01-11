@@ -12,6 +12,19 @@ class HandlerTest(BaseTestCase):
         super().setUp()
         self.user = User(id=0, email='test@test.com')
 
+    def test_fetch_sub_category_do_not_make_root(self):
+        data = fetch_sub_category(self.user)
+        self.assertIsNotNone(data)
+        root = Category.query.count()
+        self.assertEqual(1, root)
+        movie_category = Category(name="Movie", parent_id=data.id, user_id=self.user.id)
+        db.session.add(movie_category)
+        db.session.commit()
+
+        fetch_sub_category(self.user, movie_category.id)
+        two = Category.query.count()
+        self.assertEqual(2, two)
+
     def test_fetch_category_with_sub_list(self):
         data = fetch_sub_category(self.user)
         self.assertIsNotNone(data)
@@ -64,7 +77,10 @@ class HandlerTest(BaseTestCase):
         self.assertTrue(hasattr(root_with_sub_list.sub[1], 'url'))
         self.assertEqual('http://test.com', root_with_sub_list.sub[1].url)
 
-        hero_category_with_snapshots_only = fetch_sub_category(self.user, movie_category.id)
+        movie_category_sub_list = fetch_sub_category(self.user, movie_category.id)
+        self.assertEqual(2, len(movie_category_sub_list.sub))
+
+        hero_category_with_snapshots_only = fetch_sub_category(self.user, hero_movie_category.id)
         self.assertEqual(3, len(hero_category_with_snapshots_only.sub))
         self.assertTrue(type(hero_category_with_snapshots_only.sub[0]) == BookMark)
         self.assertEqual('http://ironman1.com', hero_category_with_snapshots_only.sub[0].url)

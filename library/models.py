@@ -1,4 +1,6 @@
 import json
+from flask import url_for
+
 from bookMarkLibrary.database import db
 from bookMarkLibrary.models import User
 from handlers.snapshot_handler import SnapShotHandler
@@ -18,6 +20,7 @@ class Category(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
+    __sub = []
 
     @property
     def sub(self):
@@ -30,6 +33,13 @@ class Category(db.Model):
         sub_list.sort(key=get_id)
         self.__sub = sub_list
 
+    @property
+    def thumbnail(self):
+        if len(self.sub) < 1:
+            return url_for('static', filename='img/directory_default.png')
+        else:
+            return self.sub[0].thumbnail
+
 
 class BookMark(db.Model):
 
@@ -41,6 +51,14 @@ class BookMark(db.Model):
     parent_id = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
+
+    @property
+    def thumbnail(self):
+        return url_for('storage', filename=self.img)
+
+    @property
+    def name(self):
+        return self.url
 
     def save(self):
         handler = SnapShotHandler()

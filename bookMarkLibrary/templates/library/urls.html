@@ -11,11 +11,25 @@
             <button id="btn">+</button>
         </li>
         {% for elem in category.sub %}
-            <li>
-            {{ elem }}
-{#                <img src="{{url_for('storage', filename=thumbnail['img']) }}" alt="" width="200px" height="200px">#}
-{#                {{ thumbnail['url'] }}#}
-{#            </li>#}
+            <li style="width: 150px; margin-right: 25px"
+                {% if elem.__class__.__name__ == 'BookMark' %}
+                    class="bookmark"
+                    data-id="{{ elem.id }}"
+                {% else %}
+                    class="category"
+                    data-href="{{  url_for('library.urls', id=elem.id) }}"
+                {% endif %}
+
+            >
+            <div style="height: 150px">
+                <img src="{{elem.thumbnail }}" alt="" width="150px" height="150px"
+                >
+
+            </div>
+            <div style="text-align: center">
+                {{ elem.name }}
+            </div>
+            </li>
         {% endfor %}
     </ul>
 </div>
@@ -41,12 +55,34 @@
                     {% endfor %}
 
                 </select>
-            <input type="text" name="path" id="path">
+            <input type="text" name="path" id="path" placeholder="name">
 
             </form>
         </main>
         <footer class="modal__footer">
-            <button class="modal__btn modal__btn-primary">Continue</button>
+            <button class="modal__btn modal__btn-primary" id="submit">Submit</button>
+            <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
+        </footer>
+        </div>
+    </div>
+</div>
+
+<div class="modal micromodal-slide" id="changeThumbnail" aria-hidden="true">
+    <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+            <header class="modal__header">
+                <h2 class="modal__title" id="modal-1-title">Change Thumbnail</h2>
+                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+            </header>
+        <main class="modal__content" id="modal-1-content">
+            <form action="{{ url_for('library.change_thumbnail') }}" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="id" id="change_id">
+                    <input type="file" name="thumbnail" id="thumbnail">
+            </form>
+        </main>
+        <footer class="modal__footer">
+            <button class="modal__btn modal__btn-primary" id="change">Change</button>
             <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
         </footer>
         </div>

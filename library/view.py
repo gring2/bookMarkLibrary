@@ -4,6 +4,7 @@ from flask_security import current_user, login_required
 
 from bookMarkLibrary.app import ALLOWED_EXTENSIONS
 from handlers.category_handler import save_category
+from handlers.snapshot_handler import resize_img
 from . import bp
 from flask import (current_app as app, render_template, request, g, redirect, url_for)
 from handlers import category_handler
@@ -23,7 +24,7 @@ def add_ele():
         elif kind_code == book_mark_kind['code']:
             book_mark = BookMark(parent_id=request.form['parent_id'], url=request.form['path'])
             book_mark.save()
-        return redirect(url_for('library.urls'))
+        return redirect(url_for('library.urls', id=request.form['parent_id']))
 
 
 def __get_category_list(data: Category)->list:
@@ -39,9 +40,11 @@ def __get_category_list(data: Category)->list:
 
 
 @bp.route('/urls')
+@bp.route('/urls/<id>')
+
 @login_required
-def urls():
-    category = category_handler.fetch_sub_category(current_user)
+def urls(id=0):
+    category = category_handler.fetch_sub_category(current_user, id)
 
     return render_template('library/urls.html', category=category)
 
@@ -54,7 +57,10 @@ def change_thumbnail():
         id = request.form['id']
         bookmark = BookMark.query.get(id)
         img_name = bookmark.img
-        file.save(os.path.join(app.config['STORAGE_PATH'], img_name))
+        path = os.path.join(app.config['STORAGE_PATH'], img_name)
+        file.save(path)
+        resize_img(path)
+
         return redirect(url_for('library.urls'))
 
 

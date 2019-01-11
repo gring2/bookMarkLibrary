@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.options import Options
 import re
 import os
 from flask import current_app as app
-
+from PIL import Image
 
 class SnapShotHandler():
     """ class handling snapshot make snapshot logic
@@ -33,7 +33,9 @@ class SnapShotHandler():
             url = self.__get_http_format_url(url)
             self.__driver.get(url)
             file_name = self.__remove_http_protocol_string(url) + '.png'
-            self.__driver.save_screenshot(self.__dir + '/' + file_name)
+            path = self.__dir + '/' + file_name
+            self.__driver.save_screenshot(path)
+            resize_img(path)
 
         except Exception:
             return False
@@ -56,3 +58,10 @@ class SnapShotHandler():
         return re.sub("https?://[www]?", '', url)
 
 
+def resize_img(path)->bool:
+    try:
+        img = Image.open(path)
+        img.resize((150, 150)).save()
+        return True
+    except Exception:
+        return False
