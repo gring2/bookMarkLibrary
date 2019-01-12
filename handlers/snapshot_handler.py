@@ -17,6 +17,7 @@ class SnapShotHandler():
         options = Options()
         options.add_argument('--headless')
         self.__driver = webdriver.Chrome(options=options)
+
         self.__driver.set_window_size(1800, 1200)
         self.__dir = app.config['STORAGE_PATH']
 
@@ -35,11 +36,14 @@ class SnapShotHandler():
             file_name = self.__remove_http_protocol_string(url) + '.png'
             path = self.__dir + '/' + file_name
             self.__driver.save_screenshot(path)
-            resize_img(path)
 
+            resize_img(path)
+            result = file_name
         except Exception:
-            return False
-        return file_name
+            result = False
+        finally:
+            self.__driver.close()
+            return result
 
     def __get_http_format_url(self, url: str)->str:
         """
