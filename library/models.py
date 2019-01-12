@@ -52,6 +52,15 @@ class BookMark(db.Model):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
+    @classmethod
+    def remove_last_slash_from_url(cls, url):
+        last_char = url[-1:]
+
+        if last_char == '/':
+            return url[:-1]
+        else:
+            return url
+
     @property
     def thumbnail(self):
         return url_for('storage', filename=self.img)
@@ -62,7 +71,10 @@ class BookMark(db.Model):
 
     def save(self):
         handler = SnapShotHandler()
-        file_name = handler.make_snapshot(self.url)
+        db.session.add(self)
+        db.session.commit()
+
+        file_name = handler.make_snapshot(self.url, self.id)
         try:
             if file_name is not False:
                 self.img = file_name

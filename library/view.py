@@ -22,7 +22,7 @@ def add_ele():
         if kind_code == cat_kind['code']:
             cat = save_category(current_user, parent_id=request.form['parent_id'], name=request.form['path'])
         elif kind_code == book_mark_kind['code']:
-            book_mark = BookMark(parent_id=request.form['parent_id'], url=request.form['path'])
+            book_mark = BookMark(parent_id=request.form['parent_id'], url=BookMark.remove_last_slash_from_url(request.form['path']))
             book_mark.save()
         return redirect(url_for('library.urls', id=request.form['parent_id']))
 

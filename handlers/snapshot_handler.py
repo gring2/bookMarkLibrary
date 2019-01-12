@@ -24,7 +24,7 @@ class SnapShotHandler():
         if os.path.exists(self.__dir) is not True:
             os.makedirs(self.__dir)
 
-    def make_snapshot(self, url: str)->str or False:
+    def make_snapshot(self, url: str, bookmark_id:str)->str or False:
         """
 
         :param url:
@@ -33,7 +33,7 @@ class SnapShotHandler():
         try:
             url = self.__get_http_format_url(url)
             self.__driver.get(url)
-            file_name = self.__remove_http_protocol_string(url) + '.png'
+            file_name = str(bookmark_id) + '.png'
             path = self.__dir + '/' + file_name
             self.__driver.save_screenshot(path)
 
@@ -43,6 +43,8 @@ class SnapShotHandler():
             result = False
         finally:
             self.__driver.close()
+            self.__driver.quit()
+            self.__driver = None
             return result
 
     def __get_http_format_url(self, url: str)->str:
@@ -54,12 +56,6 @@ class SnapShotHandler():
             url = 'http://' + url
         return url
 
-    def __remove_http_protocol_string(self, url: str)->str:
-        """
-        :param url: url format(http or https may be included or not ) string
-        :return: uri (http[s]:// and www must not included )
-        """
-        return re.sub("https?://[www]?", '', url)
 
 
 def resize_img(path)->bool:

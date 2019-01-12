@@ -25,7 +25,7 @@ kindSelector.addEventListener('change', (e) => {
 const submitEleBtn = document.querySelector('#submit')
 
 submitEleBtn.addEventListener('click', () => {
-    document.querySelector('form').submit()
+    document.querySelector('#addEleForm').submit()
 })
 
 const categoryLis = document.querySelectorAll('.category')
@@ -53,5 +53,5 @@ bookMakrkLis.forEach(function(ele){
 
 const changeEleBtn = document.querySelector('#change')
 changeEleBtn.addEventListener('click', () => {
-    document.querySelector('form').submit()
+    document.querySelector('#changeThumbNailForm').submit()
 })

@@ -44,8 +44,7 @@
                 <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
         <main class="modal__content" id="modal-1-content">
-            <form action="{{ url_for('library.add_ele') }}"
-                  method="POST">
+            <form id="addEleForm"action="{{ url_for('library.add_ele') }}" method="POST">
                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="hidden" name="parent_id" value="{{ category.id }}">
 
@@ -75,7 +74,7 @@
                 <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
         <main class="modal__content" id="modal-1-content">
-            <form action="{{ url_for('library.change_thumbnail') }}" method="POST" enctype="multipart/form-data">
+            <form id="changeThumbNailForm" action="{{ url_for('library.change_thumbnail') }}" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="id" id="change_id">
                     <input type="file" name="thumbnail" id="thumbnail">
