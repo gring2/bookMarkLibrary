@@ -38,7 +38,7 @@ class ShowTestCase(BaseTestCase):
         super().setUp()
 
     def test_show_thumbnails(self):
-        # mocking selenium dependency
+        # mocking selenium dependencya
 
         with mock.patch('handlers.category_handler.fetch_sub_category', return_value=test_library_dict_factory()):
             with self.client:
