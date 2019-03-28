@@ -31,7 +31,7 @@ class AddTestCase(BaseTestCase):
         os.makedirs(app.config['STORAGE_PATH'])
         super().tearDown()
 
-@skip
+skip
 class ShowTestCase(BaseTestCase):
 
     def setUp(self):
