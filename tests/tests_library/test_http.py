@@ -5,11 +5,10 @@ from pathlib import Path
 from bookMarkLibrary.database import db
 from library.models import Category, BookMark
 from tests.base import BaseTestCase
-from unittest import  mock
+from unittest import mock, skip
 from flask import url_for, current_app as app, g
 import os
 import shutil
-
 from tests.data_factory import test_library_dict_factory
 
 
@@ -32,7 +31,7 @@ class AddTestCase(BaseTestCase):
         os.makedirs(app.config['STORAGE_PATH'])
         super().tearDown()
 
-
+@skip
 class ShowTestCase(BaseTestCase):
 
     def setUp(self):
