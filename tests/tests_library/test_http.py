@@ -1,6 +1,7 @@
 import io
 from flask_security import current_user, url_for_security
 from pathlib import Path
+from sqlalchemy import desc
 
 from bookMarkLibrary.database import db
 from library.models import Category, BookMark
@@ -31,7 +32,7 @@ class AddTestCase(BaseTestCase):
         os.makedirs(app.config['STORAGE_PATH'])
         super().tearDown()
 
-@skip
+#@skip
 class ShowTestCase(BaseTestCase):
 
     def setUp(self):
@@ -68,7 +69,7 @@ class ShowTestCase(BaseTestCase):
             self.assertEqual(2, c)
 
     def test_add_bookMark(self):
-        with mock.patch('handlers.snapshot_handler.SnapShotHandler.make_snapshot', return_value='mock_img_name'):
+        with mock.patch('handlers.screenshot_handler.ScreenShotHandler.make_screenshot', return_value='mock_img_name'):
 
             with self.client:
                 res = self.client.post(url_for_security('register'),
@@ -105,6 +106,15 @@ class ShowTestCase(BaseTestCase):
                 sub_bookmark = BookMark.query.filter_by(parent_id=sub_category.id).first()
                 assert sub_bookmark is not None
                 self.assertEqual('mock_img_name', sub_bookmark.img)
+
+                #use og:img as thumbnail
+                data = {'kind': book_mark_kind, 'parent_id': sub_category.id, 'path': 'http://ogp.me/'}
+                res = self.client.post(url_for('library.add_ele'), data=data)
+
+                og_bookmark = BookMark.query.filter_by(parent_id=sub_category.id).order_by(desc(BookMark.id)).first()
+                assert og_bookmark is not None
+                self.assertEqual('http://ogp.me/logo.png', og_bookmark.img)
+
 
     def test_change_thumbnail(self):
         file = (io.BytesIO(b"abcdef"), 'test.jpg')

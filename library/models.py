@@ -1,9 +1,8 @@
-import json
-from flask import url_for
-
+import os
+from flask import url_for, current_app as app
 from bookMarkLibrary.database import db
-from bookMarkLibrary.models import User
-from handlers.snapshot_handler import SnapShotHandler
+from handlers.thumbnail_handler import create_thumbnail
+import traceback
 
 
 class Category(db.Model):
@@ -63,19 +62,23 @@ class BookMark(db.Model):
 
     @property
     def thumbnail(self):
-        return url_for('storage', filename=self.img)
 
+        if os.path.exists(app.config['STORAGE_PATH'] + '/' + self.img) is True:
+            return url_for('storage', filename=self.img)
+
+        return self.img
     @property
     def name(self):
         return self.url
 
     def save(self):
-        handler = SnapShotHandler()
-        db.session.add(self)
-        db.session.commit()
 
-        file_name = handler.make_snapshot(self.url, self.id)
         try:
+            db.session.add(self)
+            db.session.commit()
+
+            file_name = create_thumbnail(self.url, self.id)
+
             if file_name is not False:
                 self.img = file_name
                 db.session.add(self)
@@ -86,5 +89,6 @@ class BookMark(db.Model):
                 raise Exception
 
         except Exception:
+            print(traceback.format_exc())
             db.session.rollback()
             return False

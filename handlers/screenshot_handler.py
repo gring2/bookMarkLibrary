@@ -1,11 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import re
 import os
 from flask import current_app as app
 from PIL import Image
 
-class SnapShotHandler():
+
+class ScreenShotHandler():
     """ class handling snapshot make snapshot logic
     Attributes:
         __driver (str): chrome webdriver dependency
@@ -24,14 +24,13 @@ class SnapShotHandler():
         if os.path.exists(self.__dir) is not True:
             os.makedirs(self.__dir)
 
-    def make_snapshot(self, url: str, bookmark_id:str)->str or False:
+    def make_screenshot(self, url: str, bookmark_id:str)-> str or False:
         """
 
         :param url:
         :return file_name: name of stored snapshot png file
         """
         try:
-            url = self.__get_http_format_url(url)
             self.__driver.get(url)
             file_name = str(bookmark_id) + '.png'
             path = self.__dir + '/' + file_name
@@ -46,15 +45,6 @@ class SnapShotHandler():
             self.__driver.quit()
             self.__driver = None
             return result
-
-    def __get_http_format_url(self, url: str)->str:
-        """
-        :param url: url format(http or https may be included or not ) string
-        :return: full formatted url(http[s]://[www]uri) string
-        """
-        if not ('http://' in url or 'https://' in url):
-            url = 'http://' + url
-        return url
 
 
 
