@@ -2,14 +2,13 @@ import os
 
 from flask_security import current_user, login_required
 
-from bookMarkLibrary.app import ALLOWED_EXTENSIONS
 from handlers.category_handler import save_category
 from handlers.screenshot_handler import resize_img
 from . import bp
 from flask import (current_app as app, render_template, request, g, redirect, url_for)
 from handlers import category_handler
 from library.models import BookMark, Category
-
+from bookMarkLibrary.const import ALLOWED_EXTENSIONS
 
 @login_required
 @bp.route('/add', methods=['POST'])
@@ -44,7 +43,6 @@ def __get_category_list(data: Category)->list:
 
 @bp.route('/urls')
 @bp.route('/urls/<id>')
-
 @login_required
 def urls(id=0):
     category = category_handler.fetch_sub_category(current_user, id)

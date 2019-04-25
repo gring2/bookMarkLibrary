@@ -1,13 +1,12 @@
-import bookMarkLibrary.app
 from bookMarkLibrary.database import db
 from flask_testing import TestCase
 import os
-from bookMarkLibrary.app import app as base_app
+import bookMarkLibrary.app as base_app
 
 
-app = bookMarkLibrary.app.create_app({
+app = base_app.create_app({
             'WTF_CSRF_ENABLED': False,
-            "SQLALCHEMY_DATABASE_URI" : 'sqlite:////' + os.path.join(base_app.instance_path, 'bookmark_test.sqlite'),
+            "SQLALCHEMY_DATABASE_URI" : 'sqlite:////' + os.path.join(base_app.ROOT_DIR, '../instance/bookmark_test.sqlite'),
             "SQLALCHEMY_TRACK_MODIFICATIONS" : False,
 
 })

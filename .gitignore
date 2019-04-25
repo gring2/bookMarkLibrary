@@ -4,6 +4,8 @@ venv
 instance
 */*/__pycache__
 node_modules
-/bookMarkLibrary/static/dist/js/dist.js
-/bookMarkLibrary/static/css/library/urls.css.map
-/bookMarkLibrary/static/css/library/urls.css
+/static/dist/js/dist.js
+/static/css/library/urls.css.map
+/static/css/library/urls.css
+/log
+mysql

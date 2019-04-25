@@ -1,7 +1,7 @@
 import os
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template, send_from_directory, g
 from flask_security import Security, SQLAlchemyUserDatastore
-from bookMarkLibrary.models import User
+from models import User
 from bookMarkLibrary.send_storage_file import SendStorageFileHandler
 from flask_wtf.csrf import CSRFProtect
 from bookMarkLibrary.database import init_db, db, set_db_config
@@ -9,13 +9,17 @@ from bookMarkLibrary.const import register_const
 
 send_storage_handler = SendStorageFileHandler()
 csrf = CSRFProtect()
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
-app: Flask = Flask(__name__, instance_relative_config=True)
 user_datastore = SQLAlchemyUserDatastore(db, User, None)
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def create_app(test_config=None):
     # create and configure the app
+    __setup_logging()
+#    logging.basicConfig(filename=ROOT_DIR + '/../log/error.log')
+
+    app: Flask = Flask(__name__, instance_relative_config=True)
+
     csrf.init_app(app)
     app.config.from_mapping(
         SECRET_KEY='dev',
@@ -40,8 +44,8 @@ def create_app(test_config=None):
     init_db(app)
 
     try:
-        graceful_create_dir(app.instance_path)
-        graceful_create_dir(app.config['STORAGE_PATH'])
+        __graceful_create_dir(app.instance_path)
+        __graceful_create_dir(app.config['STORAGE_PATH'])
     except OSError:
         pass
 
@@ -49,10 +53,14 @@ def create_app(test_config=None):
     def register_g_value():
         register_const()
 
+    # a simple page that says hello
+    @app.route('/hello')
+    def hello():
+        return 'Hello, World!'
+
     @app.route('/')
     def home():
         return render_template('index.html')
-
     import library
     app.register_blueprint(library.bp)
 
@@ -67,10 +75,28 @@ def create_app(test_config=None):
     security = Security(app, user_datastore)
 
 
+#    @app.errorhandler(Exception):
     return app
 
 
-def graceful_create_dir(path):
+def __setup_logging():
+    import logging.config, yaml
+
+    config = yaml.safe_load(open(ROOT_DIR+'/logging.conf'))
+
+    def __set_root_path_to_filename(handlers):
+        for k , handler in handlers.items():
+            if 'filename' in handler:
+                handler['filename'] = handler['filename'].replace('$ROOT_PATH', ROOT_DIR + '/..')
+                handlers[k] = handler
+
+    __set_root_path_to_filename(config['handlers'])
+
+    logging.config.dictConfig(config)
+
+
+
+def __graceful_create_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 

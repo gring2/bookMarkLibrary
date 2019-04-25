@@ -1,5 +1,5 @@
 from bookMarkLibrary.database import db
-from bookMarkLibrary.models import User
+from models import User
 from library.models import BookMark, Category
 
 

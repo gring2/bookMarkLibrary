@@ -1,10 +1,7 @@
-
-from flask import url_for
-
 from bookMarkLibrary.database import db
-from bookMarkLibrary.models import User
+from models import User
 from tests.base import BaseTestCase
-from flask_security import login_user, current_user, AnonymousUser, url_for_security
+from flask_security import login_user, current_user, url_for_security
 
 
 class AuthTest(BaseTestCase):

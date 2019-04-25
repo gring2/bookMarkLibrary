@@ -1,0 +1,8 @@
+version: "2"
+services:
+  database:
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    volumes:
+      - $PWD/mysql:/var/lib/mysql

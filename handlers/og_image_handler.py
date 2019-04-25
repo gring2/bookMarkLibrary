@@ -2,17 +2,16 @@ from bs4 import BeautifulSoup
 import requests
 import traceback
 
+
 class OgImageHandler():
 
-    def __init__(self, url:str):
-        self._url = url
+    def __init__(self, response:requests.Response):
+        self._response = response
         self._og = None
 
     def has_og_image_meta(self):
         try:
-            response = requests.get(self._url)
-            if response.status_code > 300:
-                return False
+            response = self._response
 
             soup = BeautifulSoup(response.text, 'html.parser')
             og = soup.find('meta', {'property': 'og:image'})
@@ -27,5 +26,5 @@ class OgImageHandler():
             print(traceback.extract_stack())
             return False
 
-    def get_og_url(self):
+    def get_url(self):
         return self._og['content']

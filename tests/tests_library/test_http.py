@@ -11,9 +11,17 @@ from flask import url_for, current_app as app, g
 import os
 import shutil
 from tests.data_factory import test_library_dict_factory
+import logging
 
 
 class AddTestCase(BaseTestCase):
+    def test_logger(self):
+        logging.debug('debug')
+        logging.error(Exception('error'))
+        logging.warning(Exception('critical'))
+        logging.critical(Warning('warning'))
+        logging.info('info')
+        self.assertTrue(True)
 
     def test_get_add_page(self):
         with self.client:
@@ -141,3 +149,4 @@ class ShowTestCase(BaseTestCase):
         shutil.rmtree(app.config['STORAGE_PATH'])
         os.makedirs(app.config['STORAGE_PATH'])
         super().tearDown()
+

@@ -26,9 +26,12 @@ MarkupSafe==1.1.0
 passlib==1.7.1
 Pillow==5.4.1
 pycparser==2.19
+PyMySQL==0.9.3
 python-dateutil==2.7.5
+python-dotenv==0.10.1
 python-editor==1.0.3
 pytz==2018.7
+PyYAML==5.1
 requests==2.21.0
 selenium==3.141.0
 six==1.11.0
@@ -36,5 +39,6 @@ speaklater==1.3
 SQLAlchemy==1.2.14
 unittest-xml-reporting==2.5.1
 urllib3==1.24.1
+uWSGI==2.0.18
 Werkzeug==0.14.1
 WTForms==2.2.1

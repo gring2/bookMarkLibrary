@@ -1,7 +1,7 @@
 from time import sleep
 
 from bookMarkLibrary.database import db
-from bookMarkLibrary.models import User
+from models import User
 from library.models import Category, BookMark
 from tests.base import BaseTestCase
 from handlers.category_handler import fetch_sub_category
@@ -93,5 +93,3 @@ class HandlerTest(BaseTestCase):
 
     def tearDown(self):
         super().tearDown()
-
-

@@ -45,9 +45,9 @@ class BookMark(db.Model):
     __tablename__ = "bookmarks"
 
     id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(255))
+    url = db.Column(db.String(255), nullable=False)
     img = db.Column(db.String(255))
-    parent_id = db.Column(db.Integer)
+    parent_id = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
 
@@ -77,7 +77,7 @@ class BookMark(db.Model):
             db.session.add(self)
             db.session.commit()
 
-            file_name = create_thumbnail(self.url, self.id)
+            file_name = create_thumbnail(self.url)
 
             if file_name is not False:
                 self.img = file_name
