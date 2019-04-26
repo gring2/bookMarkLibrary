@@ -44,7 +44,7 @@ class HandlerTest(BaseTestCase):
         db.session.add(movie_category)
         db.session.commit()
         sleep(1)
-        first_snapshot = BookMark( url='http://test.com', img='test.com.png', parent_id=data.id)
+        first_snapshot = BookMark(url='http://test.com', img='test.com.png', parent_id=data.id)
 
         hero_movie_category = Category(name="Hero", parent_id=movie_category.id, user_id=self.user.id)
         documentary_movie_category = Category(name="Documentary", parent_id=movie_category.id, user_id=self.user.id)
@@ -54,7 +54,8 @@ class HandlerTest(BaseTestCase):
                 hero_movie_category,
                 documentary_movie_category,
             ]
-            )
+        )
+
         db.session.commit()
         hero_movie_category = Category.query.filter_by(name="Hero", user_id=self.user.id).first()
         ironman_1 = BookMark(url='http://ironman1.com', img='ironman1.com.png', parent_id=hero_movie_category.id)
@@ -67,7 +68,8 @@ class HandlerTest(BaseTestCase):
                 ironman_2,
                 ironman_3
             ]
-            )
+        )
+
         db.session.commit()
         root_with_sub_list = fetch_sub_category(self.user)
         self.assertEqual(2, len(root_with_sub_list.sub))

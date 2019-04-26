@@ -7,7 +7,7 @@ import traceback
 
 class Category(db.Model):
     """
-        :private property __sub: list to insert child_elements 
+        :private property __sub: list to insert child_elements
         :property sub: list @read_only property to represent children
 
     """
@@ -18,12 +18,13 @@ class Category(db.Model):
     parent_id = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
-    updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(),
+                           server_onupdate=db.func.now())
     __sub = []
 
     @property
     def sub(self):
-        return self.__sub    
+        return self.__sub
 
     @sub.setter
     def sub(self, sub_list: list):
@@ -49,7 +50,8 @@ class BookMark(db.Model):
     img = db.Column(db.String(255))
     parent_id = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
-    updated_at = db.Column(db.DateTime, server_default=db.func.now(), server_onupdate=db.func.now())
+    updated_at = db.Column(db.DateTime, server_default=db.func.now(),
+                           server_onupdate=db.func.now())
 
     @classmethod
     def remove_last_slash_from_url(cls, url):
@@ -67,6 +69,7 @@ class BookMark(db.Model):
             return url_for('storage', filename=self.img)
 
         return self.img
+
     @property
     def name(self):
         return self.url

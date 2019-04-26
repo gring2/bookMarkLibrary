@@ -14,7 +14,7 @@ def set_db_config(app):
         })
 
     app.config.from_mapping(
-        SQLALCHEMY_DATABASE_URI= SQLALCHEMY_DATABASE_URI,
+        SQLALCHEMY_DATABASE_URI=SQLALCHEMY_DATABASE_URI,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
 
@@ -27,4 +27,3 @@ def init_db(app):
 
     db.init_app(app)
     Migrate(app, db)
-

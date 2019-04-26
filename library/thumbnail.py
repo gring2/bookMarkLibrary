@@ -5,7 +5,8 @@ maybe not used any more
 """
 
 
-def create_or_update(category: Category, bookmark_obj: BookMark, parent_id: str):
+def create_or_update(category: Category, bookmark_obj: BookMark,
+                     parent_id: str):
     if type(category) is Category:
         category = __find_parent(category, parent_id)
     else:
@@ -26,4 +27,3 @@ def __find_parent(category: Category, parent_id: str)->Category or None:
 
     else:
         return None
-
