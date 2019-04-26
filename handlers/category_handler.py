@@ -11,7 +11,7 @@ def fetch_sub_category(user: User, id=0) -> Category:
             if exists:
                 return with sub list
     """
-    if id == 0 :
+    if id == 0:
         category = Category.query.filter_by(parent_id=id, user_id=user.id).first()
 
     else:
@@ -28,7 +28,7 @@ def fetch_sub_category(user: User, id=0) -> Category:
 
 def save_category(user: User, parent_id: int, name: str):
     try:
-        category = Category( name=name, parent_id=parent_id, user_id=user.id)
+        category = Category(name=name, parent_id=parent_id, user_id=user.id)
         db.session.add(category)
         db.session.commit()
         return category
