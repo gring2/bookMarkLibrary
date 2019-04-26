@@ -7,5 +7,7 @@ node_modules
 /static/dist/js/dist.js
 /static/css/library/urls.css.map
 /static/css/library/urls.css
-/log
+/log/info/*
+/log/warning/*
+
 mysql
