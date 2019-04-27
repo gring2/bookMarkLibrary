@@ -10,6 +10,7 @@ from handlers import category_handler
 from library.models import BookMark, Category
 from bookMarkLibrary.const import ALLOWED_EXTENSIONS
 
+
 @login_required
 @bp.route('/add', methods=['POST'])
 def add_ele():

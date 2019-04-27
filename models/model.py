@@ -46,5 +46,3 @@ class IDPublisher(db.Model):
     __tablename__ = 'id_publisher'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-
-

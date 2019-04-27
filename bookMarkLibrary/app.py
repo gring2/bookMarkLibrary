@@ -16,16 +16,16 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 def create_app(test_config=None):
     # create and configure the app
     __setup_logging()
-#    logging.basicConfig(filename=ROOT_DIR + '/../log/error.log')
+    # logging.basicConfig(filename=ROOT_DIR + '/../log/error.log')
 
-    app: Flask = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True)
 
     csrf.init_app(app)
     app.config.from_mapping(
         SECRET_KEY='dev',
         STORAGE_PATH=app.root_path + '/storage',
         SECURITY_REGISTERABLE=True,
-        SECURITY_SEND_REGISTER_EMAIL= False
+        SECURITY_SEND_REGISTER_EMAIL=False
     )
     # flask-security configuration mapping
     app.config.from_mapping(
@@ -80,12 +80,13 @@ def create_app(test_config=None):
 
 
 def __setup_logging():
-    import logging.config, yaml
+    import logging.config
+    import yaml
 
-    config = yaml.safe_load(open(ROOT_DIR+'/logging.conf'))
+    config = yaml.safe_load(open(ROOT_DIR + '/logging.conf'))
 
     def __set_root_path_to_filename(handlers):
-        for k , handler in handlers.items():
+        for k, handler in handlers.items():
             if 'filename' in handler:
                 handler['filename'] = handler['filename'].replace('$ROOT_PATH', ROOT_DIR + '/..')
                 handlers[k] = handler
@@ -95,10 +96,6 @@ def __setup_logging():
     logging.config.dictConfig(config)
 
 
-
 def __graceful_create_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
-
-
-

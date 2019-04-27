@@ -1,10 +1,9 @@
-from handlers.og_image_handler import OgImageHandler
-from handlers.favicon_handler import FaviconHandler
+from handlers.image_handler import FaviconHandler, OgImageHandler
 from urllib.parse import urlparse
 import requests
 
 
-def create_thumbnail(url:str)->str or None:
+def create_thumbnail(url: str)->str or None:
     url = get_http_format_url(url)
     response = requests.get(url)
     thumbnail_path = None
@@ -18,7 +17,7 @@ def create_thumbnail(url:str)->str or None:
     if og_handler.has_og_image_meta():
         thumbnail_path = og_handler.get_url()
 
-    elif favicon_handler.has_favicon_image_meta() or favicon_handler.has_image_meta_tag_in_header():
+    elif favicon_handler.has_favicon_image_link_tag() or favicon_handler.has_image_meta_tag():
         thumbnail_path = favicon_handler.get_url()
 
     if thumbnail_path is not None and is_subpath(thumbnail_path):
@@ -42,5 +41,5 @@ def is_subpath(url: str)->bool:
 
 
 def get_host(url: str)->str:
-    parsed_url =  urlparse(url, '/')
+    parsed_url = urlparse(url, '/')
     return '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_url)

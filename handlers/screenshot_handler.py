@@ -24,7 +24,7 @@ class ScreenShotHandler():
         if os.path.exists(self.__dir) is not True:
             os.makedirs(self.__dir)
 
-    def make_screenshot(self, url: str, bookmark_id:str)-> str or False:
+    def make_screenshot(self, url: str, bookmark_id: str)-> str or False:
         """
 
         :param url:
@@ -45,7 +45,6 @@ class ScreenShotHandler():
             self.__driver.quit()
             self.__driver = None
             return result
-
 
 
 def resize_img(path)->bool:

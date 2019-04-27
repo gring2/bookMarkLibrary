@@ -6,3 +6,5 @@ services:
       - 3306:3306
     volumes:
       - $PWD/mysql:/var/lib/mysql
+    env_file:
+      - ./.env

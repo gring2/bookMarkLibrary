@@ -5,9 +5,11 @@ from models import User
 from library.models import Category, BookMark
 from tests.base import BaseTestCase
 from handlers.category_handler import fetch_sub_category
+from handlers.image_handler import OgImageHandler, FaviconHandler
+from unittest import mock
 
 
-class HandlerTest(BaseTestCase):
+class CategoryHandlerTest(BaseTestCase):
     def setUp(self):
         super().setUp()
         self.user = User(id=0, email='test@test.com')
@@ -44,7 +46,7 @@ class HandlerTest(BaseTestCase):
         db.session.add(movie_category)
         db.session.commit()
         sleep(1)
-        first_snapshot = BookMark( url='http://test.com', img='test.com.png', parent_id=data.id)
+        first_snapshot = BookMark(url='http://test.com', img='test.com.png', parent_id=data.id)
 
         hero_movie_category = Category(name="Hero", parent_id=movie_category.id, user_id=self.user.id)
         documentary_movie_category = Category(name="Documentary", parent_id=movie_category.id, user_id=self.user.id)
@@ -54,7 +56,8 @@ class HandlerTest(BaseTestCase):
                 hero_movie_category,
                 documentary_movie_category,
             ]
-            )
+        )
+
         db.session.commit()
         hero_movie_category = Category.query.filter_by(name="Hero", user_id=self.user.id).first()
         ironman_1 = BookMark(url='http://ironman1.com', img='ironman1.com.png', parent_id=hero_movie_category.id)
@@ -67,7 +70,8 @@ class HandlerTest(BaseTestCase):
                 ironman_2,
                 ironman_3
             ]
-            )
+        )
+
         db.session.commit()
         root_with_sub_list = fetch_sub_category(self.user)
         self.assertEqual(2, len(root_with_sub_list.sub))
@@ -93,3 +97,281 @@ class HandlerTest(BaseTestCase):
 
     def tearDown(self):
         super().tearDown()
+
+
+class OGHandlerTest(BaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.mock_res = mock.patch('requests.Response')    
+
+    def test_has_og_image_meta(self):
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta property="og:image" content="testmeta"/>
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+
+        handler = OgImageHandler(self.mock_res)
+
+        result = handler.has_og_image_meta()
+        self.assertTrue(result)
+
+    def test_has_no_og_image_meta(self):
+        # meta tag does not exist
+        self.mock_res.text = """
+            <html>
+                <head>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = OgImageHandler(self.mock_res)
+        result = handler.has_og_image_meta()
+        self.assertFalse(result)
+
+        # meta:porperty does not exist
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta charset="utf8" content="testmeta"/>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = OgImageHandler(self.mock_res)
+        result = handler.has_og_image_meta()
+        self.assertFalse(result)
+
+        # meta:porperty's value is not og:image
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta property="utf8" content="testmeta"/>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = OgImageHandler(self.mock_res)
+        result = handler.has_og_image_meta()
+        self.assertFalse(result)
+
+        # meta has property attribute but does not have content attribute
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta property="og:image" />
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = OgImageHandler(self.mock_res)
+        result = handler.has_og_image_meta()
+        self.assertFalse(result)
+
+        # meta content attribute has not value
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta property="og:image" content=""/>
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = OgImageHandler(self.mock_res)
+        result = handler.has_og_image_meta()
+        self.assertFalse(result)
+
+
+class FaviconHandlerTest(BaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.mock_res = mock.patch('requests.Response')
+
+    def test_has_favicon_image_link_tag(self):
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <link rel="icon" href="test.com"/>
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+
+        result = handler.has_favicon_image_link_tag()
+        self.assertTrue(result)
+
+    def test_has_no_favicon_link_tag(self):
+        # link tag does not exist
+        self.mock_res.text = """
+            <html>
+                <head>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_favicon_image_link_tag()
+        self.assertFalse(result)
+
+        # link:rel does not exist
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <link test="test"/>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_favicon_image_link_tag()
+        self.assertFalse(result)
+
+        # link:ref's value is not icon
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <link rel="stylesheet" href="test.icon"/>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_favicon_image_link_tag()
+        self.assertFalse(result)
+
+        # link has rel attribute but does not have href attribute
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <link rel="icon" />
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_favicon_image_link_tag()
+        self.assertFalse(result)
+
+        # link href attribute has not value
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <link rel="icon" href=""/>
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_favicon_image_link_tag()
+        self.assertFalse(result)
+
+    def test_has_itemprop_meta_tag(self):
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta itemprop="image" content="testmeta"/>
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_image_meta_tag()
+        self.assertTrue(result)
+
+    def test_has_no_itemprop_meta_tag(self):
+        # meta tag does not exist
+        self.mock_res.text = """
+            <html>
+                <head>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_image_meta_tag()
+        self.assertFalse(result)
+
+        # meta:itemprop does not exist
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta charset="utf8" content="testmeta"/>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_image_meta_tag()
+        self.assertFalse(result)
+
+        # meta:itemprop's value is not image
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta itemprop="test" content="testmeta.icon"/>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_image_meta_tag()
+        self.assertFalse(result)
+
+        # meta has itemprop attribute but does not have content attribute
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta itemprop="image"/>
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_image_meta_tag()
+        self.assertFalse(result)
+
+        # meta content attribute has not value
+        self.mock_res.text = """
+            <html>
+                <head>
+                    <meta itemprop="image" content=""/>
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        handler = FaviconHandler(self.mock_res)
+        result = handler.has_image_meta_tag()
+        self.assertFalse(result)
