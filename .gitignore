@@ -9,5 +9,5 @@ node_modules
 /static/css/library/urls.css
 /log/info/*
 /log/warning/*
-
+.env
 mysql

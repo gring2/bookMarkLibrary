@@ -1,0 +1,13 @@
+node_modules
+venv
+mysql
+ghostdriver.log
+yarn.lock
+README.md
+tox.ini
+.gitignore
+.dockerignore
+.idea
+docker-compose.yaml
+Dockerfile
+Dockerfile
