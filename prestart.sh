@@ -3,4 +3,4 @@
 # Let the DB start
 sleep 10;
 # Run migrations
-alembic upgrade head
+FLASK_APP=$PWD/bookMarkLibrary/run.py flask db upgrade
