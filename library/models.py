@@ -18,8 +18,10 @@ class Category(db.Model):
     parent_id = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+
     updated_at = db.Column(db.DateTime, server_default=db.func.now(),
                            server_onupdate=db.func.now())
+    deleted_at = db.Column(db.DateTime)
     __sub = []
 
     @property
