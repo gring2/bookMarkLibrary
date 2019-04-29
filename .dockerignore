@@ -9,5 +9,5 @@ tox.ini
 .dockerignore
 .idea
 docker-compose.yaml
-Dockerfile
 Dockerfile.pro
+Dockerfile
