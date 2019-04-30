@@ -1,5 +1,20 @@
 version: "2"
 services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.pro
+    tty: true
+    ports:
+      - "80:80"
+    depends_on:
+      - database
+    networks:
+      - the_net
+    volumes:
+      - $HOME/DOCKERHOME:/app/bookMarkLibrary/storage
+    environment:
+      - DB_HOST=database
   database:
     image: mysql:latest
     ports:
@@ -8,3 +23,9 @@ services:
       - $PWD/mysql:/var/lib/mysql
     env_file:
       - ./.env
+    networks:
+      - the_net
+
+
+networks:
+  the_net:
