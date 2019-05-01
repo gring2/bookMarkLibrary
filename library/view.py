@@ -8,7 +8,6 @@ from . import bp
 from flask import (current_app as app, render_template, request, g, redirect, url_for)
 from handlers import category_handler
 from library.models import BookMark, Category
-from bookMarkLibrary.const import ALLOWED_EXTENSIONS
 
 
 @login_required
@@ -20,7 +19,7 @@ def add_ele():
         book_mark_kind = kind['book_mark']
         kind_code = request.form['kind']
         if kind_code == cat_kind['code']:
-            cat = save_category(current_user, parent_id=request.form['parent_id'], name=request.form['path'])
+            save_category(current_user, parent_id=request.form['parent_id'], name=request.form['path'])
 
         elif kind_code == book_mark_kind['code']:
 
@@ -55,17 +54,10 @@ def urls(id=0):
 @login_required
 def change_thumbnail():
     file = request.files['thumbnail']
-    if file and allowed_file(file.filename):
-        id = request.form['id']
-        bookmark = BookMark.query.get(id)
-        img_name = bookmark.img
-        path = os.path.join(app.config['STORAGE_PATH'], img_name)
-        file.save(path)
-        resize_img(path)
+    id = request.form['id']
 
-        return redirect(url_for('library.urls'))
+    bookmark = BookMark.query.get(id)
 
+    bookmark.change_thumbnail(file)
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return redirect(url_for('library.urls'))

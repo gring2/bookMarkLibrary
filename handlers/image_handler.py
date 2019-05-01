@@ -73,4 +73,4 @@ class FaviconHandler():
 
     def get_url(self)->str:
 
-        return self._favicon['content']
+        return self._node['content']

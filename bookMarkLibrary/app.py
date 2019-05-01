@@ -24,13 +24,12 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         STORAGE_PATH=app.root_path + '/storage',
-        SECURITY_REGISTERABLE=True,
-        SECURITY_SEND_REGISTER_EMAIL=False
     )
     # flask-security configuration mapping
     app.config.from_mapping(
         SECURITY_REGISTERABLE=True,
-        SECURITY_SEND_REGISTER_EMAIL=False
+        SECURITY_SEND_REGISTER_EMAIL=False,
+        SECURITY_TOKEN_MAX_AGE=1
     )
 
     if test_config is None:
@@ -74,8 +73,7 @@ def create_app(test_config=None):
     # Setup Flask-Security
     security = Security(app, user_datastore)
 
-
-#    @app.errorhandler(Exception):
+    # app.config['WTF_CSRF_ENABLED'] = False
     return app
 
 

@@ -1,8 +1,14 @@
+from __future__ import annotations
 import os
+import traceback
+import time
+import logging
 from flask import url_for, current_app as app
 from bookMarkLibrary.database import db
 from handlers.thumbnail_handler import create_thumbnail
-import traceback
+from bookMarkLibrary.const import ALLOWED_EXTENSIONS
+from handlers.screenshot_handler import resize_img
+
 
 
 class Category(db.Model):
@@ -80,7 +86,6 @@ class BookMark(db.Model):
 
         try:
             db.session.add(self)
-            db.session.commit()
 
             file_name = create_thumbnail(self.url)
 
@@ -94,6 +99,30 @@ class BookMark(db.Model):
                 raise Exception
 
         except Exception:
-            print(traceback.format_exc())
+            logging.error(traceback.format_exc())
             db.session.rollback()
             return False
+
+    def change_thumbnail(self, file):
+        if file and self.__allowed_file(file.filename):
+            ts = time.time()
+            img_name = str(int(ts)) + file.filename
+            path = os.path.join(app.config['STORAGE_PATH'], img_name)
+            file.save(path)
+            resize_img(path)
+
+            try:
+
+                self.img = img_name
+
+                db.session.add(self)
+                db.session.commit()
+
+            except Exception:
+                os.remove(path)
+                db.session.rollback()
+
+    def __allowed_file(self, filename):
+        return '.' in filename and \
+               filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
