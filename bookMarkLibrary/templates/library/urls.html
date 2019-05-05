@@ -15,6 +15,7 @@
                 {% if elem.__class__.__name__ == 'BookMark' %}
                     class="bookmark"
                     data-id="{{ elem.id }}"
+                    data-url="{{ elem.url }}"
                 {% else %}
                     class="category"
                     data-href="{{  url_for('library.urls', id=elem.id) }}"

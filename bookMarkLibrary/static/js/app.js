@@ -39,7 +39,7 @@ categoryLis.forEach(function(ele){
 
 const bookMakrkLis = document.querySelectorAll('.bookmark')
 bookMakrkLis.forEach(function(ele){
-    ele.addEventListener('click', function () {
+    ele.addEventListener('contextmenu', function () {
         const changeIdHidden = document.querySelector('#changeThumbnail #change_id')
         changeIdHidden.value = this.dataset.id
 
@@ -48,7 +48,11 @@ bookMakrkLis.forEach(function(ele){
         MicroModal.show('changeThumbnail');
 
     })
-
+    ele.addEventListener('click', function(){
+        const url = this.dataset.url
+        const child = window.open(url, '_blank');
+        child.focus()
+    })
 })
 
 const changeEleBtn = document.querySelector('#change')

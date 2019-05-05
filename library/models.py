@@ -5,7 +5,7 @@ import time
 import logging
 from flask import url_for, current_app as app
 from bookMarkLibrary.database import db
-from handlers.thumbnail_handler import create_thumbnail
+from handlers.thumbnail_handler import create_thumbnail, get_http_format_url
 from bookMarkLibrary.const import ALLOWED_EXTENSIONS
 from handlers.screenshot_handler import resize_img
 
@@ -54,7 +54,7 @@ class BookMark(db.Model):
     __tablename__ = "bookmarks"
 
     id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(255), nullable=False)
+    _url = db.Column(db.String(255), nullable=False)
     img = db.Column(db.String(255))
     parent_id = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
@@ -81,6 +81,14 @@ class BookMark(db.Model):
     @property
     def name(self):
         return self.url
+
+    @property
+    def url(self):
+        return get_http_format_url(self._url)
+
+    @url.setter
+    def url(self, url):
+        self._url = url
 
     def save(self):
 
