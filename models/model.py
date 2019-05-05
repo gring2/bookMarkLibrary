@@ -40,9 +40,3 @@ class User(db.Model, UserMixin):
     def password(self, password):
         self.__password = password
 
-
-class IDPublisher(db.Model):
-
-    __tablename__ = 'id_publisher'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
