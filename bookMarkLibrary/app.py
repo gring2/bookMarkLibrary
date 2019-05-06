@@ -1,11 +1,15 @@
 import os
+import traceback
+
 from flask import Flask, render_template, send_from_directory, g
 from flask_security import Security, SQLAlchemyUserDatastore
+
 from models import User
 from bookMarkLibrary.send_storage_file import SendStorageFileHandler
 from flask_wtf.csrf import CSRFProtect
 from bookMarkLibrary.database import init_db, db, set_db_config
 from bookMarkLibrary.const import register_const
+import logging
 
 send_storage_handler = SendStorageFileHandler()
 csrf = CSRFProtect()
@@ -74,6 +78,10 @@ def create_app(test_config=None):
     security = Security(app, user_datastore)
 
     # app.config['WTF_CSRF_ENABLED'] = False
+    @app.errorhandler(Exception)
+    def handle_http_exception(e):
+        logging.error(traceback.format_exc())
+        return e
     return app
 
 
