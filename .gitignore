@@ -7,3 +7,5 @@ node_modules
 
 .env
 mysql
+log/info/*
+log/warning/*
