@@ -5,6 +5,7 @@ import time
 import logging
 from flask import url_for, current_app as app
 from bookMarkLibrary.database import db
+from bookMarkLibrary.exceptions import InvalidURLException
 from handlers.thumbnail_handler import create_thumbnail, get_http_format_url
 from bookMarkLibrary.const import ALLOWED_EXTENSIONS
 from handlers.screenshot_handler import resize_img
@@ -97,14 +98,14 @@ class BookMark(db.Model):
 
             file_name = create_thumbnail(self.url)
 
-            if file_name is not False:
+            if file_name is not None:
                 self.img = file_name
                 db.session.add(self)
                 db.session.commit()
                 return self
 
             else:
-                raise Exception
+                raise InvalidURLException('url is not valid')
 
         except Exception:
             logging.error(traceback.format_exc())

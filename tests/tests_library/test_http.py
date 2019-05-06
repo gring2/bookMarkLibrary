@@ -4,6 +4,7 @@ from pathlib import Path
 from sqlalchemy import desc
 
 from bookMarkLibrary.database import db
+from bookMarkLibrary.exceptions import InvalidURLException
 from library.models import Category, BookMark
 from tests.base import BaseTestCase
 from unittest import mock, skip
@@ -147,6 +148,28 @@ class ShowTestCase(BaseTestCase):
 
             path = Path(app.config['STORAGE_PATH'] +'/' +bookmark.img)
             self.assertTrue(path.is_file())
+
+    def test_invalid_url(self):
+        with self.client:
+            res = self.client.post(url_for_security('register'),
+                                   data={'email': 'test@test.com', 'password': 'test123',
+                                         'password_confirm': 'test123'})
+
+            self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
+
+            kind = g.kind
+            # add bookmark to root category
+            book_mark_kind = kind['book_mark']['code']
+
+            data = {'kind': book_mark_kind, 'parent_id': '1', 'path': 'yahoo.jp'}
+            res = self.client.post(url_for('library.add_ele'), data=data)
+
+            self.assertRedirects(res, url_for('library.urls') + '/1')
+            self.assertRaises(InvalidURLException)
+
+            bookmark_cnt = BookMark.query.count()
+
+            self.assertEqual(0, bookmark_cnt)
 
     def tearDown(self):
         shutil.rmtree(app.config['STORAGE_PATH'])

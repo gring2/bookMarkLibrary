@@ -1,11 +1,9 @@
-import os
 
 from flask_security import current_user, login_required
 
 from handlers.category_handler import save_category
-from handlers.screenshot_handler import resize_img
 from . import bp
-from flask import (current_app as app, render_template, request, g, redirect, url_for)
+from flask import ( render_template, request, g, redirect, url_for)
 from handlers import category_handler
 from library.models import BookMark, Category
 
