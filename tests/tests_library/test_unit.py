@@ -375,3 +375,21 @@ class FaviconHandlerTest(BaseTestCase):
         handler = FaviconHandler(self.mock_res)
         result = handler.has_image_meta_tag()
         self.assertFalse(result)
+
+    def test_set_name_with_title_tag(self):
+        bookmark = BookMark()
+        bookmark.url = 'https://google.com'
+        bookmark.save()
+
+        self.assertEqual('Google', bookmark.name)
+
+    def test_blank_page_thumbnail(self):
+        bookmark = BookMark()
+        bookmark.url = 'https://google.com'
+        bookmark.parent_id=1
+        bookmark.save()
+        bookmark.img = None
+        db.session.add(bookmark)
+        db.session.commit()
+
+        self.assertEqual('/static/img/blank.png', bookmark.thumbnail)
