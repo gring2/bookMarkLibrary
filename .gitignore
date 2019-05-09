@@ -9,3 +9,5 @@ node_modules
 mysql
 log/info/*
 log/warning/*
+yarn-error.log
+yarn.lock
