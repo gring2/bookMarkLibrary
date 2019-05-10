@@ -5,11 +5,9 @@ import time
 import logging
 from flask import url_for, current_app as app
 from bookMarkLibrary.database import db
-from bookMarkLibrary.exceptions import InvalidURLException
 from handlers.thumbnail_handler import create_thumbnail, get_http_format_url
 from bookMarkLibrary.const import ALLOWED_EXTENSIONS
 from handlers.screenshot_handler import resize_img
-
 
 
 class Category(db.Model):
@@ -57,6 +55,8 @@ class BookMark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     _url = db.Column(db.String(255), nullable=False)
     img = db.Column(db.String(255))
+    name = db.Column(db.String(255))
+
     parent_id = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(),
@@ -74,14 +74,14 @@ class BookMark(db.Model):
     @property
     def thumbnail(self):
 
-        if os.path.exists(app.config['STORAGE_PATH'] + '/' + self.img) is True:
+        if not self.img:
+            return url_for('static', filename='img/blank.png')
+
+        elif os.path.exists(app.config['STORAGE_PATH'] + '/' + self.img) is True:
             return url_for('storage', filename=self.img)
 
         return self.img
 
-    @property
-    def name(self):
-        return self.url
 
     @property
     def url(self):
@@ -96,16 +96,14 @@ class BookMark(db.Model):
         try:
             db.session.add(self)
 
-            file_name = create_thumbnail(self.url)
+            file_name, name = create_thumbnail(self.url)
 
-            if file_name is not None:
-                self.img = file_name
-                db.session.add(self)
-                db.session.commit()
-                return self
+            self.img = file_name
+            self.name = name
 
-            else:
-                raise InvalidURLException('url is not valid')
+            db.session.add(self)
+            db.session.commit()
+            return self
 
         except Exception:
             logging.error(traceback.format_exc())
