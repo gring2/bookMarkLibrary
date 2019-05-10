@@ -126,8 +126,8 @@ class ShowTestCase(BaseTestCase):
 
         with self.client:
             self.client.post(url_for_security('register'),
-                                   data={'email': 'test@test.com', 'password': 'test123',
-                                         'password_confirm': 'test123'})
+                             data={'email': 'test@test.com', 'password': 'test123',
+                             'password_confirm': 'test123'})
 
             self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
 
@@ -146,7 +146,7 @@ class ShowTestCase(BaseTestCase):
 
             self.assertNotEqual(past_img, bookmark.img)
 
-            path = Path(app.config['STORAGE_PATH'] +'/' +bookmark.img)
+            path = Path(app.config['STORAGE_PATH'] + '/' + bookmark.img)
             self.assertTrue(path.is_file())
 
     def test_invalid_url(self):
@@ -161,7 +161,7 @@ class ShowTestCase(BaseTestCase):
             # add bookmark to root category
             book_mark_kind = kind['book_mark']['code']
 
-            data = {'kind': book_mark_kind, 'parent_id': '1', 'path': 'yahoo.jp'}
+            data = {'kind': book_mark_kind, 'parent_id': '1', 'path': 'yahoo.invalid'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
             self.assertRedirects(res, url_for('library.urls') + '/1')

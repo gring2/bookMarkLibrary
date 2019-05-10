@@ -5,10 +5,10 @@ import time
 import logging
 from flask import url_for, current_app as app
 from bookMarkLibrary.database import db
-from handlers.thumbnail_handler import create_thumbnail, get_http_format_url
+from handlers.thumbnail_handler import ThumbnailHandler
 from bookMarkLibrary.const import ALLOWED_EXTENSIONS
 from handlers.screenshot_handler import resize_img
-
+from utils.url_utils import get_http_format_url
 
 class Category(db.Model):
     """
@@ -57,7 +57,7 @@ class BookMark(db.Model):
     img = db.Column(db.String(255))
     name = db.Column(db.String(255))
 
-    parent_id = db.Column(db.Integer, nullable=False)
+    parent_id = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(),
                            server_onupdate=db.func.now())
@@ -82,7 +82,6 @@ class BookMark(db.Model):
 
         return self.img
 
-
     @property
     def url(self):
         return get_http_format_url(self._url)
@@ -91,16 +90,18 @@ class BookMark(db.Model):
     def url(self, url):
         self._url = url
 
+    def makeup(self):
+        handler = ThumbnailHandler(self.url)
+        file_name, name = handler.create_thumbnail()
+
+        self.img = file_name
+        self.name = name
+
+        return self
+
     def save(self):
 
         try:
-            db.session.add(self)
-
-            file_name, name = create_thumbnail(self.url)
-
-            self.img = file_name
-            self.name = name
-
             db.session.add(self)
             db.session.commit()
             return self
@@ -108,8 +109,8 @@ class BookMark(db.Model):
         except Exception:
             logging.error(traceback.format_exc())
             db.session.rollback()
-            return False
 
+    # need to be moved 
     def change_thumbnail(self, file):
         if file and self.__allowed_file(file.filename):
             ts = time.time()

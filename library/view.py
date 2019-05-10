@@ -3,9 +3,10 @@ from flask_security import current_user, login_required
 
 from handlers.category_handler import save_category
 from . import bp
-from flask import ( render_template, request, g, redirect, url_for)
+from flask import (render_template, request, g, redirect, url_for)
 from handlers import category_handler
 from library.models import BookMark, Category
+from bookMarkLibrary.exceptions import InvalidURLException
 
 
 @login_required
@@ -22,8 +23,11 @@ def add_ele():
         elif kind_code == book_mark_kind['code']:
 
             book_mark = BookMark(parent_id=request.form['parent_id'], url=BookMark.remove_last_slash_from_url(request.form['path']))
-            book_mark.save()
-
+            try:
+                book_mark.makeup().save()
+            except InvalidURLException:
+                pass
+                
         return redirect(url_for('library.urls', id=request.form['parent_id']))
 
 

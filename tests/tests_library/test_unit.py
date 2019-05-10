@@ -379,17 +379,24 @@ class FaviconHandlerTest(BaseTestCase):
     def test_set_name_with_title_tag(self):
         bookmark = BookMark()
         bookmark.url = 'https://google.com'
-        bookmark.save()
+        bookmark.makeup()
 
         self.assertEqual('Google', bookmark.name)
 
     def test_blank_page_thumbnail(self):
         bookmark = BookMark()
         bookmark.url = 'https://google.com'
-        bookmark.parent_id=1
-        bookmark.save()
+        bookmark.parent_id = 1
+        bookmark.makeup().save()
         bookmark.img = None
         db.session.add(bookmark)
         db.session.commit()
 
         self.assertEqual('/static/img/blank.png', bookmark.thumbnail)
+   
+    def test_google_favicon(self):
+        bookmark = BookMark()
+        bookmark.url = 'https://www.google.com/search?source=hp&ei=RT3VXIXyJfSMr7wPjI6M6Ac&q=urlparse&oq=urlp&gs_l=psy-ab.1.1.0l5j0i10j0l4.2477.3781..5473...2.0..0.87.451.6......0....1..gws-wiz.....0.FWwWVpuif-g'
+        bookmark.makeup()
+        self.assertIsNotNone(bookmark.img)
+        self.assertTrue('google.com' in bookmark.img)    
