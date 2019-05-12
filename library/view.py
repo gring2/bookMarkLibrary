@@ -1,11 +1,8 @@
 
 from flask_security import current_user, login_required
-
-from handlers.category_handler import save_category
 from . import bp
 from flask import (render_template, request, g, redirect, url_for)
-from handlers import category_handler
-from library.models import BookMark, Category
+from library.models import BookMark
 from bookMarkLibrary.exceptions import InvalidURLException
 
 
@@ -13,43 +10,21 @@ from bookMarkLibrary.exceptions import InvalidURLException
 @bp.route('/add', methods=['POST'])
 def add_ele():
     if request.method == "POST":
-        kind = g.kind
-        cat_kind = kind['category']
-        book_mark_kind = kind['book_mark']
-        kind_code = request.form['kind']
-        if kind_code == cat_kind['code']:
-            save_category(current_user, parent_id=request.form['parent_id'], name=request.form['path'])
+        book_mark = BookMark(parent_id=request.form['parent_id'], url=BookMark.remove_last_slash_from_url(request.form['path']))
+        try:
+            book_mark.makeup().save()
+        except InvalidURLException:
+            pass
 
-        elif kind_code == book_mark_kind['code']:
-
-            book_mark = BookMark(parent_id=request.form['parent_id'], url=BookMark.remove_last_slash_from_url(request.form['path']))
-            try:
-                book_mark.makeup().save()
-            except InvalidURLException:
-                pass
-                
         return redirect(url_for('library.urls', id=request.form['parent_id']))
 
 
-def __get_category_list(data: Category)->list:
-    current_obj = {'id': data.id, 'name': data.name}
-    result = [current_obj]
-    sub = []
-    for item in data.sub:
-        if type(item) is Category:
-            sub = sub + __get_category_list(item)
-
-    result = result + sub
-    return result
-
-
 @bp.route('/urls')
-@bp.route('/urls/<id>')
 @login_required
-def urls(id=0):
-    category = category_handler.fetch_sub_category(current_user, id)
-
-    return render_template('library/urls.html', category=category)
+def urls():
+    bookMarks = current_user.bookmarks
+    tags = set([bookMark.tags for bookMark in bookMarks])
+    return render_template('library/urls.html', category=bookMarks, tags=tags)
 
 
 @bp.route('/thumbnail', methods=['POST'])

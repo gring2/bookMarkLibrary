@@ -9,43 +9,16 @@ from handlers.thumbnail_handler import ThumbnailHandler
 from bookMarkLibrary.const import ALLOWED_EXTENSIONS
 from handlers.screenshot_handler import resize_img
 from utils.url_utils import get_http_format_url
+from sqlalchemy_utils import UUIDType
+import uuid
+from sqlalchemy import Table
+from sqlalchemy.orm import relationship
 
-class Category(db.Model):
-    """
-        :private property __sub: list to insert child_elements
-        :property sub: list @read_only property to represent children
 
-    """
-    __tablename__ = "categories"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255))
-    parent_id = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
-
-    updated_at = db.Column(db.DateTime, server_default=db.func.now(),
-                           server_onupdate=db.func.now())
-    deleted_at = db.Column(db.DateTime)
-    __sub = []
-
-    @property
-    def sub(self):
-        return self.__sub
-
-    @sub.setter
-    def sub(self, sub_list: list):
-        def get_id(elem):
-            return elem.id
-        sub_list.sort(key=get_id)
-        self.__sub = sub_list
-
-    @property
-    def thumbnail(self):
-        if len(self.sub) < 1:
-            return url_for('static', filename='img/directory_default.png')
-        else:
-            return self.sub[0].thumbnail
+association_table = Table('bookmark_tag_rel', db.metadata,
+                          db.Column('bookmarks', db.Integer, db.ForeignKey('bookmarks.id')),
+                          db.Column('tags', UUIDType(binary=False), db.ForeignKey('tags.id'))
+                          )
 
 
 class BookMark(db.Model):
@@ -54,10 +27,10 @@ class BookMark(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     _url = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    holder = relationship('User', backref='bookmarks')
     img = db.Column(db.String(255))
     name = db.Column(db.String(255))
-
-    parent_id = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(),
                            server_onupdate=db.func.now())
@@ -110,7 +83,7 @@ class BookMark(db.Model):
             logging.error(traceback.format_exc())
             db.session.rollback()
 
-    # need to be moved 
+    # need to be moved
     def change_thumbnail(self, file):
         if file and self.__allowed_file(file.filename):
             ts = time.time()
@@ -134,3 +107,12 @@ class BookMark(db.Model):
         return '.' in filename and \
                filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+
+    id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
+    tag = db.Column(db.Integer)
+    bookmarks = relationship("BookMark",
+                             secondary=association_table,
+                             backref="tags")

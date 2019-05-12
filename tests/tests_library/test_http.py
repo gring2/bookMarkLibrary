@@ -5,13 +5,12 @@ from sqlalchemy import desc
 
 from bookMarkLibrary.database import db
 from bookMarkLibrary.exceptions import InvalidURLException
-from library.models import Category, BookMark
+from library.models import BookMark
 from tests.base import BaseTestCase
 from unittest import mock, skip
 from flask import url_for, current_app as app, g
 import os
 import shutil
-from tests.data_factory import test_library_dict_factory
 import logging
 
 
@@ -48,33 +47,16 @@ class ShowTestCase(BaseTestCase):
 
     def test_show_thumbnails(self):
         # mocking selenium dependency
-
-        with mock.patch('handlers.category_handler.fetch_sub_category', return_value=test_library_dict_factory()):
-            with self.client:
-                res = self.client.post(url_for_security('register'),
-                                       data={'email': 'test@test.com', 'password': 'test123',
-                                             'password_confirm': 'test123'})
-
-                self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
-                result = self.client.get(url_for('library.urls'))
-
-                content = result.data.decode('utf-8')
-                assert 'div' in content
-                self.assert_template_used('library/urls.html')
-
-    def test_add_category(self):
-        self.client.post(url_for_security('register'), data={'email': 'test@test.com', 'password': 'test123',
-                                                             'password_confirm': 'test123'})
-        self.client.get(url_for_security('logout'))
         with self.client:
-            self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
-            self.client.get(url_for('library.urls'))
-            c = Category.query.filter_by(user_id=current_user.id).count()
-            self.assertEqual(1, c)
-            res = self.client.post(url_for('library.add_ele'), data={'kind': '1', 'path': 'category', 'parent_id': '1'})
-            c = Category.query.filter_by(user_id=current_user.id).count()
+            res = self.client.post(url_for_security('register'),
+                                   data={'email': 'test@test.com', 'password': 'test123', 'password_confirm': 'test123'})
 
-            self.assertEqual(2, c)
+            self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
+            result = self.client.get(url_for('library.urls'))
+
+            content = result.data.decode('utf-8')
+            assert 'div' in content
+            self.assert_template_used('library/urls.html')
 
     def test_add_bookMark(self):
 
@@ -87,37 +69,27 @@ class ShowTestCase(BaseTestCase):
             add = self.client.get(url_for('library.urls'))
 
             kind = g.kind
-            # add bookmark to root category
-            book_mark_kind = kind['book_mark']['code']
-            root_category = Category.query.filter_by(user_id=current_user.id).first()
-            data = {'kind': book_mark_kind, 'parent_id': root_category.id, 'path': 'google.com'}
+            # add bookmark with out tag
+            data = {'path': 'google.com'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
-            bookmark = BookMark.query.filter_by(parent_id=root_category.id).first()
+            bookmark = BookMark.query.filter_by(path=data['path']).first()
             assert bookmark is not None
             self.assertIsNotNone(bookmark.img)
 
-            # add sub category to root category
-            category_kind = kind['category']['code']
-            data = {'kind': category_kind, 'parent_id': root_category.id, 'path': 'subcategory'}
-            res = self.client.post(url_for('library.add_ele'), data=data)
+            self.fail('add bookmark with new tag')
 
-            sub_category = Category.query.filter_by(parent_id=root_category.id, user_id=current_user.id).first()
-            assert sub_category is not None
-            self.assertEqual('subcategory', sub_category.name)
+            self.fail('add bookmark with new tags')
 
-            # add bookmark to sub category
-            data = {'kind': book_mark_kind, 'parent_id': sub_category.id, 'path': 'sub bookmark'}
-            res = self.client.post(url_for('library.add_ele'), data=data)
+            self.fail('add bookmark with existing tags')
 
-            sub_bookmark = BookMark.query.filter_by(parent_id=sub_category.id).first()
-            assert sub_bookmark is None
+            self.fail('add bookmark with existing tags and new tags')
 
             # use og:img as thumbnail
-            data = {'kind': book_mark_kind, 'parent_id': sub_category.id, 'path': 'http://ogp.me/'}
+            data = {'path': 'http://ogp.me/'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
-            og_bookmark = BookMark.query.filter_by(parent_id=sub_category.id).order_by(desc(BookMark.id)).first()
+            og_bookmark = BookMark.query.filter_by(path=data['path']).order_by(desc(BookMark.id)).first()
             assert og_bookmark is not None
             self.assertEqual('http://ogp.me/logo.png', og_bookmark.img)
 
@@ -132,9 +104,8 @@ class ShowTestCase(BaseTestCase):
             self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
 
             self.client.get(url_for('library.urls'))
-            root_category = Category.query.filter_by(user_id=current_user.id).first()
 
-            bookmark = BookMark(url='dummy.url', img='dummy.png', parent_id=root_category.id)
+            bookmark = BookMark(url='dummy.url', img='dummy.png')
 
             past_img = bookmark.img
 
