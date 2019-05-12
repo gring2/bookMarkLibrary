@@ -38,8 +38,8 @@ class ShowTestCase(BaseTestCase):
         super().setUp()
 
         self.client.post(url_for_security('register'),
-                           data={'email': 'test@test.com', 'password': 'test123',
-                                 'password_confirm': 'test123'})
+                         data={'email': 'test@test.com', 'password': 'test123',
+                               'password_confirm': 'test123'})
 
     def test_show_thumbnails(self):
         with self.client:
@@ -56,22 +56,22 @@ class ShowTestCase(BaseTestCase):
             data = {'url': 'google.com'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
-            bookmark = BookMark.query.filter_by(_url=data['path']).first()
+            bookmark = BookMark.query.filter_by(_url=data['url']).first()
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
 
             # use og:img as thumbnail
-            data = {'path': 'http://ogp.me/'}
+            data = {'url': 'http://ogp.me/'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
-            og_bookmark = BookMark.query.filter_by(path=data['path']).order_by(desc(BookMark.id)).first()
+            og_bookmark = BookMark.query.filter_by(_url='http://ogp.me').order_by(desc(BookMark.id)).first()
             self.assertIsNotNone(og_bookmark)
             self.assertEqual('http://ogp.me/logo.png', og_bookmark.img)
 
             result = self.client.get(url_for('library.urls'))
 
             content = result.data.decode('utf-8')
-            assert 'opg.me' in content
+            assert 'ogp.me' in content
             assert 'Google' in content
 
             self.assert_template_used('library/urls.html')
@@ -151,7 +151,7 @@ class ShowTestCase(BaseTestCase):
         with self.client:
             self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
 
-            data = {'path': 'yahoo.invalid'}
+            data = {'url': 'yahoo.invalid'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
             self.assertRedirects(res, url_for('library.urls'))

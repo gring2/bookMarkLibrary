@@ -304,7 +304,9 @@ class FaviconHandlerTest(BaseTestCase):
 
     def test_google_favicon(self):
         bookmark = BookMark()
-        bookmark.url = 'https://www.google.com/search?source=hp&ei=RT3VXIXyJfSMr7wPjI6M6Ac&q=urlparse&oq=urlp&gs_l=psy-ab.1.1.0l5j0i10j0l4.2477.3781..5473...2.0..0.87.451.6......0....1..gws-wiz.....0.FWwWVpuif-g'
+        bookmark.url = 'https://www.google.com/search?' + \
+                       'source=hp&ei=RT3VXIXyJfSMr7wPjI6M6Ac&q=' + \
+                       'urlparse&oq=urlp&gs_l=psy-ab.1.1.0l5j0i10j0l4.2477.3781..5473...2.0..0.87.451.6......0....1..gws-wiz.....0.FWwWVpuif-g'
         bookmark.makeup()
         self.assertIsNotNone(bookmark.img)
         self.assertTrue('google.com' in bookmark.img)

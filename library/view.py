@@ -23,7 +23,11 @@ def add_ele():
 @login_required
 def urls():
     bookMarks = current_user.bookmarks
-    tags = set([bookMark.tags for bookMark in bookMarks])
+    # flattern need
+    tags = []
+    for bookmark in bookMarks:
+        tags.extend(bookmark.tags)
+
     return render_template('library/urls.html', bookmarks=bookMarks, tags=tags)
 
 
