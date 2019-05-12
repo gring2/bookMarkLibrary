@@ -9,14 +9,14 @@ from bookMarkLibrary.exceptions import InvalidURLException
 @login_required
 @bp.route('/add', methods=['POST'])
 def add_ele():
-    if request.method == "POST":
-        book_mark = BookMark(parent_id=request.form['parent_id'], url=BookMark.remove_last_slash_from_url(request.form['path']))
-        try:
-            book_mark.makeup().save()
-        except InvalidURLException:
-            pass
+    bookmark = BookMark(url=BookMark.remove_last_slash_from_url(request.form['url']))
+    try:
+        bookmark.makeup()
+        current_user.create_bookmarks(bookmark)
+    except InvalidURLException:
+        pass
 
-        return redirect(url_for('library.urls', id=request.form['parent_id']))
+    return redirect(url_for('library.urls'))
 
 
 @bp.route('/urls')
@@ -24,7 +24,7 @@ def add_ele():
 def urls():
     bookMarks = current_user.bookmarks
     tags = set([bookMark.tags for bookMark in bookMarks])
-    return render_template('library/urls.html', category=bookMarks, tags=tags)
+    return render_template('library/urls.html', bookmarks=bookMarks, tags=tags)
 
 
 @bp.route('/thumbnail', methods=['POST'])

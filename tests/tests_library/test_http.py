@@ -5,7 +5,7 @@ from sqlalchemy import desc
 
 from bookMarkLibrary.database import db
 from bookMarkLibrary.exceptions import InvalidURLException
-from library.models import BookMark
+from library.models import BookMark, Tag
 from tests.base import BaseTestCase
 from unittest import mock, skip
 from flask import url_for, current_app as app, g
@@ -15,14 +15,6 @@ import logging
 
 
 class AddTestCase(BaseTestCase):
-    def test_logger(self):
-        logging.debug('debug')
-        logging.error(Exception('error'))
-        logging.warning(Exception('critical'))
-        logging.critical(Warning('warning'))
-        logging.info('info')
-        self.assertTrue(True)
-
     def test_get_add_page(self):
         with self.client:
             res = self.client.post(url_for_security('register'),
@@ -45,71 +37,106 @@ class ShowTestCase(BaseTestCase):
     def setUp(self):
         super().setUp()
 
-    def test_show_thumbnails(self):
-        # mocking selenium dependency
-        with self.client:
-            res = self.client.post(url_for_security('register'),
-                                   data={'email': 'test@test.com', 'password': 'test123', 'password_confirm': 'test123'})
+        self.client.post(url_for_security('register'),
+                           data={'email': 'test@test.com', 'password': 'test123',
+                                 'password_confirm': 'test123'})
 
+    def test_show_thumbnails(self):
+        with self.client:
             self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
             result = self.client.get(url_for('library.urls'))
 
             content = result.data.decode('utf-8')
-            assert 'div' in content
+            assert 'main' in content
             self.assert_template_used('library/urls.html')
 
     def test_add_bookMark(self):
-
         with self.client:
-            res = self.client.post(url_for_security('register'),
-                                   data={'email': 'test@test.com', 'password': 'test123',
-                                         'password_confirm': 'test123'})
-
-            self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
-            add = self.client.get(url_for('library.urls'))
-
-            kind = g.kind
             # add bookmark with out tag
-            data = {'path': 'google.com'}
+            data = {'url': 'google.com'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
-            bookmark = BookMark.query.filter_by(path=data['path']).first()
-            assert bookmark is not None
+            bookmark = BookMark.query.filter_by(_url=data['path']).first()
+            self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
-
-            self.fail('add bookmark with new tag')
-
-            self.fail('add bookmark with new tags')
-
-            self.fail('add bookmark with existing tags')
-
-            self.fail('add bookmark with existing tags and new tags')
 
             # use og:img as thumbnail
             data = {'path': 'http://ogp.me/'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
             og_bookmark = BookMark.query.filter_by(path=data['path']).order_by(desc(BookMark.id)).first()
-            assert og_bookmark is not None
+            self.assertIsNotNone(og_bookmark)
             self.assertEqual('http://ogp.me/logo.png', og_bookmark.img)
+
+            result = self.client.get(url_for('library.urls'))
+
+            content = result.data.decode('utf-8')
+            assert 'opg.me' in content
+            assert 'Google' in content
+
+            self.assert_template_used('library/urls.html')
+
+    def test_add_bookmark_with_new_tag(self):
+        with self.client:
+            data = {'url': 'google.com', 'tags': ['new_tag']}
+            res = self.client.post(url_for('library.add_ele'), data=data)
+            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            self.assertIsNotNone(bookmark)
+            self.assertIsNotNone(bookmark.img)
+            self.assertEquals(1, len(bookmark.tags))
+
+            tags = Tag.query.all()
+            self.assertEquals(1, len(tags))
+            self.assertEquals(tags[0], bookmark.tags[0])
+
+            self.assertEquals(bookmark, current_user.bookmarks[0])
+
+            result = self.client.get(url_for('library.urls'))
+
+            content = result.data.decode('utf-8')
+            assert 'new_tag' in content
+            assert 'Google' in content
+
+            self.assert_template_used('library/urls.html')
+
+        self.fail('add bookmark with new tag')
+
+    def test_add_bookmark_with_new_tags(self):
+
+        self.fail('add bookmark with new tags')
+
+    def test_add_bookmark_with_existing_tag(self):
+        self.fail('add bookmark with existing tag')
+
+    def test_add_bookmark_with_existing_tags(self):
+
+        self.fail('add bookmark with existing tags')
+
+    def test_add_bookmark_with_new_tags_and_existing_tags(self):
+        self.fail('add bookmark with existing tags and new tags')
+
+    def test_add_bookmark_with_new_tag_and_existing_tags(self):
+        self.fail('add bookmark with existing tags and new tag')
+
+    def test_add_bookmark_with_new_tag_and_existing_tag(self):
+        self.fail('add bookmark with existing tag and new tag')
+
+    def test_add_bookmark_with_new_tags_and_existing_tag(self):
+        self.fail('add bookmark with existing tag and new tags')
 
     def test_change_thumbnail(self):
         file = (io.BytesIO(b"abcdef"), 'test.jpg')
 
         with self.client:
-            self.client.post(url_for_security('register'),
-                             data={'email': 'test@test.com', 'password': 'test123',
-                             'password_confirm': 'test123'})
-
             self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
-
-            self.client.get(url_for('library.urls'))
 
             bookmark = BookMark(url='dummy.url', img='dummy.png')
 
             past_img = bookmark.img
 
-            db.session.add(bookmark)
+            current_user.bookmarks.append(bookmark)
+
+            db.session.add(current_user)
             db.session.commit()
 
             data = {'thumbnail': file, 'id': BookMark.query.first().id}
@@ -122,20 +149,12 @@ class ShowTestCase(BaseTestCase):
 
     def test_invalid_url(self):
         with self.client:
-            res = self.client.post(url_for_security('register'),
-                                   data={'email': 'test@test.com', 'password': 'test123',
-                                         'password_confirm': 'test123'})
-
             self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
 
-            kind = g.kind
-            # add bookmark to root category
-            book_mark_kind = kind['book_mark']['code']
-
-            data = {'kind': book_mark_kind, 'parent_id': '1', 'path': 'yahoo.invalid'}
+            data = {'path': 'yahoo.invalid'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
-            self.assertRedirects(res, url_for('library.urls') + '/1')
+            self.assertRedirects(res, url_for('library.urls'))
             self.assertRaises(InvalidURLException)
 
             bookmark_cnt = BookMark.query.count()
@@ -145,4 +164,5 @@ class ShowTestCase(BaseTestCase):
     def tearDown(self):
         shutil.rmtree(app.config['STORAGE_PATH'])
         os.makedirs(app.config['STORAGE_PATH'])
+        db.session.close()
         super().tearDown()

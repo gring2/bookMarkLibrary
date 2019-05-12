@@ -4,6 +4,7 @@ import traceback
 import time
 import logging
 from flask import url_for, current_app as app
+from flask_security import current_user
 from bookMarkLibrary.database import db
 from handlers.thumbnail_handler import ThumbnailHandler
 from bookMarkLibrary.const import ALLOWED_EXTENSIONS
@@ -27,7 +28,7 @@ class BookMark(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     _url = db.Column(db.String(255), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     holder = relationship('User', backref='bookmarks')
     img = db.Column(db.String(255))
     name = db.Column(db.String(255))
@@ -73,15 +74,7 @@ class BookMark(db.Model):
         return self
 
     def save(self):
-
-        try:
-            db.session.add(self)
-            db.session.commit()
-            return self
-
-        except Exception:
-            logging.error(traceback.format_exc())
-            db.session.rollback()
+        current_user.create_bookmarks(self)
 
     # need to be moved
     def change_thumbnail(self, file):
@@ -112,7 +105,7 @@ class Tag(db.Model):
     __tablename__ = "tags"
 
     id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
-    tag = db.Column(db.Integer)
+    tag = db.Column(db.Integer, nullable=False)
     bookmarks = relationship("BookMark",
                              secondary=association_table,
                              backref="tags")

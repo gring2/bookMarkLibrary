@@ -6,33 +6,40 @@
 {% endblock %}
 {% block content %}
 <div class="content">
-    <ul>
-        <li>
-            <button id="btn">+</button>
-        </li>
-        {% for elem in category.sub %}
-            <li style="width: 150px; margin-right: 25px"
-                {% if elem.__class__.__name__ == 'BookMark' %}
-                    class="bookmark"
-                    data-id="{{ elem.id }}"
-                    data-url="{{ elem.url }}"
-                {% else %}
-                    class="category"
-                    data-href="{{  url_for('library.urls', id=elem.id) }}"
-                {% endif %}
-
-            >
-            <div style="height: 150px">
-                <img src="{{elem.thumbnail }}" alt="" width="150px" height="150px"
-                >
-
-            </div>
-            <div style="text-align: center">
-                {{ elem.name }}
-            </div>
+    <div class="side">
+        <ul>
+            {% for tag in tags %}
+                <span>
+                    {{ tag.tag }}
+                </span>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="main">
+        <ul>
+            <li>
+                <button id="btn">+</button>
             </li>
-        {% endfor %}
-    </ul>
+            {% for elem in bookmarks %}
+                <li style="width: 150px; margin-right: 25px"
+                        class="bookmark"
+                        data-id="{{ elem.id }}"
+                        data-url="{{ elem.url }}"
+
+                >
+                <div style="height: 150px">
+                    <img src="{{elem.thumbnail }}" alt="" width="150px" height="150px"
+                    >
+
+                </div>
+                <div style="text-align: center">
+                    {{ elem.name }}
+                </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
 </div>
 {% endblock %}
 
@@ -47,15 +54,7 @@
         <main class="modal__content" id="modal-1-content">
             <form id="addEleForm"action="{{ url_for('library.add_ele') }}" method="POST">
                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <input type="hidden" name="parent_id" value="{{ category.id }}">
-
-                <select name="kind" id="kind">
-                    {% for _, kind in g.kind.items() %}
-                    <option value="{{ kind.code }}">{{ kind.name }}</option>
-                    {% endfor %}
-
-                </select>
-            <input type="text" name="path" id="path" placeholder="name">
+                <input type="text" name="url" id="url" placeholder="url">
 
             </form>
         </main>
