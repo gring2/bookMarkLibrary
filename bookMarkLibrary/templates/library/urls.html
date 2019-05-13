@@ -52,9 +52,10 @@
                 <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
         <main class="modal__content" id="modal-1-content">
-            <form id="addEleForm"action="{{ url_for('library.add_ele') }}" method="POST">
+            <form id="addEleForm" action="{{ url_for('library.add_ele') }}" method="POST">
                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <input type="text" name="url" id="url" placeholder="url">
+                <input type="text" name="tags[]" id="tags" placeholder="#tag">
 
             </form>
         </main>

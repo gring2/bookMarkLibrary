@@ -105,7 +105,14 @@ class Tag(db.Model):
     __tablename__ = "tags"
 
     id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
-    tag = db.Column(db.Integer, nullable=False)
+    tag = db.Column(db.Integer, nullable=False, unique=True)
     bookmarks = relationship("BookMark",
                              secondary=association_table,
                              backref="tags")
+
+    @classmethod
+    def find_or_make(cls, tag):
+        obj = cls.query.filter_by(tag=tag).first()
+        if obj is None:
+            obj = Tag(tag=tag)
+        return obj

@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask_security import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
-from library.models import BookMark
+import library.models as library_model
 from bookMarkLibrary.database import db
 
 
@@ -39,6 +39,10 @@ class User(db.Model, UserMixin):
     def password(self, password):
         self.__password = password
 
-    def create_bookmarks(self, *args: BookMark):
-            self.bookmarks.extend([*args])
+    def create_bookmarks(self, *args: library_model.BookMark):
+            try:
+                self.bookmarks.extend([*args])
+            except Exception as e:
+                import logging
+                logging.error('seeror', e)
             db.session.add(self)

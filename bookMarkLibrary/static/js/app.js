@@ -1,6 +1,6 @@
 import MicroModal from 'micromodal'
 
-console.dir(MicroModal)
+
 MicroModal.init();
 
 const btn = document.querySelector('#btn');
@@ -8,34 +8,15 @@ btn.addEventListener('click', () => {
     MicroModal.show('addEleModal');
 })
 
-const kindSelector = document.querySelector('#kind')
-
-kindSelector.addEventListener('change', (e) => {
-    const pathInput = document.querySelector('#path')
-
-    const value = e.target.value
-    if(value === "1"){
-        pathInput.placeholder = 'name'
-    }else{
-        pathInput.placeholder = 'url format'
-
-    }
-})
 
 const submitEleBtn = document.querySelector('#submit')
 
 submitEleBtn.addEventListener('click', () => {
-    document.querySelector('#addEleForm').submit()
+    const submitEvent = new Event('submit')
+
+    document.querySelector('#addEleForm').dispatchEvent(submitEvent)
 })
 
-const categoryLis = document.querySelectorAll('.category')
-categoryLis.forEach(function(ele){
-    ele.addEventListener('click', function () {
-        const url  = this.dataset.href
-
-        location.href = url
-    })
-})
 
 const bookMakrkLis = document.querySelectorAll('.bookmark')
 bookMakrkLis.forEach(function(ele){
@@ -55,7 +36,11 @@ bookMakrkLis.forEach(function(ele){
     })
 })
 
-const changeEleBtn = document.querySelector('#change')
-changeEleBtn.addEventListener('click', () => {
-    document.querySelector('#changeThumbNailForm').submit()
+const addEleForm = document.querySelector('#addEleForm')
+addEleForm.addEventListener('submit', () => {
+    const HASH = '#'
+    const tagsEl = document.querySelector('#addEleForm > #tags')
+    let tagsVal = tagsEl.value === '' ?[]: [...new Set(tagsEl.value.split(HASH).map(tag => tag.trim()))]
+    tagsEl.value = tagsVal
+    document.querySelector('#addEleForm').submit()
 })

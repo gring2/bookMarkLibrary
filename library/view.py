@@ -2,7 +2,8 @@
 from flask_security import current_user, login_required
 from . import bp
 from flask import (render_template, request, g, redirect, url_for)
-from library.models import BookMark
+from library.models import BookMark, Tag
+from library import contract
 from bookMarkLibrary.exceptions import InvalidURLException
 
 
@@ -10,9 +11,10 @@ from bookMarkLibrary.exceptions import InvalidURLException
 @bp.route('/add', methods=['POST'])
 def add_ele():
     bookmark = BookMark(url=BookMark.remove_last_slash_from_url(request.form['url']))
+    tags = [Tag.find_or_make(tag) for tag in request.form.getlist('tags[]')]
     try:
         bookmark.makeup()
-        current_user.create_bookmarks(bookmark)
+        contract.register_bookmark_and_tag(current_user, bookmark, *tags)
     except InvalidURLException:
         pass
 

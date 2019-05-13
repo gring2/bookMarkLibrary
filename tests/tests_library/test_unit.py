@@ -295,7 +295,6 @@ class FaviconHandlerTest(BaseTestCase):
         u1 = User()
         bookmark = BookMark()
         bookmark.url = 'https://google.com'
-        bookmark.parent_id = 1
         bookmark.makeup()
         bookmark.img = None
         u1.create_bookmarks(bookmark)
