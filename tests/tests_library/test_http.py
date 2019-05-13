@@ -42,7 +42,8 @@ class AddTestCase(BaseTestCase):
             data = {'url': 'google.com'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
-            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            bookmark = BookMark.query.first()
+
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
 
@@ -50,9 +51,9 @@ class AddTestCase(BaseTestCase):
             data = {'url': 'http://ogp.me/'}
             res = self.client.post(url_for('library.add_ele'), data=data)
 
-            og_bookmark = BookMark.query.filter_by(_url='http://ogp.me').order_by(desc(BookMark.id)).first()
+            og_bookmark = BookMark.query.filter_by(_url='http://www.ogp.me').order_by(desc(BookMark.id)).first()
             self.assertIsNotNone(og_bookmark)
-            self.assertEqual('http://ogp.me/logo.png', og_bookmark.img)
+            self.assertEqual('http://www.ogp.me/logo.png', og_bookmark.img)
 
             result = self.client.get(url_for('library.urls'))
 
@@ -64,9 +65,10 @@ class AddTestCase(BaseTestCase):
 
     def test_add_bookmark_with_new_tag(self):
         with self.client:
-            data = {'url': 'google.com', 'tags[]': ['new_tag']}
+            data = {'url': 'google.com', 'tags': '#new_tag'}
             res = self.client.post(url_for('library.add_ele'), data=data)
-            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            bookmark = BookMark.query.first()
+
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
             self.assertEquals(1, len(bookmark.tags))
@@ -87,16 +89,19 @@ class AddTestCase(BaseTestCase):
 
     def test_add_bookmark_with_new_tags(self):
         with self.client:
-            data = {'url': 'google.com', 'tags[]': ['new_tag1', 'new_tag2']}
+            data = {'url': 'google.com', 'tags': '#new_tag1#new_tag2'}
             res = self.client.post(url_for('library.add_ele'), data=data)
-            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            bookmark = BookMark.query.first()
+
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
             self.assertEquals(2, len(bookmark.tags))
 
             tags = Tag.query.all()
             self.assertEquals(2, len(tags))
-            self.assertEquals(tags[0], bookmark.tags[0])
+
+            for tag in bookmark.tags:
+                assert tag in tags
 
             self.assertEquals(bookmark, current_user.bookmarks[0])
 
@@ -115,9 +120,10 @@ class AddTestCase(BaseTestCase):
             db.session.add(t1)
             db.session.commit()
 
-            data = {'url': 'google.com', 'tags[]': [t1.tag]}
+            data = {'url': 'google.com', 'tags': '#' + t1.tag}
             res = self.client.post(url_for('library.add_ele'), data=data)
-            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            bookmark = BookMark.query.first()
+
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
             self.assertEquals(1, len(bookmark.tags))
@@ -145,9 +151,10 @@ class AddTestCase(BaseTestCase):
             ])
             db.session.commit()
 
-            data = {'url': 'google.com', 'tags[]': [t1.tag, t2.tag]}
+            data = {'url': 'google.com', 'tags': '#' + t1.tag + '#' + t2.tag}
             res = self.client.post(url_for('library.add_ele'), data=data)
-            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            bookmark = BookMark.query.first()
+
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
             self.assertEquals(2, len(bookmark.tags))
@@ -177,9 +184,10 @@ class AddTestCase(BaseTestCase):
             ])
             db.session.commit()
 
-            data = {'url': 'google.com', 'tags[]': [t1.tag, t2.tag, 'new1', 'new2']}
+            data = {'url': 'google.com', 'tags': '#' + t1.tag + '#' + t2.tag + '#new1#new2'}
             res = self.client.post(url_for('library.add_ele'), data=data)
-            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            bookmark = BookMark.query.first()
+
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
             self.assertEquals(4, len(bookmark.tags))
@@ -213,16 +221,19 @@ class AddTestCase(BaseTestCase):
             ])
             db.session.commit()
 
-            data = {'url': 'google.com', 'tags[]': [t1.tag, t2.tag, 'new1']}
+            data = {'url': 'google.com', 'tags': '#' + t1.tag + '#' + t2.tag + '#new1'}
             res = self.client.post(url_for('library.add_ele'), data=data)
-            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            bookmark = BookMark.query.first()
+
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
             self.assertEquals(3, len(bookmark.tags))
 
             tags = Tag.query.all()
             self.assertEquals(3, len(tags))
-            self.assertEquals(tags[0], bookmark.tags[0])
+
+            for tag in bookmark.tags:
+                assert tag in tags
 
             self.assertEquals(bookmark, current_user.bookmarks[0])
 
@@ -243,9 +254,9 @@ class AddTestCase(BaseTestCase):
             db.session.add(t1)
             db.session.commit()
 
-            data = {'url': 'google.com', 'tags[]': [t1.tag, 'new2']}
+            data = {'url': 'google.com', 'tags': '#' + t1.tag + '#new2'}
             res = self.client.post(url_for('library.add_ele'), data=data)
-            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            bookmark = BookMark.query.first()
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
             self.assertEquals(2, len(bookmark.tags))
@@ -274,16 +285,18 @@ class AddTestCase(BaseTestCase):
             db.session.add(t1)
             db.session.commit()
 
-            data = {'url': 'google.com', 'tags[]': [t1.tag, 'new1', 'new2']}
+            data = {'url': 'google.com', 'tags': '#' + t1.tag + '#new1#new2'}
             res = self.client.post(url_for('library.add_ele'), data=data)
-            bookmark = BookMark.query.filter_by(_url=data['url']).first()
+            bookmark = BookMark.query.first()
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
             self.assertEquals(3, len(bookmark.tags))
 
             tags = Tag.query.all()
             self.assertEquals(3, len(tags))
-            self.assertEquals(tags[0], bookmark.tags[0])
+
+            for tag in bookmark.tags:
+                assert tag in tags
 
             self.assertEquals(bookmark, current_user.bookmarks[0])
 

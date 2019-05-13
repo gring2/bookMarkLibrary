@@ -12,14 +12,12 @@ btn.addEventListener('click', () => {
 const submitEleBtn = document.querySelector('#submit')
 
 submitEleBtn.addEventListener('click', () => {
-    const submitEvent = new Event('submit')
-
-    document.querySelector('#addEleForm').dispatchEvent(submitEvent)
+    document.querySelector('#addEleForm').submit()
 })
 
 
-const bookMakrkLis = document.querySelectorAll('.bookmark')
-bookMakrkLis.forEach(function(ele){
+const bookMarkList = document.querySelectorAll('.bookmark')
+bookMarkList.forEach(function(ele){
     ele.addEventListener('contextmenu', function () {
         const changeIdHidden = document.querySelector('#changeThumbnail #change_id')
         changeIdHidden.value = this.dataset.id
@@ -36,11 +34,3 @@ bookMakrkLis.forEach(function(ele){
     })
 })
 
-const addEleForm = document.querySelector('#addEleForm')
-addEleForm.addEventListener('submit', () => {
-    const HASH = '#'
-    const tagsEl = document.querySelector('#addEleForm > #tags')
-    let tagsVal = tagsEl.value === '' ?[]: [...new Set(tagsEl.value.split(HASH).map(tag => tag.trim()))]
-    tagsEl.value = tagsVal
-    document.querySelector('#addEleForm').submit()
-})

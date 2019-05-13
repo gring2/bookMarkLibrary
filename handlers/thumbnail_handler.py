@@ -1,10 +1,9 @@
 import traceback
 from bs4 import BeautifulSoup
 from flask import logging
-from urllib.parse import urlparse
 import requests
 from bookMarkLibrary.exceptions import InvalidURLException
-from utils.url_utils import get_http_format_url, get_host_from_url
+from utils.url_utils import get_host_from_url
 from handlers.image_handler import FaviconHandler, OgImageHandler
 
 
@@ -15,7 +14,7 @@ class ThumbnailHandler():
         # way 2 inject command obj      
 
     def create_thumbnail(self)->tuple:
-        url = get_http_format_url(self._url)
+        url = self._url
         thumbnail_path = None
 
         try:

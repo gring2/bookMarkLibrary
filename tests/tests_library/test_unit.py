@@ -355,3 +355,5 @@ class LibraryContactTest(BaseTestCase):
         self.assertIsNone(u1.bookmarks[0].id)
         self.assertEqual(0, Tag.query.count())
         self.assertEqual(0, BookMark.query.count())
+
+
