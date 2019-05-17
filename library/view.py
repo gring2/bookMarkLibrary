@@ -1,51 +1,44 @@
 
 from flask_security import current_user, login_required
-
-from handlers.category_handler import save_category
 from . import bp
-from flask import ( render_template, request, g, redirect, url_for)
-from handlers import category_handler
-from library.models import BookMark, Category
-
+from flask import (render_template, request, g, redirect, url_for)
+from library.models import BookMark, Tag
+from library import contract
+from bookMarkLibrary.exceptions import InvalidURLException
+from utils.url_utils import get_http_format_url
 
 @login_required
 @bp.route('/add', methods=['POST'])
 def add_ele():
-    if request.method == "POST":
-        kind = g.kind
-        cat_kind = kind['category']
-        book_mark_kind = kind['book_mark']
-        kind_code = request.form['kind']
-        if kind_code == cat_kind['code']:
-            save_category(current_user, parent_id=request.form['parent_id'], name=request.form['path'])
+    bookmark = BookMark(url=get_http_format_url(request.form['url']))
 
-        elif kind_code == book_mark_kind['code']:
+    tag_inputs = Tag.conv_tag_str_to_list(request.form.get('tags', ''))
 
-            book_mark = BookMark(parent_id=request.form['parent_id'], url=BookMark.remove_last_slash_from_url(request.form['path']))
-            book_mark.save()
+    tags = [Tag.find_or_make(tag) for idx, tag in enumerate(tag_inputs)]
+    try:
+        bookmark.makeup()
+        contract.register_bookmark_and_tag(current_user, bookmark, *tags)
+    except InvalidURLException:
+        pass
 
-        return redirect(url_for('library.urls', id=request.form['parent_id']))
-
-
-def __get_category_list(data: Category)->list:
-    current_obj = {'id': data.id, 'name': data.name}
-    result = [current_obj]
-    sub = []
-    for item in data.sub:
-        if type(item) is Category:
-            sub = sub + __get_category_list(item)
-
-    result = result + sub
-    return result
+    return redirect(url_for('library.urls'))
 
 
 @bp.route('/urls')
-@bp.route('/urls/<id>')
+@bp.route('/urls/<string:tag>')
 @login_required
-def urls(id=0):
-    category = category_handler.fetch_sub_category(current_user, id)
+def urls(tag=None):
+    book_marks = current_user.bookmarks
 
-    return render_template('library/urls.html', category=category)
+    if tag is not None:
+        book_marks = book_marks.join(Tag.bookmarks).filter(Tag.tag == tag)
+
+    # flattern need
+    tags = []
+    for bookmark in book_marks.all():
+        tags.extend(bookmark.tags)
+
+    return render_template('library/urls.html', bookmarks=book_marks, tags=tags)
 
 
 @bp.route('/thumbnail', methods=['POST'])

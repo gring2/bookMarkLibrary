@@ -4,50 +4,22 @@ import traceback
 import time
 import logging
 from flask import url_for, current_app as app
+from flask_security import current_user
 from bookMarkLibrary.database import db
-from bookMarkLibrary.exceptions import InvalidURLException
-from handlers.thumbnail_handler import create_thumbnail, get_http_format_url
+from handlers.thumbnail_handler import ThumbnailHandler
 from bookMarkLibrary.const import ALLOWED_EXTENSIONS
 from handlers.screenshot_handler import resize_img
+from utils.url_utils import get_http_format_url
+from sqlalchemy_utils import UUIDType
+import uuid
+from sqlalchemy import Table
+from sqlalchemy.orm import relationship
 
 
-
-class Category(db.Model):
-    """
-        :private property __sub: list to insert child_elements
-        :property sub: list @read_only property to represent children
-
-    """
-    __tablename__ = "categories"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255))
-    parent_id = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
-
-    updated_at = db.Column(db.DateTime, server_default=db.func.now(),
-                           server_onupdate=db.func.now())
-    deleted_at = db.Column(db.DateTime)
-    __sub = []
-
-    @property
-    def sub(self):
-        return self.__sub
-
-    @sub.setter
-    def sub(self, sub_list: list):
-        def get_id(elem):
-            return elem.id
-        sub_list.sort(key=get_id)
-        self.__sub = sub_list
-
-    @property
-    def thumbnail(self):
-        if len(self.sub) < 1:
-            return url_for('static', filename='img/directory_default.png')
-        else:
-            return self.sub[0].thumbnail
+association_table = Table('bookmark_tag_rel', db.metadata,
+                          db.Column('bookmarks', db.Integer, db.ForeignKey('bookmarks.id')),
+                          db.Column('tags', UUIDType(binary=False), db.ForeignKey('tags.id'))
+                          )
 
 
 class BookMark(db.Model):
@@ -56,11 +28,15 @@ class BookMark(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     _url = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
     img = db.Column(db.String(255))
-    parent_id = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(),
                            server_onupdate=db.func.now())
+    holder = relationship('User', back_populates='bookmarks')
+    tags = relationship('Tag', secondary=association_table, back_populates='bookmarks')
 
     @classmethod
     def remove_last_slash_from_url(cls, url):
@@ -74,14 +50,13 @@ class BookMark(db.Model):
     @property
     def thumbnail(self):
 
-        if os.path.exists(app.config['STORAGE_PATH'] + '/' + self.img) is True:
+        if not self.img:
+            return url_for('static', filename='img/blank.png')
+
+        elif os.path.exists(app.config['STORAGE_PATH'] + '/' + self.img) is True:
             return url_for('storage', filename=self.img)
 
         return self.img
-
-    @property
-    def name(self):
-        return self.url
 
     @property
     def url(self):
@@ -91,27 +66,19 @@ class BookMark(db.Model):
     def url(self, url):
         self._url = url
 
+    def makeup(self):
+        handler = ThumbnailHandler(self.url)
+        file_name, name = handler.create_thumbnail()
+
+        self.img = file_name
+        self.name = name
+
+        return self
+
     def save(self):
+        current_user.create_bookmarks(self)
 
-        try:
-            db.session.add(self)
-
-            file_name = create_thumbnail(self.url)
-
-            if file_name is not None:
-                self.img = file_name
-                db.session.add(self)
-                db.session.commit()
-                return self
-
-            else:
-                raise InvalidURLException('url is not valid')
-
-        except Exception:
-            logging.error(traceback.format_exc())
-            db.session.rollback()
-            return False
-
+    # need to be moved
     def change_thumbnail(self, file):
         if file and self.__allowed_file(file.filename):
             ts = time.time()
@@ -135,3 +102,27 @@ class BookMark(db.Model):
         return '.' in filename and \
                filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+class Tag(db.Model):
+    __tablename__ = "tags"
+
+    id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
+    tag = db.Column(db.String(255), nullable=False, unique=True)
+    bookmarks = relationship("BookMark",
+                             secondary=association_table,
+                             back_populates="tags")
+
+    @classmethod
+    def find_or_make(cls, tag):
+        obj = cls.query.filter_by(tag=tag).first()
+        if obj is None:
+            obj = Tag(tag=tag)
+        return obj
+
+    @staticmethod
+    def conv_tag_str_to_list(tag_str: str):
+        tag_inputs = tag_str.split('#')
+
+        tag_inputs.pop(0)
+
+        return tag_inputs

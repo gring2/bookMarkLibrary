@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup, element
 import requests
 import traceback
 import logging
-
+from utils.url_utils import get_http_format_url
 
 def meta_node_ha_attri(node, attr):
     return node is not None and node.has_attr(attr)
@@ -41,7 +41,7 @@ class OgImageHandler():
         return self._node is not None
 
     def get_url(self):
-        return self._node['content']
+        return get_http_format_url(self._node['content'])
 
 
 class FaviconHandler():
@@ -72,5 +72,4 @@ class FaviconHandler():
         return self._node is not None
 
     def get_url(self)->str:
-
         return self._node['content']

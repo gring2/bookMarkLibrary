@@ -1,9 +1,9 @@
 from datetime import datetime
 from flask_security import UserMixin
 from sqlalchemy.ext.hybrid import hybrid_property
-from flask_security.utils import hash_password
-
+import library.models as library_model
 from bookMarkLibrary.database import db
+from sqlalchemy.orm import relationship
 
 
 class User(db.Model, UserMixin):
@@ -15,6 +15,7 @@ class User(db.Model, UserMixin):
     __password = db.Column(db.String(255), name='password')
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
+    bookmarks = relationship('BookMark', back_populates='holder', lazy='dynamic')
 
     @hybrid_property
     def roles(self):
@@ -40,3 +41,10 @@ class User(db.Model, UserMixin):
     def password(self, password):
         self.__password = password
 
+    def create_bookmarks(self, *args: library_model.BookMark):
+            try:
+                self.bookmarks.extend([*args])
+            except Exception as e:
+                import logging
+                logging.error('seeror', e)
+            db.session.add(self)

@@ -7,5 +7,6 @@ node_modules
 
 .env
 mysql
-log/info/*
-log/warning/*
+log/*/*
+yarn-error.log
+yarn.lock

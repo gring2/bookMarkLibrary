@@ -1,8 +1,8 @@
 from bookMarkLibrary.database import db
 from flask_testing import TestCase
 import os
+import logging
 import bookMarkLibrary.app as base_app
-
 
 app = base_app.create_app(
     {
@@ -15,7 +15,6 @@ app = base_app.create_app(
 
 
 class BaseTestCase(TestCase):
-
     def create_app(self):
         self.app = app
 

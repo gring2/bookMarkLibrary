@@ -19,7 +19,7 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def create_app(test_config=None):
     # create and configure the app
-    __setup_logging()
+    __setup_logging(test_config)
     # logging.basicConfig(filename=ROOT_DIR + '/../log/error.log')
 
     app = Flask(__name__, instance_relative_config=True)
@@ -85,21 +85,22 @@ def create_app(test_config=None):
     return app
 
 
-def __setup_logging():
-    import logging.config
-    import yaml
+def __setup_logging(test_config=None):
+    if test_config is None:
+        import logging.config
+        import yaml
 
-    config = yaml.safe_load(open(ROOT_DIR + '/logging.conf'))
+        config = yaml.safe_load(open(ROOT_DIR + '/logging.conf'))
 
-    def __set_root_path_to_filename(handlers):
-        for k, handler in handlers.items():
-            if 'filename' in handler:
-                handler['filename'] = handler['filename'].replace('$ROOT_PATH', ROOT_DIR + '/..')
-                handlers[k] = handler
+        def __set_root_path_to_filename(handlers):
+            for k, handler in handlers.items():
+                if 'filename' in handler:
+                    handler['filename'] = handler['filename'].replace('$ROOT_PATH', ROOT_DIR + '/..')
+                    handlers[k] = handler
 
-    __set_root_path_to_filename(config['handlers'])
+        __set_root_path_to_filename(config['handlers'])
 
-    logging.config.dictConfig(config)
+        logging.config.dictConfig(config)
 
 
 def __graceful_create_dir(path):
