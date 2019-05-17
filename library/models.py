@@ -29,12 +29,14 @@ class BookMark(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     _url = db.Column(db.String(255), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    holder = relationship('User', backref='bookmarks')
+
     img = db.Column(db.String(255))
     name = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, server_default=db.func.now(),
                            server_onupdate=db.func.now())
+    holder = relationship('User', back_populates='bookmarks')
+    tags = relationship('Tag', secondary=association_table, back_populates='bookmarks')
 
     @classmethod
     def remove_last_slash_from_url(cls, url):
@@ -108,7 +110,7 @@ class Tag(db.Model):
     tag = db.Column(db.Integer, nullable=False, unique=True)
     bookmarks = relationship("BookMark",
                              secondary=association_table,
-                             backref="tags")
+                             back_populates="tags")
 
     @classmethod
     def find_or_make(cls, tag):

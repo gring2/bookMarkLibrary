@@ -22,12 +22,17 @@ def add_ele():
 
 
 @bp.route('/urls')
+@bp.route('/urls/<string:tag>')
 @login_required
-def urls():
+def urls(tag):
     bookMarks = current_user.bookmarks
+
+    if tag is not None:
+        bookMarks = bookMarks.join(BookMark, Tag).filter_by(Tag.tag == tag)
+
     # flattern need
     tags = []
-    for bookmark in bookMarks:
+    for bookmark in bookMarks.all():
         tags.extend(bookmark.tags)
 
     return render_template('library/urls.html', bookmarks=bookMarks, tags=tags)
