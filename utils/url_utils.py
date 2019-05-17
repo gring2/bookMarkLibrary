@@ -1,16 +1,21 @@
 from urllib.parse import urlparse
+import requests
 
 
-def get_http_format_url(url: str)->str:
+https_token = 'https://'
+http_token = 'http://'
+www_token = 'www.'
+
+
+def get_http_format_url(origin: str)->str:
     """
     :param url: url format(http or https may be included or not ) string
     :return: full formatted url(http[s]://www.uri) string
     """
-    https_token = 'https://'
-    http_token = 'http://'
-    www_token = 'www.'
 
     replaced_protocol = http_token
+
+    url = origin
 
     if https_token in url:
         url = url.replace(https_token, '')
@@ -25,7 +30,28 @@ def get_http_format_url(url: str)->str:
 
     url = replaced_protocol + url
 
+    if is_accessible_url(url):
+        return __remove_last_slash(url)
+
+    if not has_protocol_token(origin):
+        url = https_token + origin
+    else:
+        url = origin
+
     return __remove_last_slash(url)
+
+
+def has_protocol_token(url):
+    return http_token  in url or https_token  in url
+
+
+def is_accessible_url(url):
+    try:
+        requests.get(url)
+    except requests.exceptions.ConnectionError:
+        return False
+
+    return True
 
 
 def get_host_from_url(url: str)->str:

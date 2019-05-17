@@ -71,5 +71,15 @@ class FaviconHandler():
 
         return self._node is not None
 
-    def get_url(self)->str:
-        return self._node['content']
+    def get_url(self)->str or None:
+
+        url = None
+        try:
+            url = self._node['content']
+
+        except KeyError:
+            url = self._node['href']
+
+        finally:
+
+            return url
