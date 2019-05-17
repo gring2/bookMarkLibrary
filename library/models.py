@@ -107,7 +107,7 @@ class Tag(db.Model):
     __tablename__ = "tags"
 
     id = db.Column(UUIDType(binary=False), primary_key=True, default=uuid.uuid4)
-    tag = db.Column(db.Integer, nullable=False, unique=True)
+    tag = db.Column(db.String(255), nullable=False, unique=True)
     bookmarks = relationship("BookMark",
                              secondary=association_table,
                              back_populates="tags")
@@ -118,3 +118,11 @@ class Tag(db.Model):
         if obj is None:
             obj = Tag(tag=tag)
         return obj
+
+    @staticmethod
+    def conv_tag_str_to_list(tag_str: str):
+        tag_inputs = tag_str.split('#')
+
+        tag_inputs.pop(0)
+
+        return tag_inputs
