@@ -4,7 +4,8 @@ import traceback
 import logging
 from utils.url_utils import get_http_format_url
 
-def meta_node_ha_attri(node, attr):
+
+def meta_node_has_attri(node, attr):
     return node is not None and node.has_attr(attr)
 
 
@@ -14,7 +15,7 @@ def get_image_meta(response, target_info, attr_name):
         soup = BeautifulSoup(response.text, 'html.parser')
         node = soup.find(**target_info)
 
-        if meta_node_ha_attri(node, attr_name) and len(node[attr_name]) > 1:
+        if meta_node_has_attri(node, attr_name) and len(node[attr_name]) > 1:
             return node
 
         return None
@@ -49,7 +50,7 @@ class FaviconHandler():
         self._response = response
         self._node = None
 
-    def has_favicon_image_link_tag(self)->bool:
+    def set_favicon_image_link_tag(self)->bool:
         link_tag_info = {
             'name': 'link',
             'attrs': {'rel': 'icon'}
@@ -60,7 +61,7 @@ class FaviconHandler():
 
         return self._node is not None
 
-    def has_image_meta_tag(self)->bool:
+    def set_image_meta_tag(self)->bool:
         link_tag_info = {
             'name': 'meta',
             'attrs': {'itemprop': 'image'}
