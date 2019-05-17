@@ -373,7 +373,7 @@ class ShowTestCase(BaseTestCase):
             assert 'main' in content
             self.assert_template_used('library/urls.html')
 
-    def test_search_thumbail_by_tag(self):
+    def test_search_thumbnail_by_tag(self):
         from bookMarkLibrary.database import db
         user = User.query.first()
         b1 = BookMark(url='http://localhost', name='test_thumbnail')
@@ -390,7 +390,7 @@ class ShowTestCase(BaseTestCase):
 
         with self.client:
             self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
-            result = self.client.get(url_for('library.urls') + '/test_tag')
+            result = self.client.get(url_for('library.urls',  tag='test_tag'))
 
             content = result.data.decode('utf-8')
             assert 'test_tag' in content
@@ -399,24 +399,25 @@ class ShowTestCase(BaseTestCase):
 
             self.assert_template_used('library/urls.html')
 
-    def test_seach_thumbnail_by_tag_not_exists(self):
+    def test_search_thumbnail_by_tag_not_exists(self):
         from bookMarkLibrary.database import db
-
-        b1 = BookMark(url='http://localhost', name='test_thumbnail', user_id=current_user.id)
-        b2 = BookMark(url='http://localhost2', name='test_thumbnail2', user_id=current_user.id)
+        user = User.query.first()
+        b1 = BookMark(url='http://localhost', name='test_thumbnail')
+        b2 = BookMark(url='http://localhost2', name='test_thumbnail2')
         tag = Tag(tag='test_tag')
         b1.tags.append(tag)
         b2.tags.append(tag)
 
-        db.add(tag)
+        user.bookmarks.extend([b1, b2])
         db.session.commit()
 
         with self.client:
             self.client.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'})
-            result = self.client.get(url_for('library.urls') + '/null')
+            result = self.client.get(url_for('library.urls', tag='null'))
 
             content = result.data.decode('utf-8')
             assert 'null' not in content
-            assert 'test_thumbnail' in content
+            assert 'test_thumbnail' not in content
 
             self.assert_template_used('library/urls.html')
+

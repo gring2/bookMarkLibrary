@@ -27,18 +27,18 @@ def add_ele():
 @bp.route('/urls')
 @bp.route('/urls/<string:tag>')
 @login_required
-def urls(tag):
-    bookMarks = current_user.bookmarks
+def urls(tag=None):
+    book_marks = current_user.bookmarks
 
     if tag is not None:
-        bookMarks = bookMarks.join(BookMark, Tag).filter_by(Tag.tag == tag)
+        book_marks = book_marks.join(Tag.bookmarks).filter(Tag.tag == tag)
 
     # flattern need
     tags = []
-    for bookmark in bookMarks.all():
+    for bookmark in book_marks.all():
         tags.extend(bookmark.tags)
 
-    return render_template('library/urls.html', bookmarks=bookMarks, tags=tags)
+    return render_template('library/urls.html', bookmarks=book_marks, tags=tags)
 
 
 @bp.route('/thumbnail', methods=['POST'])

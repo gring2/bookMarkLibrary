@@ -10,7 +10,8 @@
         <ul>
             {% for tag in tags %}
                 <span>
-                    {{ tag.tag }}
+                <a href="{{ url_for('library.urls', tag=tag.tag) }}">{{ tag.tag }}</a>
+
                 </span>
             {% endfor %}
         </ul>

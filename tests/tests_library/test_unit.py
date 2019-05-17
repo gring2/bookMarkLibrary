@@ -325,7 +325,7 @@ class BookmarkTagRelTest(BaseTestCase):
         db.session.add_all([u1, b1, b2, t1, t2])
         db.session.commit()
 
-        self.assertEqual(2, len(u1.bookmarks))
+        self.assertEqual(2, len(u1.bookmarks.all()))
         self.assertEqual(u1, b1.holder)
         self.assertEqual(u1, b1.holder)
         self.assertEqual(2, len(b1.tags))
