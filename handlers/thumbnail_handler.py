@@ -28,13 +28,16 @@ class ThumbnailHandler():
         og_handler = OgImageHandler(response)
         favicon_handler = FaviconHandler(response)
 
+        name = self.__get_title(response)
+
         if og_handler.has_og_image_meta():
             thumbnail_path = og_handler.get_url()
 
         elif favicon_handler.has_favicon_image_link_tag() or favicon_handler.has_image_meta_tag():
             thumbnail_path = favicon_handler.get_url()
+        else:
+            return None, name
 
-        name = self.__get_title(response)
         thumbnail_path = self.__pad_host(thumbnail_path)
         return thumbnail_path, name
 
