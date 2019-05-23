@@ -7,6 +7,7 @@ from library import contract
 from bookMarkLibrary.exceptions import InvalidURLException
 from utils.url_utils import get_http_format_url
 
+
 @login_required
 @bp.route('/add', methods=['POST'])
 def add_ele():
@@ -49,6 +50,6 @@ def change_thumbnail():
 
     bookmark = BookMark.query.get(id)
 
-    bookmark.change_thumbnail(file)
+    contract.change_thumbnail(bookmark, file)
 
     return redirect(url_for('library.urls'))
