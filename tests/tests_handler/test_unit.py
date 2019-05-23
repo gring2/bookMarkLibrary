@@ -1,3 +1,6 @@
+from unittest.mock import patch
+
+from handlers.thumbnail_handler import ThumbnailHandler
 from tests.base import BaseTestCase
 from handlers.image_handler import OgImageHandler, FaviconHandler
 from unittest import mock
@@ -319,29 +322,123 @@ class FaviconHandlerTest(BaseTestCase):
         self.assertIsNotNone(url)
         self.assertEqual('testmeta', url)
 
-    def test_set_name_with_title_tag(self):
-        bookmark = BookMark()
-        bookmark.url = 'https://google.com'
-        bookmark.makeup()
 
-        self.assertEqual('Google', bookmark.name)
+class ThumbnailHandlerTest(BaseTestCase):
 
-    def test_blank_page_thumbnail(self):
-        u1 = User()
-        bookmark = BookMark()
-        bookmark.url = 'https://google.com'
-        bookmark.makeup()
-        bookmark.img = None
-        u1.create_bookmarks(bookmark)
-        db.session.commit()
-        self.assertEqual('/static/img/blank.png', bookmark.thumbnail)
+    def test_return_title_thumbnail_path(self):
+        t = ThumbnailHandler('https://google.com')
+        result = t.create_thumbnail()
 
-    def test_google_favicon(self):
-        bookmark = BookMark()
-        bookmark.url = 'https://www.google.com/search?' + \
+        self.assertIsNotNone(result[1])
+        self.assertIsNotNone(result[0])
+
+    def test_sub_domain_return_title_and_thumbnail(self):
+        url = 'https://www.google.com/search?' + \
                        'source=hp&ei=RT3VXIXyJfSMr7wPjI6M6Ac&q=' + \
                        'urlparse&oq=urlp&gs_l=psy-ab.1.1.0l5j0i10j0l4.2477.3781..5473...2.0..0.87.451.6......0....1..gws-wiz.....0.FWwWVpuif-g'
-        bookmark.makeup()
-        self.assertIsNotNone(bookmark.img)
-        self.assertTrue('google.com' in bookmark.img)
+        t = ThumbnailHandler(url)
+        result = t.create_thumbnail()
 
+        self.assertIsNotNone(result[1])
+        self.assertIsNotNone(result[0])
+
+    @patch('handlers.thumbnail_handler.requests')
+    def test_reuturn_none_thumbnail_name(self, mock_requests):
+        mock_res = mock.patch('requests.Response')
+        mock_res.status_code = 200
+        mock_res.text = """
+            <html>
+                <head>
+                    <meta charset="utf8" content="testmeta"/>
+                    <title>
+                        testTItle
+                    </title>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        mock_requests.get.return_value = mock_res
+
+        t = ThumbnailHandler('test.test')
+        result = t.create_thumbnail()
+
+        self.assertEqual('testTItle', result[1].strip())
+        self.assertIsNone(result[0])
+
+    @patch('handlers.thumbnail_handler.requests')
+    def test_return_og_image_first(self, mock_requests):
+        mock_res = mock.patch('requests.Response')
+        mock_res.status_code = 200
+        mock_res.text = """
+            <html>
+                <head>
+                    <meta property="og:image" content="testmeta"/>
+                    <link rel="icon" href="test.com"/>
+                    <title>
+                        testTItle
+                    </title>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        mock_requests.get.return_value = mock_res
+
+        t = ThumbnailHandler('test.test')
+        result = t.create_thumbnail()
+
+        self.assertEqual('testTItle', result[1].strip())
+        self.assertEqual('https://testmeta', result[0].strip())
+
+    @patch('handlers.thumbnail_handler.requests')
+    def test_return_og_image(self, mock_requests):
+        mock_res = mock.patch('requests.Response')
+        mock_res.status_code = 200
+        mock_res.text = """
+            <html>
+                <head>
+                    <meta property="og:image" content="testmeta"/>
+                    <title>
+                        testTItle
+                    </title>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        mock_requests.get.return_value = mock_res
+
+        t = ThumbnailHandler('http://test.test')
+        result = t.create_thumbnail()
+
+        self.assertEqual('testTItle', result[1].strip())
+        self.assertEqual('https://testmeta', result[0].strip())
+
+    @patch('handlers.thumbnail_handler.requests')
+    def test_return_favicon_image(self, mock_requests):
+        mock_res = mock.patch('requests.Response')
+        mock_res.status_code = 200
+        mock_res.text = """
+            <html>
+                <head>
+                    <link rel="icon" href="/test.com"/>
+                    <title>
+                        testTItle
+                    </title>
+
+                </head>
+                <body>
+                </body>
+            </html>
+        """
+        mock_requests.get.return_value = mock_res
+
+        t = ThumbnailHandler('http://test.test')
+        result = t.create_thumbnail()
+
+        self.assertEqual('testTItle', result[1].strip())
+        self.assertEqual('http://test.test/test.com', result[0].strip())
