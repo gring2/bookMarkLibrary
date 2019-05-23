@@ -1,28 +1,6 @@
-from bs4 import BeautifulSoup, element
 import requests
-import traceback
-import logging
 from utils.url_utils import get_http_format_url
-
-
-def meta_node_has_attri(node, attr):
-    return node is not None and node.has_attr(attr)
-
-
-def get_image_meta(response, target_info, attr_name):
-    try:
-
-        soup = BeautifulSoup(response.text, 'html.parser')
-        node = soup.find(**target_info)
-
-        if meta_node_has_attri(node, attr_name) and len(node[attr_name]) > 1:
-            return node
-
-        return None
-
-    except requests.exceptions.ConnectionError:
-        logging.error(traceback.extract_stack())
-        return None
+from utils.html_utils import get_html_node
 
 
 class OgImageHandler():
@@ -35,7 +13,7 @@ class OgImageHandler():
         }
 
     def has_og_image_meta(self):
-        node = get_image_meta(self._response, self._target_info, self._content_attr_name)
+        node = get_html_node(self._response, self._target_info, self._content_attr_name)
         if node:
             self._node = node
 
@@ -55,7 +33,7 @@ class FaviconHandler():
             'name': 'link',
             'attrs': {'rel': 'icon'}
         }
-        node = get_image_meta(self._response, link_tag_info, 'href')
+        node = get_html_node(self._response, link_tag_info, 'href')
         if node:
             self._node = node
 
@@ -66,7 +44,7 @@ class FaviconHandler():
             'name': 'meta',
             'attrs': {'itemprop': 'image'}
         }
-        node = get_image_meta(self._response, link_tag_info, 'content')
+        node = get_html_node(self._response, link_tag_info, 'content')
         if node:
             self._node = node
 
