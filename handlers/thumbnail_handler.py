@@ -52,6 +52,10 @@ class ThumbnailHandler():
             return None
 
     def __pad_host(self, thumbnail_path):
+
+        if 'http://' in thumbnail_path or 'https://' in thumbnail_path:
+            return thumbnail_path
+
         host = get_host_from_url(self._url)
         if host not in thumbnail_path:
             thumbnail_path = host + thumbnail_path
