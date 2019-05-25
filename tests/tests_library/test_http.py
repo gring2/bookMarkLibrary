@@ -327,12 +327,13 @@ class AddTestCase(BaseTestCase):
             db.session.commit()
 
             data = {'thumbnail': file, 'id': BookMark.query.first().id}
-            self.client.post(url_for('library.change_thumbnail'), data=data)
+            res = self.client.post(url_for('library.change_thumbnail'), data=data)
 
             self.assertNotEqual(past_img, bookmark.img)
 
             path = Path(app.config['STORAGE_PATH'] + '/' + bookmark.img)
             self.assertTrue(path.is_file())
+            self.assertRedirects(res, url_for('library.urls'))
 
     def test_invalid_url(self):
         with self.client:

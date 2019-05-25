@@ -37,7 +37,6 @@ def change_thumbnail(bookmark: BookMark, file):
             bookmark.img = img_name
             db.session.add(bookmark)
             db.session.commit()
-            db.session.commit()
 
         except Exception:
             os.remove(path)
