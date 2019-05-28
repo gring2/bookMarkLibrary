@@ -1,0 +1,43 @@
+nav{
+  .link-style-none{
+    text-decoration: none;
+  }
+  .list-style-none{
+    list-style: none  !important;
+  }
+  height: 10%;
+  background-color: #2e3131;
+  display: flex;
+  justify-content: space-between;
+  .home-logo{
+    padding-left: 10px;
+  }
+  .manu{
+    display: block;
+    color: #eee;
+    text-decoration: none;
+    padding-right: 8px;
+    padding-left: 8px;
+    font-weight: 600!important;
+  }
+  div {
+    display: flex;
+    h1{
+      color: #fff;
+    }
+
+  }
+  .authenticate{
+    display: flex;
+    justify-content: space-between;
+    // width: 16.5%;
+    min-width: 14rem;
+    color: #eee;
+    padding-right: 10px;
+    .logout-box{
+      margin-right: 2%;
+
+    }
+  }
+
+}
