@@ -1,0 +1,41 @@
+nav {
+  height: 10%;
+  background-color: #2e3131;
+  display: flex;
+  justify-content: space-between;
+}
+nav .link-style-none {
+  text-decoration: none;
+}
+nav .list-style-none {
+  list-style: none !important;
+}
+nav .home-logo {
+  padding-left: 10px;
+}
+nav .manu {
+  display: block;
+  color: #eee;
+  text-decoration: none;
+  padding-right: 8px;
+  padding-left: 8px;
+  font-weight: 600 !important;
+}
+nav div {
+  display: flex;
+}
+nav div h1 {
+  color: #fff;
+}
+nav .authenticate {
+  display: flex;
+  justify-content: space-between;
+  min-width: 14rem;
+  color: #eee;
+  padding-right: 10px;
+}
+nav .authenticate .logout-box {
+  margin-right: 2%;
+}
+
+/*# sourceMappingURL=header.css.map */

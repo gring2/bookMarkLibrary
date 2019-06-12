@@ -1,1 +1,1 @@
-{"version":3,"file":"BookMarkList.vue.js","sourceRoot":"","sources":["BookMarkList.vue"],"names":[],"mappings":";AAaE,OAAO,EAAE,SAAS,EAAQ,GAAG,EAAE,MAAM,wBAAwB,CAAC;AAK9D,IAAqB,YAAY,GAAjC,MAAqB,YAAa,SAAQ,GAAG;CAC5C,CAAA;AADoB,YAAY;IAJhC,SAAS,CAAC;QACT,UAAU,EAAE,EACX;KACF,CAAC;GACmB,YAAY,CAChC;eADoB,YAAY"}
+{"version":3,"file":"BookMarkList.vue.js","sourceRoot":"","sources":["BookMarkList.vue"],"names":[],"mappings":""}

@@ -2,13 +2,15 @@
   <nav>
     <div>
       <div class="home-logo">
-        <a  class="link-style-none"
-        ><h1>BookMarkLibrary</h1></a>
-
+        <router-link :to="{name: 'home'}"  class="link-style-none">
+          <h1>BookMarkLibrary</h1>
+          </router-link>
       </div>
       <div>
         <ul class="list-style-none flex flex-items-center">
-          <li><a class="manu">library</a></li>
+          <li>
+            <router-link :to="{name: 'bookmarks'}"  class="manu">library</router-link>
+          </li>
 
         </ul>
       </div>
@@ -18,7 +20,7 @@
 
     <div class="authenticate flex-items-center">
       <div>
-        <p>Hi! {{email}}</p>
+        <p>Hi! {{user? user.email : 'test email'}}</p>
       </div>
       <div class="logout-box">
         <Button className="logout"><template v-slot:text>Log out</template></Button>
@@ -27,7 +29,7 @@
 
         <Button className="register"><template v-slot:text>Sign Up</template></Button>
       </div>
-      <div class="">
+      <div class="" v-if="!user">
 
         <Button className="login"><template v-slot:text>Sign In</template></Button>
       </div>
@@ -39,13 +41,14 @@
 <script lang="ts">
   import { Component, Prop, Vue } from 'vue-property-decorator';
   import Button from '@/components/Button'
+  import User from '@/vo/User'
   @Component({
     components: {
       Button,
     },
   })
   export default class Header extends Vue {
-     @Prop({default: 'email'}) private email!: string;
+     @Prop() private user!: User;
   }
 </script>
 

@@ -1,9 +1,15 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, mount, RouterLinkStub } from '@vue/test-utils';
 import Header from '@/views/Header.vue';
 describe('Header.vue', () => {
+    beforeEach(() => {
+    });
     it('renders default props.email', () => {
         const defaultEmail = 'email';
-        const wrapper = shallowMount(Header, {});
+        const wrapper = shallowMount(Header, {
+            stubs: {
+                RouterLink: RouterLinkStub
+            }
+        });
         expect(wrapper.text()).toMatch(defaultEmail);
     });
     it('render props.email when passed', () => {
@@ -11,9 +17,31 @@ describe('Header.vue', () => {
         const wrapper = shallowMount(Header, {
             propsData: {
                 email
+            },
+            stubs: {
+                RouterLink: RouterLinkStub
             }
         });
         expect(wrapper.text()).toMatch(email);
+    });
+    it('do not render sign in button when user is not null', () => {
+        const wrapper = mount(Header, {
+            propsData: {
+                user: {}
+            },
+            stubs: {
+                RouterLink: RouterLinkStub
+            }
+        });
+        expect(wrapper.find('.login').exists()).toBeFalsy();
+    });
+    it('render sign in button when user is  null', () => {
+        const wrapper = mount(Header, {
+            stubs: {
+                RouterLink: RouterLinkStub
+            }
+        });
+        expect(wrapper.find('.login').exists()).toBeTruthy();
     });
 });
 //# sourceMappingURL=header.spec.js.map
