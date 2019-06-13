@@ -16,6 +16,12 @@ csrf = CSRFProtect()
 user_datastore = SQLAlchemyUserDatastore(db, User, None)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+env = os.getenv('ENV', 'production')
+
+if env == 'testing':
+    from dotenv import load_dotenv
+    load_dotenv()
+
 
 def create_app(test_config=None):
     # create and configure the app

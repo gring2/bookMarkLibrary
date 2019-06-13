@@ -9,11 +9,10 @@ services:
       - "80:80"
     depends_on:
       - database
-    networks:
-      - the_net
     volumes:
       - $HOME/DOCKERHOME:/app/bookMarkLibrary/storage
     environment:
+      - ENV=testing
       - DB_HOST=database
   database:
     image: mysql:latest
@@ -21,11 +20,6 @@ services:
       - 3306:3306
     volumes:
       - $PWD/mysql:/var/lib/mysql
+      - $PWD/mysql-confd:/etc/mysql/conf.d
     env_file:
       - ./.env
-    networks:
-      - the_net
-
-
-networks:
-  the_net:
