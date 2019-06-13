@@ -15,9 +15,18 @@
     "ordered-imports": false,
     "object-literal-sort-keys": false,
     "no-consecutive-blank-lines": false,
-    "semicolon": false,
+    "semicolon": [true, "never"],
     "trailing-comma": false,
     "eofline": false,
-    "no-console": false
+    "no-console": false,
+    "whitespace": true,
+    "variable-name": {
+      "options": [
+        "ban-keywords",
+        "check-format",
+        "allow-leading-underscore",
+        "allow-pascal-case"
+      ]
+    }
   }
 }

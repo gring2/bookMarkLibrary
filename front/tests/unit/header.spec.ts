@@ -1,19 +1,19 @@
-import {shallowMount, mount, RouterLinkStub } from '@vue/test-utils';
-import Header from '@/views/Header.vue';
+import {shallowMount, mount, RouterLinkStub } from '@vue/test-utils'
+import Header from '@/views/Header.vue'
 
 describe('Header.vue', () => {
   it('renders default props.email', () => {
-    const defaultEmail = 'email';
+    const defaultEmail = 'email'
     const wrapper = shallowMount(Header, {
       stubs: {
         RouterLink: RouterLinkStub
       }
-    });
-    expect(wrapper.text()).toMatch(defaultEmail);
-  });
+    })
+    expect(wrapper.text()).toMatch(defaultEmail)
+  })
 
   it('render props.email when passed', () => {
-    const email = 'test email';
+    const email = 'test email'
     const wrapper = shallowMount(Header, {
       propsData: {
         email
@@ -22,8 +22,8 @@ describe('Header.vue', () => {
         RouterLink: RouterLinkStub
       }
 
-    });
-    expect(wrapper.text()).toMatch(email);
+    })
+    expect(wrapper.text()).toMatch(email)
 
   })
 
@@ -50,4 +50,4 @@ describe('Header.vue', () => {
     expect(wrapper.find('.login').exists()).toBeTruthy()
 
   })
-});
+})

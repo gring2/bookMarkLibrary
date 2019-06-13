@@ -3,11 +3,11 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Prop, Vue } from 'vue-property-decorator'
 
   @Component
   export default class Input extends Vue {
-    @Prop() private change?:() => void;
+    @Prop() private change?: () => void
 
   }
 </script>

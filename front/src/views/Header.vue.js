@@ -1,6 +1,6 @@
 import * as tslib_1 from "tslib";
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import Button from '@/components/Button';
+import Button from '@/components/Button.vue';
 let Header = class Header extends Vue {
 };
 tslib_1.__decorate([

@@ -1,10 +1,10 @@
 export default class User {
   get email(): string {
-    return this._email;
+    return this._email
   }
 
   set email(value: string) {
-    this._email = value;
+    this._email = value
   }
-  private _email!: string;
+  private _email!: string
 }

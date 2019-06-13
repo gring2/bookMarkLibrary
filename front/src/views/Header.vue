@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Prop, Vue } from 'vue-property-decorator'
   import Button from '@/components/Button.vue'
   import User from '@/vo/User'
   @Component({
@@ -48,10 +48,10 @@
     },
   })
   export default class Header extends Vue {
-     @Prop() private user!: User;
+     @Prop() private user!: User
   }
 </script>
 
 <style scoped lang="scss">
-  @import "@/styles/header.scss"
+  @import "@/styles/header.scss";
 </style>

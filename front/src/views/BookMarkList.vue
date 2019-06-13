@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-  import { Component, Prop, Vue } from 'vue-property-decorator';
+  import { Component, Prop, Vue } from 'vue-property-decorator'
   import TagsPanel from '@/views/TagsPanel.vue'
   import BookmarksPanel from '@/views/BookmarksPanel.vue'
 

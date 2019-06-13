@@ -22,15 +22,15 @@
     }
   })
   export default class BookmarksPanel extends Vue {
-    private url?: string;
-    private tag?: string;
-    
-    private setTag( value: string ){
-      this.tag = value;
+    private url?: string
+    private tag?: string
+
+    private setTag(value: string) {
+      this.tag = value
       console.log(this.tag)
     }
 
-    private setUrl( value: string ){
+    private setUrl(value: string) {
       this.url = value
       console.log(this.url)
 

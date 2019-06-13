@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import TagsPanel from '@/views/TagsPanel.vue';
-describe("Tag Penel Test", () => {
+describe('Tag Penel Test', () => {
     it('render Tag component', () => {
         const wrapper = mount(TagsPanel, {
             data: () => {

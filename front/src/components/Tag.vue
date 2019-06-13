@@ -9,9 +9,9 @@
 
   })
   export default class Tag extends Vue {
-    @Prop() private tag!:string;
+    @Prop() private tag!: string
 
-    private search(){
+    private search() {
       console.log('search')
     }
   }

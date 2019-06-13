@@ -1,7 +1,7 @@
-import { createLocalVue, mount } from '@vue/test-utils';
-import BookMarkList from '@/views/BookMarkList.vue';
-import VueRouter from 'vue-router';
-import App from '@/App.vue';
+import { createLocalVue, mount } from '@vue/test-utils'
+import BookMarkList from '@/views/BookMarkList.vue'
+import VueRouter from 'vue-router'
+import App from '@/App.vue'
 
 
 describe('BookMarkList.vue', () => {
@@ -26,28 +26,28 @@ describe('BookMarkList.vue', () => {
               name: 'home',
             }
       ],
-    });
+    })
 
-    const wrapper = mount(App, { localVue, router });
+    const wrapper = mount(App, { localVue, router })
 
-    router.push('bookmarks');
-    expect(wrapper.find('aside').exists()).toBeTruthy();
+    router.push('bookmarks')
+    expect(wrapper.find('aside').exists()).toBeTruthy()
     expect(wrapper.element).toMatchSnapshot()
-  });
+  })
 
   it('render tag list panel', () => {
 
     const wrapper = mount(BookMarkList, {
-    });
+    })
     expect(wrapper.find('aside').exists()).toBeTruthy()
   })
 
   it('render bookmarks panel', () => {
     const wrapper = mount(BookMarkList, {
-    });
+    })
     expect(wrapper.find('main').exists()).toBeTruthy()
 
   })
 
 
-});
+})
