@@ -40,7 +40,7 @@
 
 <script lang="ts">
   import { Component, Prop, Vue } from 'vue-property-decorator';
-  import Button from '@/components/Button'
+  import Button from '@/components/Button.vue'
   import User from '@/vo/User'
   @Component({
     components: {

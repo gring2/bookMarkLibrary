@@ -35,7 +35,7 @@ describe('BookMarkList.vue', () => {
     expect(wrapper.element).toMatchSnapshot()
   });
 
-  it('render tag list panel', ()=> {
+  it('render tag list panel', () => {
 
     const wrapper = mount(BookMarkList, {
     });

@@ -6,5 +6,5 @@ export default class User {
   set email(value: string) {
     this._email = value;
   }
-  private _email!:string;
+  private _email!: string;
 }

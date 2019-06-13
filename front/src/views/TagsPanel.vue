@@ -18,7 +18,7 @@ import Tag from '@/components/Tag.vue'
   },
 })
 export default class TagsPanel extends Vue {
-  private tags?:string[] = [];
+  private tags?: string[] = [];
   private created() {
     this.tags = ['test1', 'test2']
   }

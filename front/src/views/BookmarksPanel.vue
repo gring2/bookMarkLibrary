@@ -1,17 +1,40 @@
 <template>
   <main>
+    <Input :change="(e) => {
+      setUrl(e.target.value)
+    }"/>
+    <Input :change="(e) => {
+      setTag(e.target.value)
+    }"/>
+
     <h4>BookMarks</h4>
   </main>
 </template>
 
-<script>
+<script lang=ts>
   import { Component, Vue } from 'vue-property-decorator'
+  import Input from '@/components/Input.vue'
+
 
   @Component({
-
+    components: {
+      Input
+    }
   })
   export default class BookmarksPanel extends Vue {
+    private url?: string;
+    private tag?: string;
+    
+    private setTag( value: string ){
+      this.tag = value;
+      console.log(this.tag)
+    }
 
+    private setUrl( value: string ){
+      this.url = value
+      console.log(this.url)
+
+    }
   }
 
 </script>

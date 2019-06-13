@@ -2,9 +2,6 @@ import {shallowMount, mount, RouterLinkStub } from '@vue/test-utils';
 import Header from '@/views/Header.vue';
 
 describe('Header.vue', () => {
-  beforeEach(() => {
-
-  })
   it('renders default props.email', () => {
     const defaultEmail = 'email';
     const wrapper = shallowMount(Header, {
