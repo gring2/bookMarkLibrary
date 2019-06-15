@@ -18,7 +18,7 @@
     </div>
 
 
-    <div class="authenticate flex-items-center">
+    <div class="authenticate flex-items-center" v-if="!isMobile">
       <div>
         <p>Hi! {{user? user.email : 'test email'}}</p>
       </div>
@@ -49,6 +49,16 @@
   })
   export default class Header extends Vue {
      @Prop() private user!: User
+     private isMobile: boolean = false;
+
+    calculateisMobile(){
+      const html = document.querySelector('html')
+      this.isMobile = html!.clientWidth < 768
+    }
+    mounted() {
+      this.calculateisMobile()
+      window.addEventListener('resize', this.calculateisMobile);
+    }
   }
 </script>
 
