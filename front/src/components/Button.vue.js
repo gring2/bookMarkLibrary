@@ -5,6 +5,9 @@ let Button = class Button extends Vue {
 tslib_1.__decorate([
     Prop({ default: '' })
 ], Button.prototype, "className", void 0);
+tslib_1.__decorate([
+    Prop({ default: () => Object.create({}) })
+], Button.prototype, "styles", void 0);
 Button = tslib_1.__decorate([
     Component
 ], Button);

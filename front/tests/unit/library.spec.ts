@@ -1,10 +1,10 @@
 import { createLocalVue, mount } from '@vue/test-utils'
-import BookMarkList from '@/views/BookMarkList.vue'
+import Library from '@/views/Library.vue'
 import VueRouter from 'vue-router'
 import App from '@/App.vue'
 
 
-describe('BookMarkList.vue', () => {
+describe('Library.vue', () => {
   it('renders a component via routing', () => {
     const localVue = createLocalVue()
     localVue.use(VueRouter)
@@ -19,7 +19,7 @@ describe('BookMarkList.vue', () => {
               // route level code-splitting
               // this generates a separate chunk (about.[hash].js) for this route
               // which is lazy-loaded when the route is visited.
-              component: BookMarkList,
+              component: Library,
             },
             {
               path: '/',
@@ -35,15 +35,15 @@ describe('BookMarkList.vue', () => {
     expect(wrapper.element).toMatchSnapshot()
   })
 
-  it('render tag list panel', () => {
+  it('Tagpanel exists in Library', () => {
 
-    const wrapper = mount(BookMarkList, {
+    const wrapper = mount(Library, {
     })
     expect(wrapper.find('aside').exists()).toBeTruthy()
   })
 
-  it('render bookmarks panel', () => {
-    const wrapper = mount(BookMarkList, {
+  it('BookMarkPanel exits in Library', () => {
+    const wrapper = mount(Library, {
     })
     expect(wrapper.find('main').exists()).toBeTruthy()
 

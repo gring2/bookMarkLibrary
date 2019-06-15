@@ -1,31 +1,37 @@
 <template>
   <div>
-    <img src="bookmark.src" alt="">
-    <a href="bookmark.url">bookmark.title</a>
+    <img :src="bookmark.thumbnail" alt="">
+    <a :href="bookmark.url">{{bookmark.title}}</a>
   </div>
 </template>
 
 <script lang="ts">
   import {Component, Vue, Prop} from 'vue-property-decorator'
+  import BookMarkModel from '@/vo/BookMark'
 
   @Component({
 
   })
   export default class BookMark extends Vue {
-    @Prop({default: () => Object.create({src: null, url: null, title: null})}) private bookmark!: object
+    @Prop({default: () =>  new BookMarkModel('', '' ,'')}) private bookmark!: BookMarkModel
 
     private search() {
-      
       console.log('search')
     }
   }
 </script>
 
 <style scoped lang="scss">
-  span{
-    cursor: pointer;
-    &:hover{
-      color: blue;
+  $defaultImgSize : 7rem;
+  div{
+    width: $defaultImgSize;
+    height: $defaultImgSize;
+    img{
+      width: inherit;
+      height: $defaultImgSize - 1rem;
+    }
+    a{
+      font-size: 1rem;
     }
   }
 

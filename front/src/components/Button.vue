@@ -1,5 +1,5 @@
 <template>
-    <button :class="className" v-bind:style="styles"><slot name="text"></slot></button>
+    <button :class="className" :style="styles"><slot name="text"></slot></button>
 </template>
 
 <script lang="ts">
@@ -24,5 +24,9 @@
     font-weight: bold;
     text-decoration: none;
     display: inline-block;
+    &.submit {
+        background: #22a7f0;
+        color: #eee;
+    }
   }
 </style>

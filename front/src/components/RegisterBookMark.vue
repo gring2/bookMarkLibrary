@@ -1,14 +1,27 @@
 <template>
   <div>
-    <Input :change="(e) => {
-      setUrl(e.target.value)
-    }" :placeholder="'url'"/>
-    <Input :change="(e) => {
-      setTag(e.target.value)
-    }" :placeholder="'#tag'"/>
-    <Button :styles="{
-    fontWeight: 'normal'
-  }"><template v-slot:text >Susbmit</template></Button>
+    <Input :change="(e) => { setUrl(e.target.value) }" :placeholder="'url'"
+           :styles="{
+                      width: '100%',
+                      fontSize: '2rem',
+                      height: '2rem'
+                    }"
+    />
+    <Input :change="(e) => { setTag(e.target.value) }" :placeholder="'#tag'"
+           :styles="{
+                      width: '100%',
+                      fontSize: '2rem',
+                      height: '2rem'
+                    }"
+
+    />
+    <Button
+        :class="'submit'"
+        :styles="{
+        fontWeight: 'normal',
+        fontSize: '1.4rem',
+        width: '8rem',
+    }"><template v-slot:text >Susbmit</template></Button>
   </div>
 </template>
 
@@ -43,22 +56,7 @@
 </script>
 
 <style scoped lang="scss">
-  main {
-    width: 75%;
-  ul{
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    list-style-type: none;
-    width: 100%;
-    height: 100%;
-  li{
-    display: block;
-  //	margin-right: 5%;
-    width: 15%;
-    height: 10%;
-  }
-  }
+  div *:not(:last-child){
+    margin-bottom: 0.3rem;
   }
 </style>
