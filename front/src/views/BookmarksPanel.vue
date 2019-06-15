@@ -1,40 +1,27 @@
 <template>
   <main>
-    <Input :change="(e) => {
-      setUrl(e.target.value)
-    }"/>
-    <Input :change="(e) => {
-      setTag(e.target.value)
-    }"/>
+    <RegisterBookMark/>
+    <ul v-for="bookmark in bookmarks">
+        <BookMark :bookmark="bookmark"></BookMark>
+    </ul>
 
-    <h4>BookMarks</h4>
   </main>
 </template>
 
 <script lang=ts>
   import { Component, Vue } from 'vue-property-decorator'
-  import Input from '@/components/Input.vue'
+  import RegisterBookMark from '@/components/RegisterBookMark.vue'
 
+  import BookMark from '@/components/BookMark.vue'
 
   @Component({
     components: {
-      Input
+      RegisterBookMark,
+      BookMark
     }
   })
   export default class BookmarksPanel extends Vue {
-    private url?: string
-    private tag?: string
-
-    private setTag(value: string) {
-      this.tag = value
-      console.log(this.tag)
-    }
-
-    private setUrl(value: string) {
-      this.url = value
-      console.log(this.url)
-
-    }
+    private bookmarks: object[] = []
   }
 
 </script>

@@ -1,12 +1,9 @@
 <template>
-  <div>
     <aside class="side">
       <ul v-for="tag in tags">
         <Tag :tag="tag"></Tag>
       </ul>
     </aside>
-
-  </div>
 </template>
 
 <script lang="ts">
