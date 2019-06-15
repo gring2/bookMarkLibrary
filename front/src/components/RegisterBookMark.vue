@@ -56,7 +56,10 @@
 </script>
 
 <style scoped lang="scss">
-  div *:not(:last-child){
-    margin-bottom: 0.3rem;
+  div{
+     padding-top: 1rem;
+    *:not(:last-child) {
+      margin-bottom: 0.3rem;
+    }
   }
 </style>

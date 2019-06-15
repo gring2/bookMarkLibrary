@@ -1,21 +1,34 @@
 import * as tslib_1 from "tslib";
+/>
+    < BookmarkList /  >
+    /main>
+    < /template>
+    < script;
+lang = ts >
+;
 import { Component, Vue } from 'vue-property-decorator';
 import RegisterBookMark from '@/components/RegisterBookMark.vue';
-import BookMark from '@/components/BookMark.vue';
-import BookMarkModel from '@/vo/BookMark';
+import BookmarkList from '@/views/BookmarkList.vue';
 let BookmarksPanel = class BookmarksPanel extends Vue {
-    constructor() {
-        super(...arguments);
-        this.bookmarks = [new BookMarkModel('title', '#', 'https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png')];
-    }
 };
 BookmarksPanel = tslib_1.__decorate([
     Component({
         components: {
             RegisterBookMark,
-            BookMark
+            BookmarkList
         }
     })
 ], BookmarksPanel);
 export default BookmarksPanel;
+/script>
+    < style;
+scoped;
+lang = "scss" >
+    main;
+{
+    width: 70 % ;
+    margin - right;
+    5 % ;
+}
+/style>;
 //# sourceMappingURL=BookmarksPanel.vue.js.map

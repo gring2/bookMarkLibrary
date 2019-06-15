@@ -1,5 +1,7 @@
+@import "@/styles/mixins.scss";
+
 %centralize {
-  display: flex;
+  @include flex;
   justify-content: center;
   align-items:  center;
 }

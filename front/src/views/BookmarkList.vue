@@ -26,6 +26,7 @@
 </script>
 
 <style module lang="scss">
+  @import "@/styles/mixins.scss";
   .container {
     margin-top: 2rem;
     border-top: 1px solid #e4e6e8;
@@ -36,11 +37,7 @@
     height: 100%;
     align-items: center;
 
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
+    @include flex;
 
     flex-wrap: wrap;
     -webkit-flex-flow: row wrap;
