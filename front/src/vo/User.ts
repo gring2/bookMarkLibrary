@@ -6,5 +6,7 @@ export default class User {
   set email(value: string) {
     this._email = value
   }
+
+  public token!: string
   private _email!: string
 }
