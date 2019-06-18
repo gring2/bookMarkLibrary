@@ -2,7 +2,7 @@ import { createLocalVue, mount } from '@vue/test-utils'
 import Library from '@/views/Library.vue'
 import VueRouter from 'vue-router'
 import App from '@/App.vue'
-
+import Home from '@/views/Home.vue'
 
 describe('Library.vue', () => {
   it('renders a component via routing', () => {
@@ -24,14 +24,15 @@ describe('Library.vue', () => {
             {
               path: '/',
               name: 'home',
+              component: Library
             }
       ],
     })
 
     const wrapper = mount(App, { localVue, router })
 
-    router.push('bookmarks')
-    expect(wrapper.find('aside').exists()).toBeTruthy()
+    let c = router.push('/bookmarks')
+    expect(wrapper.find(Library).exists()).toBeTruthy()
     expect(wrapper.element).toMatchSnapshot()
   })
 

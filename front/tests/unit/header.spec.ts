@@ -20,7 +20,13 @@ describe('Header.vue', () => {
       },
       stubs: {
         RouterLink: RouterLinkStub
+      },
+      methods: {
+        calculateisMobile: () => {
+
+        }
       }
+
 
     })
     expect(wrapper.text()).toMatch(email)
@@ -34,8 +40,12 @@ describe('Header.vue', () => {
       },
       stubs: {
         RouterLink: RouterLinkStub
-      }
+      },
+      methods: {
+        calculateisMobile: () => {
 
+        }
+      }
     })
     expect(wrapper.find('.login').exists()).toBeFalsy()
   })
@@ -44,10 +54,34 @@ describe('Header.vue', () => {
     const wrapper = mount(Header, {
       stubs: {
         RouterLink: RouterLinkStub
-      }
+      },
+      methods: {
+        calculateisMobile: () => {
 
+        }
+      }
     })
     expect(wrapper.find('.login').exists()).toBeTruthy()
+
+  })
+
+  it('no render sign if isMobile is true', () => {
+    const wrapper = mount(Header, {
+      stubs: {
+        RouterLink: RouterLinkStub
+      },
+      methods: {
+        calculateisMobile: () => {
+        }
+      },
+      data:() => {
+        return { isMobile: true}
+      }
+    })
+
+    console.log(wrapper.html())
+
+    expect(wrapper.find('.login').exists()).toBeFalsy()
 
   })
 })

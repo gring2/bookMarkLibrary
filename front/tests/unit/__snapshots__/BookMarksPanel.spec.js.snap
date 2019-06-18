@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BookMarksPenel Test render BookMarksPenel view 1`] = `
+<main>
+  <div><input type="text" placeholder="url" style="width: 100%; font-size: 2rem; height: 2rem;"> <input type="text" placeholder="#tag" style="width: 100%; font-size: 2rem; height: 2rem;"> <button class="submit" style="font-weight: normal; font-size: 1.4rem; width: 8rem;">Susbmit</button></div>
+  <div class="container">
+    <ul>
+      <li>
+        <div><img src="https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png" alt=""> <a href="#">title</a></div>
+      </li>
+    </ul>
+  </div>
+</main>
+`;

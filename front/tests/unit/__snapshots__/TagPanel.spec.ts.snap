@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TagPenel Test render TagPenel view 1`] = `
+<aside class="side">
+  <ul><span>test1</span></ul>
+  <ul><span>test2</span></ul>
+</aside>
+`;
