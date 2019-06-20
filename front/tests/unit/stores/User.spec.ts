@@ -36,7 +36,24 @@ describe('SET USER', () => {
   })
 
   it('get a user state', () => {
+    const user = new User()
+    user.email = 'test@email.com'
+    user.token = 'test token'
+
+    const state = {
+      token: null,
+      user
+    }
+    userMod.state = state
+    const actual = userMod.state.user
+    expect(actual).toBe(user)
+ ///   fail('no implemented')
+
+  })
+
+  it('action sign up works', () =>{
     fail('no implemented')
+
   })
 })
 
@@ -50,7 +67,13 @@ describe('get user', () => {
     const user = new User()
     user.email = 'vuex-email'
     userMod.SET_USER(user)
-    const wrapper = mount(Header)
+    const wrapper = mount(Header,{
+      stubs: {
+        RouterLink: RouterLinkStub
+      },
+
+    }
+      )
 
     expect(wrapper.find('p').text()).toBe('Hi! vuex-email')
   })

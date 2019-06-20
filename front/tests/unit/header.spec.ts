@@ -35,7 +35,7 @@ describe('Header.vue', () => {
 
   })
 
-  it('no render sign if isMobile is true', () => {
+  it('no render buttons if isMobile is true', () => {
 
     const wrapper = mount(Header, {
       stubs: {
@@ -50,7 +50,7 @@ describe('Header.vue', () => {
       }
     })
 
-    expect(wrapper.find('.login').exists()).toBeFalsy()
+    expect(wrapper.find('.authenticate').exists()).toBeFalsy()
 
   })
 })
