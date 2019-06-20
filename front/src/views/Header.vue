@@ -30,7 +30,6 @@
         <Button className="register"><template v-slot:text>Sign Up</template></Button>
       </div>
       <div class="" v-if="!user">
-
         <Button className="login"><template v-slot:text>Sign In</template></Button>
       </div>
     </div>
@@ -42,13 +41,15 @@
   import { Component, Prop, Vue } from 'vue-property-decorator'
   import Button from '@/components/Button.vue'
   import User from '@/vo/User'
-  @Component({
+  import UserModule, {userMod} from '@/stores/modules/user'
+
+@Component({
     components: {
       Button,
     },
   })
   export default class Header extends Vue {
-     @Prop() private user!: User
+     private user: User | null = userMod.user
      private isMobile: boolean = false;
 
     calculateisMobile(){

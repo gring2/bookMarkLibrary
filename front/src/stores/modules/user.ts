@@ -1,34 +1,21 @@
+import { Module, VuexModule, Mutation, getModule } from 'vuex-module-decorators'
+import store from '@/stores'
+
 import User from '@/vo/User'
-interface State {
+export interface IUserState {
   token: string | null,
   user: User | null
 }
-const state: State =  {
-  token: null,
-  user: null
-}
+@Module({dynamic: true, store, name:'userMod'})
+export default class UserModule extends VuexModule implements IUserState {
+  token: string | null = null;
+  user: User | null = null;
 
-const getters = {
-
-}
-
-const actions = {
-
-}
-
-const mutations = {
-  // tslint:disable-next-line:no-shadowed-variable
-  SET_USER(state: State, { user }: {[key: string]: User}) {
-    state.token = user.token
-    state.user = user
+  @Mutation
+  public SET_USER(user: User) {
+    this.token = user.token
+    this.user = user
   }
 
 }
-
-export default {
-  namespaced: true,
-  state,
-  getters,
-  actions,
-  mutations
-}
+export const userMod = getModule(UserModule)

@@ -1,13 +1,19 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
-import user from './modules/user'
+import Vuex, { Store } from 'vuex'
+import UserModule, {IUserState} from './modules/user'
 Vue.use(Vuex)
 
 const debug = process.env.NODE_ENV !== 'production'
+// const modules = {
+//   user: UserModule
+// }
+export interface IRootState {
+  user: IUserState;
+}
 
-export default new Vuex.Store({
-  modules: {
-    user
-  },
+const store = new Vuex.Store<IRootState>({
   strict: debug,
 })
+
+export default store
+

@@ -31,7 +31,7 @@ describe('Library.vue', () => {
 
     const wrapper = mount(App, { localVue, router })
 
-    let c = router.push('/bookmarks')
+    router.push('/bookmarks')
     expect(wrapper.find(Library).exists()).toBeTruthy()
     expect(wrapper.element).toMatchSnapshot()
   })
