@@ -1,5 +1,6 @@
 <template>
-    <button :class="className" :style="styles"><slot name="text"></slot></button>
+    <button :class="className" :style="styles" 
+    @click="click"><slot name="text"></slot></button>
 </template>
 
 <script lang="ts">
@@ -9,6 +10,7 @@
   export default class Button extends Vue {
     @Prop({default: ''}) private className!: string
     @Prop({default: () => Object.create({}) }) private styles!: object
+    @Prop({default: () => () =>{} }) private click!: Function
   }
 </script>
 

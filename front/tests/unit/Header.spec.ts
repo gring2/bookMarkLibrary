@@ -1,13 +1,11 @@
 import {shallowMount, mount, RouterLinkStub, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import Header from '@/views/Header.vue'
-import { getModule, VuexModule } from 'vuex-module-decorators'
 import {userMod} from '@/stores/modules/user'
-import store from '@/stores'
 import User from '@/vo/User';
 
-
 describe('Header.vue', () => {
+  
   it('renders default props.email', () => {
 
     const defaultEmail = 'email'
@@ -53,6 +51,8 @@ describe('Header.vue', () => {
     expect(wrapper.find('.authenticate').exists()).toBeFalsy()
 
   })
+
+
 })
 
 describe('Header.vue do not render sign in button when user is not null', ()=>{
@@ -75,4 +75,19 @@ describe('Header.vue do not render sign in button when user is not null', ()=>{
     expect(wrapper.find('.login').exists()).toBeFalsy()
   })
 
+})
+
+describe('Store integration Test', () =>{
+  it('sign up method call action module SIGN_UP action', () =>{
+    const wrapper = shallowMount(Header, {
+      stubs: {
+        RouterLink: RouterLinkStub
+      },
+    });
+    userMod.SIGN_UP = jest.fn()
+    const vm: any = wrapper.vm
+
+    vm.signUp()
+    expect(userMod.SIGN_UP).toBeCalled()
+  })
 })

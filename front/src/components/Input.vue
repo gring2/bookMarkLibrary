@@ -1,5 +1,5 @@
 <template>
-  <input type="text" @change="change" :placeholder='placeholder' :style="styles">
+  <input :type="type" @change="change" :placeholder='placeholder' :style="styles">
 </template>
 
 <script lang="ts">
@@ -7,10 +7,12 @@
 
   @Component
   export default class Input extends Vue {
-    @Prop() private change?: () => void
+    @Prop({default: () => {
+      return () => {}
+    }}) private change?: () => void
     @Prop() private placeholder?: string
     @Prop({default: () => Object.create({}) }) private styles!: object
-
+    @Prop({default: 'text'}) private type!: string 
   }
 </script>
 

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Library.vue renders a component via routing 1`] = `
+exports[`Router rendering views renders a Library view via routing 1`] = `
 <div
   id="app"
 >
@@ -10,7 +10,7 @@ exports[`Library.vue renders a component via routing 1`] = `
         class="home-logo"
       >
         <a
-          class="link-style-none router-link-exact-active router-link-active"
+          class="link-style-none router-link-active"
           href="/"
         >
           <h1>
@@ -25,7 +25,7 @@ exports[`Library.vue renders a component via routing 1`] = `
         >
           <li>
             <a
-              class="manu"
+              class="manu router-link-exact-active router-link-active"
               href="/bookmarks"
             >
               library
@@ -35,41 +35,7 @@ exports[`Library.vue renders a component via routing 1`] = `
       </div>
     </div>
      
-    <div
-      class="authenticate flex-items-center"
-    >
-      <div>
-        <p>
-          Hi! test email
-        </p>
-      </div>
-       
-      <div
-        class="logout-box"
-      >
-        <button
-          class="logout"
-        >
-          Log out
-        </button>
-      </div>
-       
-      <div>
-        <button
-          class="register"
-        >
-          Sign Up
-        </button>
-      </div>
-       
-      <div>
-        <button
-          class="login"
-        >
-          Sign In
-        </button>
-      </div>
-    </div>
+    <!---->
   </nav>
    
   <section
@@ -134,6 +100,80 @@ exports[`Library.vue renders a component via routing 1`] = `
           </ul>
         </div>
       </main>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Router rendering views renders a SignUp Views via routing 1`] = `
+<div
+  id="app"
+>
+  <nav>
+    <div>
+      <div
+        class="home-logo"
+      >
+        <a
+          class="link-style-none router-link-active"
+          href="/"
+        >
+          <h1>
+            BookMarkLibrary
+          </h1>
+        </a>
+      </div>
+       
+      <div>
+        <ul
+          class="list-style-none flex flex-items-center"
+        >
+          <li>
+            <a
+              class="manu router-link-active"
+              href="/"
+            >
+              library
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+     
+    <!---->
+  </nav>
+   
+  <section>
+    <div>
+      <div>
+        <div>
+          Email: 
+        </div>
+         
+        <input
+          type="text"
+        />
+      </div>
+       
+      <div>
+        <div>
+          password: 
+        </div>
+         
+        <input
+          type="password"
+        />
+      </div>
+       
+      <div>
+        <div>
+          password confirm: 
+        </div>
+         
+        <input
+          type="password"
+        />
+      </div>
     </div>
   </section>
 </div>

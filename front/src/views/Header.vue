@@ -26,8 +26,9 @@
         <Button className="logout"><template v-slot:text>Log out</template></Button>
       </div>
       <div class="">
-
-        <Button className="register"><template v-slot:text>Sign Up</template></Button>
+        <router-link :to="{name: 'signup'}">
+          <Button className="register"><template v-slot:text>Sign Up</template></Button>
+        </router-link>
       </div>
       <div class="" v-if="!user">
         <Button className="login"><template v-slot:text>Sign In</template></Button>
@@ -51,11 +52,18 @@
   export default class Header extends Vue {
      private user: User | null = userMod.user
      private isMobile: boolean = false;
+     private testStr = 'test'
 
     calculateisMobile(){
       const html = document.querySelector('html')
       this.isMobile = html!.clientWidth < 768
     }
+    
+    signUp(){
+      let dumm = new User()
+      userMod.SIGN_UP(dumm)
+    }
+
     mounted() {
       this.calculateisMobile()
       window.addEventListener('resize', this.calculateisMobile);

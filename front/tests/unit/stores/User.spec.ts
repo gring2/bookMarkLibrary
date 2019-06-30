@@ -1,10 +1,15 @@
 import {createLocalVue, mount, shallowMount, RouterLinkStub} from '@vue/test-utils'
-import {VuexModule, getModule} from 'vuex-module-decorators'
+import { VuexModule } from 'vuex-module-decorators'
 import Vuex from 'vuex'
 import User from '@/vo/User'
 
 import UserModule, { userMod } from '@/stores/modules/user'
 import Header from '@/views/Header.vue'
+
+import axios from 'axios'
+jest.mock('axios')
+
+
 describe('SET USER', () => {
   let userMod: any
 
@@ -12,13 +17,14 @@ describe('SET USER', () => {
       userMod = new VuexModule({
         state: UserModule.state,
         mutations: UserModule.mutations,
-        getters: UserModule.getters
+        getters: UserModule.getters,
+        actions: UserModule.actions
       })
       const localVue = createLocalVue()
       localVue.use(Vuex)
   })
 
-  it('adds a user to the state', () => {
+  it('mutation SET_UP adds a user to the state', () => {
     const user = new User()
     user.email = 'test@email.com'
     user.token = 'test token'
@@ -35,6 +41,27 @@ describe('SET USER', () => {
     expect(state.token).toBe('test token')
   })
 
+  it('mutation IS_SIGNUP change error to true when null is passed', () => {
+    const state = {
+      error: false
+    }
+
+    userMod.mutations.IS_SIGNUP(state, null)
+    expect(state.error).toBeTruthy()
+  })
+
+  it('mutation IS_SIGNUP change error to false when null is User', () => {
+    const state = {
+      error: true,
+    }
+    const user = new User()
+    user.email = 'test@email.com'
+    user.token = 'test token'
+
+    userMod.mutations.IS_SIGNUP(state, user)
+    expect(state.error).toBeFalsy()
+  })
+
   it('get a user state', () => {
     const user = new User()
     user.email = 'test@email.com'
@@ -44,17 +71,45 @@ describe('SET USER', () => {
       token: null,
       user
     }
+
     userMod.state = state
     const actual = userMod.state.user
     expect(actual).toBe(user)
- ///   fail('no implemented')
 
   })
 
-  it('action sign up works', () =>{
-    fail('no implemented')
+  it('action sign up works', async () =>{
+    let url = ''
+    let body = {}
+    const myAxios: jest.Mocked<any> = axios as any;
+    myAxios.post.mockImplementation(
+      (_url: string, _body: string) => { 
+        return new Promise((resolve) => {
+          url = _url
+          body = _body
+          resolve(true)
+        })
+      }
+    )
+    const commit = jest.fn()
+    const user = new User()
+    user.email = 'test@email.com'
+    user.token = 'test_token'
 
+    await userMod.actions.SIGN_UP({commit}, user)
+    
+
+    expect(url).toBe("/api/authenticate")
+    await expect(commit).toHaveBeenCalledWith(
+      "IS_SIGNUP", user)
+
+    await expect(commit).toHaveBeenCalledWith(
+      "SET_USER", user)
+  
+    expect(userMod.state.error).toBe(false)
+  
   })
+
 })
 
 
