@@ -1,4 +1,4 @@
-import {createLocalVue, mount, shallowMount, RouterLinkStub} from '@vue/test-utils'
+import {createLocalVue, mount, RouterLinkStub} from '@vue/test-utils'
 import { VuexModule } from 'vuex-module-decorators'
 import Vuex from 'vuex'
 import User from '@/vo/User'
@@ -11,10 +11,10 @@ jest.mock('axios')
 
 
 describe('SET USER', () => {
-  let userMod: any
+  let userModObj: any
 
   beforeEach(() => {
-      userMod = new VuexModule({
+      userModObj = new VuexModule({
         state: UserModule.state,
         mutations: UserModule.mutations,
         getters: UserModule.getters,
@@ -33,7 +33,7 @@ describe('SET USER', () => {
       user: null
     }
 
-    userMod.mutations.SET_USER(state, user)
+    userModObj.mutations.SET_USER(state, user)
     expect(state.user).toEqual(
       user
     )
@@ -45,7 +45,7 @@ describe('SET USER', () => {
       error: false
     }
 
-    userMod.mutations.IS_SIGNUP(state, null)
+    userModObj.mutations.IS_SIGNUP(state, null)
     expect(state.error).toBeTruthy()
   })
 
@@ -56,7 +56,7 @@ describe('SET USER', () => {
     const user = new User('test@email.com')
     user.token = 'test token'
 
-    userMod.mutations.IS_SIGNUP(state, user)
+    userModObj.mutations.IS_SIGNUP(state, user)
     expect(state.error).toBeFalsy()
   })
 
@@ -65,7 +65,7 @@ describe('SET USER', () => {
       error: false
     }
 
-    userMod.mutations.IS_SIGNIN(state, new Auth_Token(null))
+    userModObj.mutations.IS_SIGNIN(state, new Auth_Token(null))
     expect(state.error).toBeTruthy()
   })
 
@@ -75,7 +75,7 @@ describe('SET USER', () => {
     }
     const token = new Auth_Token('test token')
 
-    userMod.mutations.IS_SIGNIN(state, token)
+    userModObj.mutations.IS_SIGNIN(state, token)
     expect(state.error).toBeFalsy()
   })
 
@@ -88,18 +88,18 @@ describe('SET USER', () => {
       user
     }
 
-    userMod.state = state
-    const actual = userMod.state.user
+    userModObj.state = state
+    const actual = userModObj.state.user
     expect(actual).toBe(user)
 
   })
 
-  it('action sign up works', async () =>{
+  it('action sign up works', async () => {
     let url = ''
     let body = {}
-    const myAxios: jest.Mocked<any> = axios as any;
+    const myAxios: jest.Mocked<any> = axios as any
     myAxios.post.mockImplementation(
-      (_url: string, _body: string) => { 
+      (_url: string, _body: string) => {
         return new Promise((resolve) => {
           url = _url
           body = _body
@@ -111,28 +111,27 @@ describe('SET USER', () => {
     const user = new User('test@email.com')
     user.token = 'test_token'
 
-    await userMod.actions.SIGN_UP({commit}, user)
-    
+    await userModObj.actions.SIGN_UP({commit}, user)
 
-    expect(url).toBe("/api/signup")
+    expect(url).toBe('/api/signup')
     await expect(commit).toHaveBeenCalledWith(
-      "IS_SIGNUP", user)
+      'IS_SIGNUP', user)
 
     await expect(commit).toHaveBeenCalledWith(
-      "SET_USER", user)
-  
-    expect(userMod.state.error).toBe(false)
-  
+      'SET_USER', user)
+
+    expect(userModObj.state.error).toBe(false)
+
   })
 
-  it('action sign in works', async () =>{
+  it('action sign in works', async () => {
     let url = ''
     let body = {}
-    const myAxios: jest.Mocked<any> = axios as any;
+    const myAxios: jest.Mocked<any> = axios as any
     const token = 'mocktoken'
 
     myAxios.post.mockImplementation(
-      (_url: string, _body: string) => { 
+      (_url: string, _body: string) => {
         return new Promise((resolve) => {
           url = _url
           body = _body
@@ -142,18 +141,18 @@ describe('SET USER', () => {
     )
     const commit = jest.fn()
     const user = new User('test@email.com')
-    await userMod.actions.SIGN_IN({commit}, user)
-    
+    await userModObj.actions.SIGN_IN({commit}, user)
 
-    expect(url).toBe("/api/signin")
+
+    expect(url).toBe('/api/signin')
     await expect(commit).toHaveBeenCalledWith(
-      "IS_SIGNIN", {token})
+      'IS_SIGNIN', {token})
 
     await expect(commit).toHaveBeenCalledWith(
-      "SET_USER", user)
-  
-    expect(userMod.state.error).toBe(false)
-  
+      'SET_USER', user)
+
+    expect(userModObj.state.error).toBe(false)
+
   })
 
 })

@@ -2,10 +2,10 @@ import {shallowMount, mount, RouterLinkStub, createLocalVue } from '@vue/test-ut
 import Vuex from 'vuex'
 import Header from '@/views/Header.vue'
 import {userMod} from '@/stores/modules/user'
-import User from '@/vo/User';
+import User from '@/vo/User'
 
 describe('Header.vue', () => {
-  
+
   it('renders default props.email', () => {
 
     const defaultEmail = 'email'
@@ -24,9 +24,7 @@ describe('Header.vue', () => {
         RouterLink: RouterLinkStub
       },
       methods: {
-        calculateisMobile: () => {
-
-        }
+        calculateisMobile: jest.fn()
       },
     })
     expect(wrapper.find('.login').exists()).toBeTruthy()
@@ -40,8 +38,7 @@ describe('Header.vue', () => {
         RouterLink: RouterLinkStub
       },
       methods: {
-        calculateisMobile: () => {
-        }
+        calculateisMobile: jest.fn()
       },
       data:() => {
         return { isMobile: true}
@@ -55,15 +52,14 @@ describe('Header.vue', () => {
 
 })
 
-describe('Header.vue do not render sign in button when user is not null', ()=>{
+describe('Header.vue do not render sign in button when user is not null', ()=> {
   beforeEach(()=> {
     const localVue = createLocalVue()
     localVue.use(Vuex)
-  
+
   })
   it('user is not null', () => {
-    const user = new User()
-    user.email = 'vuex-email'
+    const user = new User('vuex-email')
     userMod.SET_USER(user)
     const wrapper = mount(Header,{
       stubs: {
@@ -77,13 +73,13 @@ describe('Header.vue do not render sign in button when user is not null', ()=>{
 
 })
 
-describe('Store integration Test', () =>{
-  it('sign up method call action module SIGN_UP action', () =>{
+describe('Store integration Test', () => {
+  it('sign up method call action module SIGN_UP action', () => {
     const wrapper = shallowMount(Header, {
       stubs: {
         RouterLink: RouterLinkStub
       },
-    });
+    })
     userMod.SIGN_UP = jest.fn()
     const vm: any = wrapper.vm
 

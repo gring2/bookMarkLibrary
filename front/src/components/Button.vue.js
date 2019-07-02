@@ -8,6 +8,9 @@ tslib_1.__decorate([
 tslib_1.__decorate([
     Prop({ default: () => Object.create({}) })
 ], Button.prototype, "styles", void 0);
+tslib_1.__decorate([
+    Prop({ default: () => () => { return; } })
+], Button.prototype, "click", void 0);
 Button = tslib_1.__decorate([
     Component
 ], Button);

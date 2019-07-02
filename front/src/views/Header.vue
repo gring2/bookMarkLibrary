@@ -46,29 +46,28 @@
   import User from '@/vo/User'
   import {userMod} from '@/stores/modules/user'
 
-@Component({
+  @Component({
     components: {
       Button,
     },
   })
   export default class Header extends Vue {
      private user: User | null = userMod.user
-     private isMobile: boolean = false;
-     private testStr = 'test'
+     private isMobile: boolean = false
 
-    calculateisMobile(){
+    private calculateisMobile() {
       const html = document.querySelector('html')
       this.isMobile = html!.clientWidth < 768
     }
-    
-    signUp(){
-      let dumm = new User()
+
+    private signUp() {
+      const dumm = new User('dummy@email.com')
       userMod.SIGN_UP(dumm)
     }
 
-    mounted() {
+    private mounted() {
       this.calculateisMobile()
-      window.addEventListener('resize', this.calculateisMobile);
+      window.addEventListener('resize', this.calculateisMobile)
     }
   }
 </script>

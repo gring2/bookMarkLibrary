@@ -8,11 +8,11 @@
   @Component
   export default class Input extends Vue {
     @Prop({default: () => {
-      return () => {}
+      return (): void => { return}
     }}) private change?: () => void
     @Prop() private placeholder?: string
     @Prop({default: () => Object.create({}) }) private styles!: object
-    @Prop({default: 'text'}) private type!: string 
+    @Prop({default: 'text'}) private type!: string
   }
 </script>
 

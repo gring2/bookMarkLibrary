@@ -1,13 +1,13 @@
-import {shallowMount, mount, RouterLinkStub, createLocalVue } from '@vue/test-utils'
+import {shallowMount} from '@vue/test-utils'
 import SignUpForm from '@/components/SignUpForm.vue'
-import { userMod } from '@/stores/modules/user';
-import User from '@/vo/User';
+import { userMod } from '@/stores/modules/user'
+import User from '@/vo/User'
 jest.mock('@/stores/modules/user', () => {
   return {
     __esModule: true, // this property makes it work
     userMod: {SIGN_UP :jest.fn()},
   }
-});
+})
 beforeEach(() => {
   (userMod.SIGN_UP as any).mockClear()
 })
@@ -29,10 +29,10 @@ describe('SignUp Form Element test', () => {
 })
 
 describe('store integration test', () => {
-  
+
   it('call SIGN_UP action', () => {
-      
-    const wrapper:any = shallowMount(SignUpForm, {
+
+    const wrapper: any = shallowMount(SignUpForm, {
       data : () => ({
         email: 'testEmail@email.com',
         password: 'testPW',

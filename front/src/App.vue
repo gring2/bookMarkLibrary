@@ -7,15 +7,13 @@
 
 
 <script lang="ts">
-  import { Component, Vue } from 'vue-property-decorator'
-  import Header from '@/views/Header.vue' // @ is an alias to /src
-  import User from '@/vo/User'
-  import { mapState } from 'vuex'
+import { Component, Vue } from 'vue-property-decorator'
+import Header from '@/views/Header.vue' // @ is an alias to /src
 @Component({
-    components: {
-      Header,
-    },
-  })
+  components: {
+    Header,
+  },
+})
 
 export default class App extends Vue {
 }

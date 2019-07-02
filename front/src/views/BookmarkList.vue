@@ -20,7 +20,8 @@
     }
   })
   export default class BookmarkList extends Vue {
-    private bookmarks: BookMarkModel[] = [new BookMarkModel('title', '#', 'https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png')]
+    private bookmarks: BookMarkModel[] = [new BookMarkModel('title', '#',
+        'https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png')]
   }
 
 </script>

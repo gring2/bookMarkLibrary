@@ -10,7 +10,7 @@
   export default class Button extends Vue {
     @Prop({default: ''}) private className!: string
     @Prop({default: () => Object.create({}) }) private styles!: object
-    @Prop({default: () => () =>{} }) private click!: Function
+    @Prop({default: () => (): void => {return} }) private click!: () => void
   }
 </script>
 

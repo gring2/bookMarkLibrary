@@ -6,7 +6,7 @@ import SignIn from '@/views/SignIn.vue'
 import App from '@/App.vue'
 
 describe('Router rendering views', () => {
-  let localVue: any;
+  let localVue: any
   beforeEach(() => {
     localVue = createLocalVue()
     localVue.use(VueRouter)
@@ -25,14 +25,13 @@ describe('Router rendering views', () => {
             },
       ],
     })
-    SignUp
     const wrapper = mount(App, { localVue, router })
 
     router.push('/signup')
     wrapper.vm.$nextTick(() => {
       expect(wrapper.find(SignUp).exists()).toBeTruthy()
       expect(wrapper.element).toMatchSnapshot()
-  
+
     })
   })
 

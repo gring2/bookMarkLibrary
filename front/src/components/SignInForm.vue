@@ -29,20 +29,20 @@
   })
   export default class SignUpForm extends Vue {
     private password?: string
-    private email ?: string
-    
-    private setData(key:string , data: string) {
+    private email: string = ''
+
+    private setData(key: string , data: string) {
       switch (key) {
         case 'password':
           this.password = data
           break
         case 'email':
           this.email = data
-          break;
+          break
       }
     }
 
-    private signin(){
+    private signin() {
       const user = new User(this.email, this.password)
       userMod.SIGN_IN(user)
     }

@@ -13,70 +13,70 @@ export interface IUserState {
 
 @Module({dynamic: true, store, name:'userMod',})
 export default class UserModule extends VuexModule implements IUserState {
-  token: string | null = null;
-  user: User | null = null;
-  error: boolean = false;
+  public token: string | null = null
+  public user: User | null = null
+  private error: boolean = false
 
   @Mutation
   public SET_USER(user: User) {
       this.token = user.token
-      this.user = user  
+      this.user = user
   }
 
   @Mutation
   public IS_SIGNUP(user: User | null) {
-    if (user instanceof User){
+    if (user instanceof User) {
       this.error = false
 
-    }else{
+    } else {
       this.error = true
     }
   }
 
   @Mutation
   public IS_SIGNIN(token: Auth_Token) {
-    if (token.isvalid()){
+    if (token.isvalid()) {
       this.error = false
 
-    }else{
+    } else {
       this.error = true
     }
   }
-  
+
  @Action({commit: 'IS_SIGNUP'})
-  public  async SIGN_UP(user: User){
-    try{
-      await axios.post("/api/signup", {
+  public  async SIGN_UP(user: User) {
+    try {
+      await axios.post('/api/signup', {
         user
       })
       this.context.commit('SET_USER', user)
       return user
-  
-    }catch{
+
+    } catch {
       return null
-      
+
     }
   }
 
   @Action({commit: 'IS_SIGNIN'})
-  public  async SIGN_IN(user: User){
-    try{
-      const resp = await axios.post("/api/signin", {
+  public  async SIGN_IN(user: User) {
+    try {
+      const resp = await axios.post('/api/signin', {
         user
       })
       // mock
       // const resp = {data : {token : 'token'}}
-      const token = new Auth_Token(resp.data['token'])
-      
-      if(token.isvalid()){
+      const token = new Auth_Token(resp.data.token)
+
+      if(token.isvalid()) {
         this.context.commit('SET_USER', user)
       }
       console.log('token')
       return token
-  
-    }catch{
+
+    } catch {
       return null
-      
+
     }
   }
 
