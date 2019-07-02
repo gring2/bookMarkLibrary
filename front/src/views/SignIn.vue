@@ -1,18 +1,18 @@
 <template>
   <section class="content">
-    <SignUpForm/>
+    <SignInForm/>
   </section>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import SignUpForm from '@/components/SignUpForm.vue'
+import SignInForm from '@/components/SignInForm.vue'
 @Component({
   components: {
-    SignUpForm
+    SignInForm
   },
 })
-export default class SignUp extends Vue {}
+export default class SignIn extends Vue {}
 </script>
 
 <style lang="scss" scoped>

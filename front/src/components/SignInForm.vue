@@ -9,11 +9,7 @@
       <Input :type="'password'" :change="(e) => { setData('password', e.target.value) }" />
     </div>
     <div>
-      <label>password confirm: </label>
-      <Input :type="'password'" :change="(e) => { setData('passwordConFirm', e.target.value) }" />
-    </div>
-    <div>
-      <Button :click="()=>{signup()}"><template v-slot:text >Susbmit</template></Button>
+      <Button :click="()=>{signin()}"><template v-slot:text >Susbmit</template></Button>
     </div>
   </div>
 </template>
@@ -33,7 +29,6 @@
   })
   export default class SignUpForm extends Vue {
     private password?: string
-    private passwordConfirm?: string
     private email ?: string
     
     private setData(key:string , data: string) {
@@ -41,18 +36,15 @@
         case 'password':
           this.password = data
           break
-        case 'passwordConfirm':
-          this.passwordConfirm = data
-          break;
         case 'email':
           this.email = data
           break;
       }
     }
 
-    private signup(){
-      const user = new User(this.email, this.password, this.passwordConfirm)
-      userMod.SIGN_UP(user)
+    private signin(){
+      const user = new User(this.email, this.password)
+      userMod.SIGN_IN(user)
     }
   }
 </script>

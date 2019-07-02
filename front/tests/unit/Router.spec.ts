@@ -2,6 +2,7 @@ import { mount, createLocalVue } from '@vue/test-utils'
 import VueRouter from 'vue-router'
 import Library from '@/views/Library.vue'
 import SignUp from '@/views/SignUp.vue'
+import SignIn from '@/views/SignIn.vue'
 import App from '@/App.vue'
 
 describe('Router rendering views', () => {
@@ -53,6 +54,27 @@ describe('Router rendering views', () => {
 
     router.push('/bookmarks')
     expect(wrapper.find(Library).exists()).toBeTruthy()
+    expect(wrapper.element).toMatchSnapshot()
+  })
+
+  it('renders a SignIn view via routing', () => {
+
+    const router = new VueRouter({
+      mode: 'history',
+          base: process.env.BASE_URL,
+          routes: [
+            {
+              path: '/signin',
+              name: 'signin',
+              component: SignIn,
+            },
+      ],
+    })
+
+    const wrapper = mount(App, { localVue, router })
+
+    router.push('/signin')
+    expect(wrapper.find(SignIn).exists()).toBeTruthy()
     expect(wrapper.element).toMatchSnapshot()
   })
 

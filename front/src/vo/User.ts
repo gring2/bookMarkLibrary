@@ -1,12 +1,12 @@
 export default class User {
-  get email(): string {
-    return this._email
-  }
-
-  set email(value: string) {
-    this._email = value
+  constructor(email: string, password?: string, passwordConfirm?: string) {
+    this.email = email
+    this.password = password
+    this.passwordConfirm = passwordConfirm
   }
 
   public token!: string
-  private _email!: string
+  public email!: string
+  private password?: string
+  private passwordConfirm?: string
 }

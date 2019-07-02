@@ -31,7 +31,9 @@
         </router-link>
       </div>
       <div class="" v-if="!user">
-        <Button className="login"><template v-slot:text>Sign In</template></Button>
+        <router-link :to="{name: 'signin'}">
+          <Button className="login"><template v-slot:text>Sign In</template></Button>
+        </router-link>
       </div>
     </div>
   </nav>
@@ -42,7 +44,7 @@
   import { Component, Prop, Vue } from 'vue-property-decorator'
   import Button from '@/components/Button.vue'
   import User from '@/vo/User'
-  import UserModule, {userMod} from '@/stores/modules/user'
+  import {userMod} from '@/stores/modules/user'
 
 @Component({
     components: {
