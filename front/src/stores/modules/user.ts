@@ -2,6 +2,7 @@ import { Module, VuexModule, Mutation, getModule, Action } from 'vuex-module-dec
 import axios from 'axios'
 import store from '@/stores'
 
+import router from '@/router'
 import User from '@/vo/User'
 import Auth_Token from '@/vo/Auth_Token'
 
@@ -59,7 +60,7 @@ export default class UserModule extends VuexModule implements IUserState {
   }
 
   @Action({commit: 'IS_SIGNIN'})
-  public  async SIGN_IN(user: User) {
+  public async SIGN_IN(user: User) {
     try {
       const resp = await axios.post('/api/signin', {
         user
@@ -68,16 +69,35 @@ export default class UserModule extends VuexModule implements IUserState {
       // const resp = {data : {token : 'token'}}
       const token = new Auth_Token(resp.data.token)
 
-      if(token.isvalid()) {
+      if (token.isvalid()) {
         this.context.commit('SET_USER', user)
       }
-      console.log('token')
       return token
 
     } catch {
       return null
 
     }
+  }
+
+  @Action
+  public async LOG_OUT() {
+    const resp = await axios.post('/api/logout', {
+      token : this.token
+    })
+    //mock data
+//    const resp = {status: 200}
+    if (resp.status === 200) {
+      this.context.commit('expire')
+    }
+    router.push({name: 'home'})
+
+  }
+
+  @Mutation
+  private expire() {
+    this.token = null
+    this.user = null
   }
 
 }

@@ -23,7 +23,7 @@
         <p>Hi! {{user? user.email : 'test email'}}</p>
       </div>
       <div class="logout-box">
-        <Button className="logout"><template v-slot:text>Log out</template></Button>
+        <Button className="logout" :click="()=>{logout()}"><template v-slot:text>Log out</template></Button>
       </div>
       <div class="">
         <router-link :to="{name: 'signup'}">
@@ -56,13 +56,17 @@
      private isMobile: boolean = false
 
     private calculateisMobile() {
-      const html = document.querySelector('html')
-      this.isMobile = html!.clientWidth < 768
+      const html = document.querySelector('html')!
+      this.isMobile = html.clientWidth < 768
     }
 
     private signUp() {
       const dumm = new User('dummy@email.com')
       userMod.SIGN_UP(dumm)
+    }
+
+    private logout() {
+       userMod.LOG_OUT()
     }
 
     private mounted() {

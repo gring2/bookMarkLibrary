@@ -1,0 +1,264 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Router rendering views renders a Library view via routing 1`] = `
+<div
+  id="app"
+>
+  <nav>
+    <div>
+      <div
+        class="home-logo"
+      >
+        <a
+          class="link-style-none router-link-active"
+          href="/"
+        >
+          <h1>
+            BookMarkLibrary
+          </h1>
+        </a>
+      </div>
+       
+      <div>
+        <ul
+          class="list-style-none flex flex-items-center"
+        >
+          <li>
+            <a
+              class="manu router-link-exact-active router-link-active"
+              href="/bookmarks"
+            >
+              library
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+     
+    <!---->
+  </nav>
+   
+  <section
+    class="content"
+  >
+    <div>
+      <aside
+        class="side"
+      >
+        <ul>
+          <span>
+            test1
+          </span>
+        </ul>
+        <ul>
+          <span>
+            test2
+          </span>
+        </ul>
+      </aside>
+       
+      <main>
+        <div>
+          <input
+            placeholder="url"
+            style="width: 100%; font-size: 2rem; height: 2rem;"
+            type="text"
+          />
+           
+          <input
+            placeholder="#tag"
+            style="width: 100%; font-size: 2rem; height: 2rem;"
+            type="text"
+          />
+           
+          <button
+            class="submit"
+            style="font-weight: normal; font-size: 1.4rem; width: 8rem;"
+          >
+            Susbmit
+          </button>
+        </div>
+         
+        <div
+          class="container"
+        >
+          <ul>
+            <li>
+              <div>
+                <img
+                  alt=""
+                  src="https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png"
+                />
+                 
+                <a
+                  href="#"
+                >
+                  title
+                </a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </main>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Router rendering views renders a SignIn view via routing 1`] = `
+<div
+  id="app"
+>
+  <nav>
+    <div>
+      <div
+        class="home-logo"
+      >
+        <a
+          class="link-style-none router-link-active"
+          href="/"
+        >
+          <h1>
+            BookMarkLibrary
+          </h1>
+        </a>
+      </div>
+       
+      <div>
+        <ul
+          class="list-style-none flex flex-items-center"
+        >
+          <li>
+            <a
+              class="manu router-link-active"
+              href="/"
+            >
+              library
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+     
+    <!---->
+  </nav>
+   
+  <section
+    class="content"
+  >
+    <div>
+      <div>
+        <label>
+          Email: 
+        </label>
+         
+        <input
+          type="text"
+        />
+      </div>
+       
+      <div>
+        <label>
+          password: 
+        </label>
+         
+        <input
+          type="password"
+        />
+      </div>
+       
+      <div>
+        <button
+          class=""
+        >
+          Susbmit
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Router rendering views renders a SignUp Views via routing 1`] = `
+<div
+  id="app"
+>
+  <nav>
+    <div>
+      <div
+        class="home-logo"
+      >
+        <a
+          class="link-style-none router-link-active"
+          href="/"
+        >
+          <h1>
+            BookMarkLibrary
+          </h1>
+        </a>
+      </div>
+       
+      <div>
+        <ul
+          class="list-style-none flex flex-items-center"
+        >
+          <li>
+            <a
+              class="manu router-link-active"
+              href="/"
+            >
+              library
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+     
+    <!---->
+  </nav>
+   
+  <section
+    class="content"
+  >
+    <div>
+      <div>
+        <label>
+          Email: 
+        </label>
+         
+        <input
+          type="text"
+        />
+      </div>
+       
+      <div>
+        <label>
+          password: 
+        </label>
+         
+        <input
+          type="password"
+        />
+      </div>
+       
+      <div>
+        <label>
+          password confirm: 
+        </label>
+         
+        <input
+          type="password"
+        />
+      </div>
+       
+      <div>
+        <button
+          class=""
+        >
+          Susbmit
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+`;

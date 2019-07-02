@@ -10,21 +10,21 @@ import axios from 'axios'
 jest.mock('axios')
 
 
-describe('SET USER', () => {
+describe('mutation test', () => {
   let userModObj: any
 
   beforeEach(() => {
-      userModObj = new VuexModule({
-        state: UserModule.state,
-        mutations: UserModule.mutations,
-        getters: UserModule.getters,
-        actions: UserModule.actions
-      })
-      const localVue = createLocalVue()
-      localVue.use(Vuex)
+    userModObj = new VuexModule({
+      state: UserModule.state,
+      mutations: UserModule.mutations,
+      getters: UserModule.getters,
+      actions: UserModule.actions
+    })
+    const localVue = createLocalVue()
+    localVue.use(Vuex)
   })
 
-  it('mutation SET_USER adds a user to the state', () => {
+  it('SET_USER adds a user to the state', () => {
     const user = new User('test@email.com')
     user.token = 'test token'
 
@@ -35,12 +35,12 @@ describe('SET USER', () => {
 
     userModObj.mutations.SET_USER(state, user)
     expect(state.user).toEqual(
-      user
+        user
     )
     expect(state.token).toBe('test token')
   })
 
-  it('mutation IS_SIGNUP change error to true when null is passed', () => {
+  it('IS_SIGNUP change error to true when null is passed', () => {
     const state = {
       error: false
     }
@@ -49,7 +49,7 @@ describe('SET USER', () => {
     expect(state.error).toBeTruthy()
   })
 
-  it('mutation IS_SIGNUP change error to false when null is User', () => {
+  it('IS_SIGNUP change error to false when null is User', () => {
     const state = {
       error: true,
     }
@@ -60,7 +60,7 @@ describe('SET USER', () => {
     expect(state.error).toBeFalsy()
   })
 
-  it('mutation IS_SIGNIN change error to true when null is passed', () => {
+  it('IS_SIGNIN change error to true when null is passed', () => {
     const state = {
       error: false
     }
@@ -69,7 +69,21 @@ describe('SET USER', () => {
     expect(state.error).toBeTruthy()
   })
 
-  it('mutation IS_SIGNIN change error to false when null is User', () => {
+  it('IS_SIGNIN change error to false when null is User', () => {
+    const user = new User('test@email.com')
+    const token = 'testtoken'
+    const state = {
+      user,
+      token
+    }
+
+    userModObj.mutations.expire(state)
+    expect(state.user).toBeNull()
+    expect(state.token).toBeNull()
+
+  })
+
+  it('expire set null to token , user state', () => {
     const state = {
       error: true,
     }
@@ -77,6 +91,21 @@ describe('SET USER', () => {
 
     userModObj.mutations.IS_SIGNIN(state, token)
     expect(state.error).toBeFalsy()
+  })
+})
+
+describe('state test', () => {
+  let userModObj: any
+
+  beforeEach(() => {
+    userModObj = new VuexModule({
+      state: UserModule.state,
+      mutations: UserModule.mutations,
+      getters: UserModule.getters,
+      actions: UserModule.actions
+    })
+    const localVue = createLocalVue()
+    localVue.use(Vuex)
   })
 
   it('get a user state', () => {
@@ -93,8 +122,24 @@ describe('SET USER', () => {
     expect(actual).toBe(user)
 
   })
+})
 
-  it('action sign up works', async () => {
+describe('action test', () => {
+  let userModObj: any
+
+  beforeEach(() => {
+    userModObj = new VuexModule({
+      state: UserModule.state,
+      mutations: UserModule.mutations,
+      getters: UserModule.getters,
+      actions: UserModule.actions
+    })
+    const localVue = createLocalVue()
+    localVue.use(Vuex)
+  })
+
+
+  it('sign up works', async () => {
     let url = ''
     let body = {}
     const myAxios: jest.Mocked<any> = axios as any
@@ -124,7 +169,7 @@ describe('SET USER', () => {
 
   })
 
-  it('action sign in works', async () => {
+  it('sign in works', async () => {
     let url = ''
     let body = {}
     const myAxios: jest.Mocked<any> = axios as any
@@ -155,13 +200,42 @@ describe('SET USER', () => {
 
   })
 
+  it('log out works', async () => {
+    let url = ''
+    let body = {}
+    const myAxios: jest.Mocked<any> = axios as any
+    const token = 'mocktoken'
+
+    myAxios.post.mockImplementation(
+        (_url: string, _body: string) => {
+          return new Promise((resolve) => {
+            url = _url
+            body = _body
+            resolve({status: 200})
+          })
+        }
+    )
+
+    const user = new User('test@email.com')
+    const state = {
+      token: 'testmock',
+      user
+    }
+
+    const commit = jest.fn()
+    await userModObj.actions.LOG_OUT({commit})
+
+    expect(url).toBe('/api/logout')
+    await expect(commit).toBeCalledWith('expire')
+
+  })
+
 })
 
 
-describe('get user', () => {
+describe('integrate to component', () => {
   const localVue = createLocalVue()
   localVue.use(Vuex)
-
 
   it('renders a username using a real Vuex store', () => {
     const user = new User('vuex-email')

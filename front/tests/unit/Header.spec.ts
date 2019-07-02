@@ -86,4 +86,19 @@ describe('Store integration Test', () => {
     vm.signUp()
     expect(userMod.SIGN_UP).toBeCalled()
   })
+
+  it('log out button fire log out action', () => {
+    const wrapper = mount(Header, {
+      methods: {
+        calculateisMobile: jest.fn()
+      },
+      stubs: {
+        RouterLink: RouterLinkStub
+      },
+    })
+    userMod.LOG_OUT = jest.fn()
+    wrapper.find('.logout').element.click()
+
+    expect(userMod.LOG_OUT).toBeCalled()
+  })
 })
