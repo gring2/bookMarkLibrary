@@ -1,5 +1,5 @@
 
-from flask_security import current_user, login_required
+from flask_security import current_user, login_required, auth_token_required
 from . import bp
 from flask import (render_template, request, g, redirect, url_for)
 from library.models import BookMark, Tag
@@ -27,7 +27,7 @@ def add_ele():
 
 @bp.route('/urls')
 @bp.route('/urls/<string:tag>')
-@login_required
+@auth_token_required
 def urls(tag=None):
     book_marks = current_user.bookmarks
 

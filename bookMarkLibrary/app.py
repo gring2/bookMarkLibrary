@@ -10,6 +10,20 @@ from flask_wtf.csrf import CSRFProtect
 from bookMarkLibrary.database import init_db, db, set_db_config
 from bookMarkLibrary.const import register_const
 import logging
+from flask.sessions import SecureCookieSessionInterface
+from flask_login import user_loaded_from_header
+
+
+class CustomSessionInterface(SecureCookieSessionInterface):
+    """Prevent creating session from API requests."""
+    def save_session(self, *args, **kwargs):
+        return
+
+
+@user_loaded_from_header.connect
+def user_loaded_from_header(self, user=None):
+    g.login_via_header = True
+
 
 send_storage_handler = SendStorageFileHandler()
 csrf = CSRFProtect()
@@ -39,7 +53,8 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECURITY_REGISTERABLE=True,
         SECURITY_SEND_REGISTER_EMAIL=False,
-        SECURITY_TOKEN_MAX_AGE=1
+       # SECURITY_TOKEN_MAX_AGE=1,
+        SECURITY_URL_PREFIX='/api'
     )
 
     if test_config is None:
@@ -83,11 +98,14 @@ def create_app(test_config=None):
     # Setup Flask-Security
     security = Security(app, user_datastore)
 
-    # app.config['WTF_CSRF_ENABLED'] = False
+    app.config['WTF_CSRF_ENABLED'] = False
     @app.errorhandler(Exception)
     def handle_http_exception(e):
         logging.error(traceback.format_exc())
         return e
+
+    app.session_interface = CustomSessionInterface()
+
     return app
 
 
