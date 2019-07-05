@@ -52,8 +52,11 @@
     },
   })
   export default class Header extends Vue {
-     private user: User | null = userMod.user
      private isMobile: boolean = false
+
+    get user (): User | null {
+      return userMod.user
+    }
 
     private calculateisMobile() {
       const html = document.querySelector('html')!

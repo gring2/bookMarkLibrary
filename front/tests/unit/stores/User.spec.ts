@@ -9,7 +9,6 @@ import Header from '@/views/Header.vue'
 import axios from 'axios'
 jest.mock('axios')
 
-
 describe('mutation test', () => {
   let userModObj: any
 
@@ -26,7 +25,6 @@ describe('mutation test', () => {
 
   it('SET_USER adds a user to the state', () => {
     const user = new User('test@email.com')
-    user.token = 'test token'
 
     const state = {
       token: null,
@@ -37,61 +35,34 @@ describe('mutation test', () => {
     expect(state.user).toEqual(
         user
     )
-    expect(state.token).toBe('test token')
+
   })
 
-  it('IS_SIGNUP change error to true when null is passed', () => {
+  it('AUTHENTICATE change error to true when null is passed', () => {
     const state = {
-      error: false
+      error: false,
+      token: null
     }
+    const token = new Auth_Token(null)
 
-    userModObj.mutations.IS_SIGNUP(state, null)
+    userModObj.mutations.AUTHENTICATE(state, token)
     expect(state.error).toBeTruthy()
-  })
-
-  it('IS_SIGNUP change error to false when null is User', () => {
-    const state = {
-      error: true,
-    }
-    const user = new User('test@email.com')
-    user.token = 'test token'
-
-    userModObj.mutations.IS_SIGNUP(state, user)
-    expect(state.error).toBeFalsy()
-  })
-
-  it('IS_SIGNIN change error to true when null is passed', () => {
-    const state = {
-      error: false
-    }
-
-    userModObj.mutations.IS_SIGNIN(state, new Auth_Token(null))
-    expect(state.error).toBeTruthy()
-  })
-
-  it('IS_SIGNIN change error to false when null is User', () => {
-    const user = new User('test@email.com')
-    const token = 'testtoken'
-    const state = {
-      user,
-      token
-    }
-
-    userModObj.mutations.expire(state)
-    expect(state.user).toBeNull()
     expect(state.token).toBeNull()
-
   })
 
-  it('expire set null to token , user state', () => {
+  it('AUTHENTICATE change error to false when null is User', () => {
     const state = {
       error: true,
+      token: null
     }
-    const token = new Auth_Token('test token')
+    const token = new Auth_Token('test@email.com')
 
-    userModObj.mutations.IS_SIGNIN(state, token)
+    userModObj.mutations.AUTHENTICATE(state, token)
     expect(state.error).toBeFalsy()
+    expect(state.token).toBe('test@email.com')
+
   })
+
 })
 
 describe('state test', () => {
@@ -128,6 +99,7 @@ describe('action test', () => {
   let userModObj: any
 
   beforeEach(() => {
+    UserModule.mutations!.GET_USER = jest.fn()
     userModObj = new VuexModule({
       state: UserModule.state,
       mutations: UserModule.mutations,
@@ -142,28 +114,40 @@ describe('action test', () => {
   it('sign up works', async () => {
     let url = ''
     let body = {}
+    const authentication_token = 'mocktoken'
+    const id = 1
+    const response = {
+      user : {
+        authentication_token,
+        id
+      }
+    }
+
     const myAxios: jest.Mocked<any> = axios as any
     myAxios.post.mockImplementation(
       (_url: string, _body: string) => {
         return new Promise((resolve) => {
           url = _url
           body = _body
-          resolve(true)
+          resolve({data: {response}})
         })
       }
     )
     const commit = jest.fn()
+    const dispatch = jest.fn()
+
     const user = new User('test@email.com')
     user.token = 'test_token'
 
-    await userModObj.actions.SIGN_UP({commit}, user)
+    await userModObj.actions.SIGN_UP({commit, dispatch}, user)
 
-    expect(url).toBe('/api/signup')
+    expect(url).toBe('/api/register')
+    //await expect(dispatch).toBeCalledWith('GET_USER', {user})
     await expect(commit).toHaveBeenCalledWith(
-      'IS_SIGNUP', user)
+      'AUTHENTICATE', new Auth_Token(authentication_token))
 
-    await expect(commit).toHaveBeenCalledWith(
-      'SET_USER', user)
+    await expect(dispatch).toHaveBeenCalledWith(
+      'GET_USER', new Auth_Token(authentication_token))
 
     expect(userModObj.state.error).toBe(false)
 
@@ -173,32 +157,42 @@ describe('action test', () => {
     let url = ''
     let body = {}
     const myAxios: jest.Mocked<any> = axios as any
-    const token = 'mocktoken'
+    const authentication_token = 'mocktoken'
+    const id = 1
+    const response = {
+      user : {
+        authentication_token,
+        id
+      }
+    }
 
     myAxios.post.mockImplementation(
       (_url: string, _body: string) => {
         return new Promise((resolve) => {
           url = _url
           body = _body
-          resolve({data: {token}})
+          resolve({data: {response}})
         })
       }
     )
+    const dispatch = jest.fn()
     const commit = jest.fn()
+
     const user = new User('test@email.com')
-    await userModObj.actions.SIGN_IN({commit}, user)
+    await userModObj.actions.SIGN_IN({commit, dispatch}, user)
 
+    expect(url).toBe('/api/login')
+    await expect(dispatch).toHaveBeenCalledWith(
+      'GET_USER', new Auth_Token(authentication_token))
 
-    expect(url).toBe('/api/signin')
     await expect(commit).toHaveBeenCalledWith(
-      'IS_SIGNIN', {token})
+      'AUTHENTICATE', new Auth_Token(authentication_token))
 
-    await expect(commit).toHaveBeenCalledWith(
-      'SET_USER', user)
 
     expect(userModObj.state.error).toBe(false)
 
   })
+
 
   it('log out works', async () => {
     let url = ''
@@ -216,17 +210,34 @@ describe('action test', () => {
         }
     )
 
-    const user = new User('test@email.com')
-    const state = {
-      token: 'testmock',
-      user
-    }
-
     const commit = jest.fn()
     await userModObj.actions.LOG_OUT({commit})
 
     expect(url).toBe('/api/logout')
     await expect(commit).toBeCalledWith('expire')
+
+  })
+
+  it('GET_USER commit SET_USER', async () => {
+    let url = ''
+    const myAxios: jest.Mocked<any> = axios as any
+    const id = 1
+    const user = new User('test@email.com')
+
+    myAxios.get.mockImplementation(
+        (_url: string) => {
+          return new Promise((resolve) => {
+            url = _url
+            resolve({status: 200, data: user})
+          })
+        }
+    )
+
+    const commit = jest.fn()
+    await userModObj.actions.GET_USER({commit}, id)
+
+    expect(url).toBe('/api/current/')
+    await expect(commit).toBeCalledWith('SET_USER', user)
 
   })
 
@@ -240,13 +251,14 @@ describe('integrate to component', () => {
   it('renders a username using a real Vuex store', () => {
     const user = new User('vuex-email')
     userMod.SET_USER(user)
+
     const wrapper = mount(Header,{
       stubs: {
         RouterLink: RouterLinkStub
       },
 
-    }
-      )
+      }
+    )
 
     expect(wrapper.find('p').text()).toBe('Hi! vuex-email')
   })

@@ -1,4 +1,4 @@
-import { Module, VuexModule, Mutation, getModule, Action } from 'vuex-module-decorators'
+import {Action, getModule, Module, Mutation, VuexModule} from 'vuex-module-decorators'
 import axios from 'axios'
 import store from '@/stores'
 
@@ -20,38 +20,35 @@ export default class UserModule extends VuexModule implements IUserState {
 
   @Mutation
   public SET_USER(user: User) {
-      this.token = user.token
       this.user = user
   }
 
-  @Mutation
-  public IS_SIGNUP(user: User | null) {
-    if (user instanceof User) {
-      this.error = false
-
-    } else {
-      this.error = true
-    }
-  }
 
   @Mutation
-  public IS_SIGNIN(token: Auth_Token) {
+  public AUTHENTICATE(token: Auth_Token) {
     if (token.isvalid()) {
       this.error = false
+      this.token = token.token
 
     } else {
       this.error = true
     }
   }
 
- @Action({commit: 'IS_SIGNUP'})
+ @Action({commit: 'AUTHENTICATE'})
   public  async SIGN_UP(user: User) {
     try {
-      await axios.post('/api/signup', {
+      const resp = await axios.post('/api/register',
         user
-      })
-      this.context.commit('SET_USER', user)
-      return user
+      )
+      const authdData = resp.data.response.user
+
+      const token = new Auth_Token(authdData.authentication_token)
+
+      if (token.isvalid()) {
+        this.context.dispatch('GET_USER', token)
+      }
+      return token
 
     } catch {
       return null
@@ -59,22 +56,23 @@ export default class UserModule extends VuexModule implements IUserState {
     }
   }
 
-  @Action({commit: 'IS_SIGNIN'})
+  @Action({commit: 'AUTHENTICATE'})
   public async SIGN_IN(user: User) {
     try {
-      const resp = await axios.post('/api/signin', {
+      const resp = await axios.post('/api/login',
         user
-      })
+      )
+      const authdData = resp.data.response.user
       // mock
       // const resp = {data : {token : 'token'}}
-      const token = new Auth_Token(resp.data.token)
+      const token = new Auth_Token(authdData.authentication_token)
 
       if (token.isvalid()) {
-        this.context.commit('SET_USER', user)
+        this.context.dispatch('GET_USER', token)
       }
       return token
 
-    } catch {
+    } catch (e){
       return null
 
     }
@@ -90,8 +88,18 @@ export default class UserModule extends VuexModule implements IUserState {
     if (resp.status === 200) {
       this.context.commit('expire')
     }
-    router.push({name: 'home'})
 
+    router.push({name: 'home'})
+  }
+
+  @Action({commit: 'SET_USER'})
+  public async GET_USER(token: Auth_Token) {
+      const headers = {
+                        'Authentication-Token': token.token
+                        }
+    const resp = await axios.get('/api/current/', {headers})
+    const data = resp.data
+    return new User(data.email);
   }
 
   @Mutation

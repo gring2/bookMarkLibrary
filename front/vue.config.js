@@ -1,5 +1,6 @@
 module.exports = {
   devServer: {
-    clientLogLevel: 'info'
+    clientLogLevel: 'info',
+    proxy: 'http://localhost:5000'
   }
 };
