@@ -30,6 +30,7 @@ export default class UserModule extends VuexModule implements IUserState {
       this.error = false
       this.token = token.token
 
+      router.push({name: 'home'})
     } else {
       this.error = true
     }
