@@ -1,16 +1,13 @@
 from __future__ import annotations
 import os
-import time
 from flask import url_for, current_app as app
 from flask_security import current_user
 from bookMarkLibrary.database import db
 from handlers.thumbnail_handler import ThumbnailHandler
-from bookMarkLibrary.const import ALLOWED_EXTENSIONS
-from handlers.screenshot_handler import resize_img
 from utils.url_utils import get_http_format_url
 from sqlalchemy_utils import UUIDType
 import uuid
-from sqlalchemy import Table
+from sqlalchemy import Table, text
 from sqlalchemy.orm import relationship
 
 
@@ -76,6 +73,9 @@ class BookMark(db.Model):
     def save(self):
         current_user.create_bookmarks(self)
 
+    def as_dict(self):
+        return {'id': self.id, 'url': self.url, 'name': self.name, 'img': self.img}
+
 
 class Tag(db.Model):
     __tablename__ = "tags"
@@ -100,3 +100,22 @@ class Tag(db.Model):
         tag_inputs.pop(0)
 
         return tag_inputs
+
+    def as_dict(self):
+        return {'id': self.id, 'tag': self.tag}
+
+    @classmethod
+    def get_lists(cls, ids):
+        params = {str(idx): id for idx, id in enumerate(ids)}
+        stmt = text('SELECT tags.id as id, tags.tag as tag FROM tags'
+                    ' '
+                    'JOIN bookmark_tag_rel btr on tags.id = btr.tags'
+                    ' '
+                    'WHERE btr.bookmarks in (%s)'
+                    ' '
+                    'GROUP BY tags.id' % ','.join([":" + key for key in params.keys()]))
+        stmt = stmt.columns(cls.id, cls.tag)
+
+        stmt = stmt.bindparams(**params)
+
+        return db.session.query(cls).from_statement(stmt).all()

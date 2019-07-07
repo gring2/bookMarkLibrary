@@ -49,6 +49,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECURITY_REGISTERABLE=True,
         SECURITY_SEND_REGISTER_EMAIL=False,
+        SECURITY_URL_PREFIX='/api'
     )
 
     if test_config is None:
@@ -66,11 +67,6 @@ def create_app(test_config=None):
         __graceful_create_dir(app.config['STORAGE_PATH'])
     except OSError:
         pass
-
-    class Custom_Rule(Rule):
-        def __init__(self, string, *args, **kwargs):
-            prefix = '/api'
-            super(Custom_Rule, self).__init__(prefix + string, *args, **kwargs)
 
     __config_routes(app)
 
@@ -92,23 +88,15 @@ def create_app(test_config=None):
 
 
 def __config_routes(app):
-    class Custom_Rule(Rule):
-        def __init__(self, string, *args, **kwargs):
-            prefix = '/api'
-            super(Custom_Rule, self).__init__(prefix + string, *args, **kwargs)
-
-    # set url_rule_class
-    app.url_rule_class = Custom_Rule
-
     @app.before_request
     def register_g_value():
         register_const()
 
-    @app.route('/')
+    @app.route('/api')
     def home():
         return render_template('index.html')
 
-    @app.route('/current/')
+    @app.route('/api/current/')
     @auth_token_required
     def user():
         user = User.query.get(current_user.id)
