@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 import requests
-
+from bookMarkLibrary.exceptions import InvalidURLException
 
 https_token = 'https://'
 http_token = 'http://'
@@ -12,6 +12,8 @@ def get_http_format_url(origin: str)->str:
     :param url: url format(http or https may be included or not ) string
     :return: full formatted url(http[s]://www.uri) string
     """
+    if len(origin) < 1 :
+        raise InvalidURLException('url is not valid')
 
     replaced_protocol = http_token
 
