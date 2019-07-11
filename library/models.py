@@ -102,7 +102,7 @@ class Tag(db.Model):
         return tag_inputs
 
     def as_dict(self):
-        return {'id': self.id, 'tag': self.tag}
+        return {'id': self.id.__str__(), 'tag': self.tag}
 
     @classmethod
     def get_lists(cls, ids):
@@ -113,7 +113,10 @@ class Tag(db.Model):
                     ' '
                     'WHERE btr.bookmarks in (%s)'
                     ' '
-                    'GROUP BY tags.id' % ','.join([":" + key for key in params.keys()]))
+                    'GROUP BY tags.id'
+                    ' '
+                    'ORDER BY tags.id' % ','.join([":" + key for key in params.keys()]))
+
         stmt = stmt.columns(cls.id, cls.tag)
 
         stmt = stmt.bindparams(**params)

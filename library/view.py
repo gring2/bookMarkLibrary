@@ -6,13 +6,12 @@ from library.models import BookMark, Tag
 from library import contract
 from bookMarkLibrary.exceptions import InvalidURLException
 from utils.url_utils import get_http_format_url
-
+from bookMarkLibrary import const
 
 @auth_token_required
 @bp.route('/add', methods=['POST'])
 def add_ele():
-    result = True
-    code = 200
+    code = const.NO_CONTENT
     try:
         bookmark = BookMark(url=get_http_format_url(request.json.get('url', '')))
 
@@ -23,11 +22,10 @@ def add_ele():
         contract.register_bookmark_and_tag(current_user, bookmark, *tags)
 
     except InvalidURLException:
-        result = False
-        code = 500
+        code = const.SERVER_ERROR
     finally:
 
-        return json.dumps({'success': result}), code, {'ContentType': 'application/json'}
+        return json.dumps({}), code, {'ContentType': 'application/json'}
 
 
 @bp.route('/urls')
@@ -51,14 +49,21 @@ def urls(tag=None):
     return jsonify({'tags': tag_json, 'bookmarks': bookmarks_json})
 
 
-@bp.route('/thumbnail', methods=['POST'])
-@login_required
+@bp.route('/thumbnail', methods=['PATCH'])
+@auth_token_required
 def change_thumbnail():
-    file = request.files['thumbnail']
-    id = request.form['id']
+    code = const.NO_CONTENT
 
-    bookmark = BookMark.query.get(id)
+    try:
+        file = request.files['thumbnail']
+        id = request.form['id']
 
-    contract.change_thumbnail(bookmark, file)
+        bookmark = BookMark.query.get(id)
 
-    return redirect(url_for('library.urls'))
+        contract.change_thumbnail(bookmark, file)
+    except:
+        code = const.SERVER_ERROR
+
+    finally:
+
+        return json.dumps({}), code, {'ContentType': 'application/json'}
