@@ -5,6 +5,7 @@ import {userMod} from './user'
 
 import router from '@/router'
 import BookMark from '@/vo/BookMark'
+import Tag from "@/vo/Tag";
 
 export interface IUserState {
   bookmarks: BookMark[]
@@ -14,13 +15,20 @@ export interface IUserState {
 @Module({dynamic: true, store, name:'bookmarkMod',})
 export default class BookMarkModule extends VuexModule implements IUserState {
   public bookmarks: BookMark[] = []
+  public tags: Tag[] = []
+
 
   @Mutation
   SET_BOOKMARKS(bookmarks: BookMark[]){
     this.bookmarks = bookmarks
   }
 
-  @Action({commit: 'SET_BOOKMARKS'})
+  @Mutation
+  SET_TAGS(tags: Tag[]){
+    this.tags = tags
+  }
+
+  @Action
   public async GET_BOOKMARKS(tags: string[] | null= null){
     const data:{[key: string]: any} = {}
 
@@ -31,8 +39,9 @@ export default class BookMarkModule extends VuexModule implements IUserState {
 
     }
 
-    const resp = await axios.get('/api/bookmarks', data)
-    return resp.data
+    const resp = await axios.get('/api/library/urls', data)
+    this.context.commit('SET_BOOKMARKS', resp.data['bookmarks'])
+    this.context.commit('SET_TAGS', resp.data['tags'])
   }
 }
 export const bookmarkMod = getModule(BookMarkModule)

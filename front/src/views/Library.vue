@@ -12,6 +12,7 @@
   import { Component, Prop, Vue } from 'vue-property-decorator'
   import TagsPanel from '@/views/TagsPanel.vue'
   import BookmarksPanel from '@/views/BookmarksPanel.vue'
+  import {bookmarkMod} from '@/stores/modules/bookmark'
 
   @Component({
     components: {
@@ -20,6 +21,10 @@
     },
   })
   export default class Library extends Vue {
+    created(){
+      bookmarkMod.GET_BOOKMARKS()
+    }
+
   }
 </script>
 

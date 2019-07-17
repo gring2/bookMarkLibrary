@@ -44,18 +44,7 @@ exports[`Router rendering views renders a Library view via routing 1`] = `
     <div>
       <aside
         class="side"
-      >
-        <ul>
-          <span>
-            test1
-          </span>
-        </ul>
-        <ul>
-          <span>
-            test2
-          </span>
-        </ul>
-      </aside>
+      />
        
       <main>
         <div>
@@ -82,22 +71,7 @@ exports[`Router rendering views renders a Library view via routing 1`] = `
         <div
           class="container"
         >
-          <ul>
-            <li>
-              <div>
-                <img
-                  alt=""
-                  src="https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png"
-                />
-                 
-                <a
-                  href="#"
-                >
-                  title
-                </a>
-              </div>
-            </li>
-          </ul>
+          <ul />
         </div>
       </main>
     </div>

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <img :src="bookmark.thumbnail" alt="">
-    <a :href="bookmark.url">{{bookmark.title}}</a>
+    <img :src="bookmark.img" alt="">
+    <a :href="bookmark.url">{{bookmark.name}}</a>
   </div>
 </template>
 

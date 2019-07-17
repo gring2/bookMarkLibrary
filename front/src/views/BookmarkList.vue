@@ -1,7 +1,7 @@
 <template>
     <div :class="$style.container">
-      <ul v-for="bookmark in bookmarks">
-        <li>
+      <ul >
+        <li v-for="bookmark in bookmarks">
           <BookMark :bookmark="bookmark" ></BookMark>
         </li>
       </ul>
@@ -13,6 +13,7 @@
   import { Component, Vue } from 'vue-property-decorator'
   import BookMark from '@/components/BookMark.vue'
   import BookMarkModel from '@/vo/BookMark'
+  import {bookmarkMod} from '@/stores/modules/bookmark'
 
   @Component({
     components: {
@@ -20,8 +21,11 @@
     }
   })
   export default class BookmarkList extends Vue {
-    private bookmarks: BookMarkModel[] = [new BookMarkModel('title', '#',
-        'https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png')]
+    // private bookmarks: BookMarkModel[] = [new BookMarkModel('title', '#',
+    //     'https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png')]
+    get bookmarks (): BookMarkModel[]  {
+      return bookmarkMod.bookmarks
+    }
   }
 
 </script>

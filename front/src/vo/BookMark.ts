@@ -1,11 +1,11 @@
 export default class BookMark {
-  public title: string
+  public name: string
   public url: string
-  public thumbnail: string
-  constructor(title: string, url: string, thumbnail: string) {
-    this.title = title
+  public img: string
+  constructor(name: string, url: string, img: string) {
+    this.name = name
     this.url = url
-    this.thumbnail = thumbnail
+    this.img = img
   }
 
 }

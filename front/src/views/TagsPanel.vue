@@ -1,23 +1,27 @@
 <template>
     <aside class="side">
       <ul v-for="tag in tags">
-        <Tag :tag="tag"></Tag>
+        <TagLink :tag="tag"></TagLink>
       </ul>
     </aside>
 </template>
 
 <script lang="ts">
 import { Component , Vue } from 'vue-property-decorator'
-import Tag from '@/components/Tag.vue'
+import TagLink from '@/components/TagLink.vue'
+import Tag from '@/vo/Tag'
+import {bookmarkMod} from '@/stores/modules/bookmark'
+
+
 @Component({
   components: {
-    Tag,
+    TagLink,
   },
 })
 export default class TagsPanel extends Vue {
-  private tags?: string[] = []
+  private tags?: Tag[] = []
   private created() {
-    this.tags = ['test1', 'test2']
+    this.tags = bookmarkMod.tags
   }
 }
 </script>
