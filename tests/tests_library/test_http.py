@@ -1,5 +1,5 @@
 import io
-from flask_security import current_user, url_for_security
+from flask_security import url_for_security
 from pathlib import Path
 from sqlalchemy import desc
 from models import User
@@ -24,11 +24,13 @@ class AddTestCase(BaseTestCase):
                                      'password_confirm': 'test123'})
 
         user = api_utils.loads(login.data)['response']['user']
+        self.current_user = User.query.get(user['id'])
         self.token = user['authentication_token']
 
     def tearDown(self):
         shutil.rmtree(app.config['STORAGE_PATH'])
         os.makedirs(app.config['STORAGE_PATH'])
+        db.session.close()
         super().tearDown()
 
     def test_add_bookMark(self):
@@ -46,6 +48,7 @@ class AddTestCase(BaseTestCase):
         # use og:img as thumbnail
         data = {'url': 'http://ogp.me/'}
         res = api_utils.post(url_for('library.add_ele'), data=data, headers={'Authentication-Token': self.token})
+        self.assertStatus(res, 204)
 
         og_bookmark = BookMark.query.filter_by(_url='http://www.ogp.me').order_by(desc(BookMark.id)).first()
         self.assertIsNotNone(og_bookmark)
@@ -57,30 +60,35 @@ class AddTestCase(BaseTestCase):
         assert 'ogp.me' in content
         assert 'Google' in content
 
-        self.assert_template_used('library/urls.html')
+        data = api_utils.loads(result.data)
+        self.assertEqual(2, len(data))
 
     def test_add_bookmark_with_new_tag(self):
         data = {'url': 'google.com', 'tags': '#new_tag'}
         res = api_utils.post(url_for('library.add_ele'), data=data, headers={'Authentication-Token': self.token})
+
         bookmark = BookMark.query.first()
 
         self.assertIsNotNone(bookmark)
         self.assertIsNotNone(bookmark.img)
-        self.assertEquals(1, len(bookmark.tags))
+        self.assertEqual(1, len(bookmark.tags))
 
         tags = Tag.query.all()
-        self.assertEquals(1, len(tags))
-        self.assertEquals(tags[0], bookmark.tags[0])
+        self.assertEqual(1, len(tags))
+        self.assertEqual(tags[0], bookmark.tags[0])
 
-        self.assertEquals(bookmark, current_user.bookmarks[0])
+        current_user = User.query.first()
+        self.assertEqual(bookmark, current_user.bookmarks[0])
 
         result = api_utils.get(url_for('library.urls'), headers={'Authentication-Token': self.token})
 
-        content = result.data.decode('utf-8')
-        assert 'new_tag' in content
-        assert 'Google' in content
+        content = api_utils.loads(result.data)
 
-        self.assert_template_used('library/urls.html')
+        self.assertEqual(1, len(content['tags']))
+
+        assert Tag.query.filter_by(tag='new_tag').first().as_dict() in content['tags']
+
+        self.assertEqual('Google', content['bookmarks'][0]['name'])
 
     def test_add_bookmark_with_new_tags(self):
         data = {'url': 'google.com', 'tags': '#new_tag1#new_tag2'}
@@ -89,24 +97,26 @@ class AddTestCase(BaseTestCase):
 
         self.assertIsNotNone(bookmark)
         self.assertIsNotNone(bookmark.img)
-        self.assertEquals(2, len(bookmark.tags))
+        self.assertEqual(2, len(bookmark.tags))
 
         tags = Tag.query.all()
-        self.assertEquals(2, len(tags))
+        self.assertEqual(2, len(tags))
 
         for tag in bookmark.tags:
             assert tag in tags
 
-        self.assertEquals(bookmark, current_user.bookmarks[0])
+        self.assertEqual(bookmark, self.current_user.bookmarks[0])
 
         result = api_utils.get(url_for('library.urls'), headers={'Authentication-Token': self.token})
 
-        content = result.data.decode('utf-8')
-        assert 'new_tag1' in content
-        assert 'new_tag2' in content
-        assert 'Google' in content
+        content = api_utils.loads(result.data)
 
-        self.assert_template_used('library/urls.html')
+        self.assertEqual(2, len(content['tags']))
+
+        assert Tag.query.filter_by(tag='new_tag1').first().as_dict() in content['tags']
+        assert Tag.query.filter_by(tag='new_tag2').first().as_dict() in content['tags']
+
+        self.assertEqual('Google', content['bookmarks'][0]['name'])
 
     def test_add_bookmark_with_existing_tag(self):
         with self.client:
@@ -120,21 +130,21 @@ class AddTestCase(BaseTestCase):
 
             self.assertIsNotNone(bookmark)
             self.assertIsNotNone(bookmark.img)
-            self.assertEquals(1, len(bookmark.tags))
+            self.assertEqual(1, len(bookmark.tags))
 
             tags = Tag.query.all()
-            self.assertEquals(1, len(tags))
-            self.assertEquals(tags[0], bookmark.tags[0])
+            self.assertEqual(1, len(tags))
+            self.assertEqual(tags[0], bookmark.tags[0])
 
-            self.assertEquals(bookmark, current_user.bookmarks[0])
+            self.assertEqual(bookmark, self.current_user.bookmarks[0])
 
             result = api_utils.get(url_for('library.urls'), headers={'Authentication-Token': self.token})
 
-            content = result.data.decode('utf-8')
-            assert t1.tag in content
-            assert 'Google' in content
+            content = api_utils.loads(result.data)
 
-            self.assert_template_used('library/urls.html')
+            assert t1.as_dict() in content['tags']
+
+            self.assertEqual('Google', content['bookmarks'][0]['name'])
 
     def test_add_bookmark_with_existing_tags(self):
         t1 = Tag(id=uuid.uuid4().hex, tag='existing_1')
@@ -150,23 +160,24 @@ class AddTestCase(BaseTestCase):
 
         self.assertIsNotNone(bookmark)
         self.assertIsNotNone(bookmark.img)
-        self.assertEquals(2, len(bookmark.tags))
+        self.assertEqual(2, len(bookmark.tags))
 
         tags = Tag.query.all()
-        self.assertEquals(2, len(tags))
-        self.assertEquals(tags[0], bookmark.tags[0])
+        self.assertEqual(2, len(tags))
+        self.assertEqual(tags[0], bookmark.tags[0])
 
-        self.assertEquals(bookmark, current_user.bookmarks[0])
+        self.assertEqual(bookmark, self.current_user.bookmarks[0])
 
         result = api_utils.get(url_for('library.urls'), headers={'Authentication-Token': self.token})
 
-        content = result.data.decode('utf-8')
-        assert t1.tag in content
-        assert t2.tag in content
+        content = api_utils.loads(result.data)
 
-        assert 'Google' in content
+        self.assertEqual(2, len(content['tags']))
 
-        self.assert_template_used('library/urls.html')
+        assert t1.as_dict() in content['tags']
+        assert t2.as_dict() in content['tags']
+
+        self.assertEqual('Google', content['bookmarks'][0]['name'])
 
     def test_add_bookmark_with_new_tags_and_existing_tags(self):
         t1 = Tag(id=uuid.uuid4().hex, tag='existing_1')
@@ -182,27 +193,30 @@ class AddTestCase(BaseTestCase):
 
         self.assertIsNotNone(bookmark)
         self.assertIsNotNone(bookmark.img)
-        self.assertEquals(4, len(bookmark.tags))
+        self.assertEqual(4, len(bookmark.tags))
 
         tags = Tag.query.all()
-        self.assertEquals(4, len(tags))
+        self.assertEqual(4, len(tags))
 
         for tag in bookmark.tags:
             assert tag in tags
 
-        self.assertEquals(bookmark, current_user.bookmarks[0])
+        self.assertEqual(bookmark, self.current_user.bookmarks[0])
 
         result = api_utils.get(url_for('library.urls'), headers={'Authentication-Token': self.token})
 
         content = result.data.decode('utf-8')
-        assert t1.tag in content
-        assert t2.tag in content
-        assert 'new1' in content
-        assert 'new2' in content
 
-        assert 'Google' in content
+        content = api_utils.loads(result.data)
 
-        self.assert_template_used('library/urls.html')
+        self.assertEqual(4, len(content['tags']))
+
+        assert t1.as_dict() in content['tags']
+        assert t2.as_dict() in content['tags']
+        assert Tag.query.filter_by(tag='new1').first().as_dict() in content['tags']
+        assert Tag.query.filter_by(tag='new2').first().as_dict() in content['tags']
+
+        self.assertEqual('Google', content['bookmarks'][0]['name'])
 
     def test_add_bookmark_with_new_tag_and_existing_tags(self):
         t1 = Tag(id=uuid.uuid4().hex, tag='existing_1')
@@ -218,26 +232,27 @@ class AddTestCase(BaseTestCase):
 
         self.assertIsNotNone(bookmark)
         self.assertIsNotNone(bookmark.img)
-        self.assertEquals(3, len(bookmark.tags))
+        self.assertEqual(3, len(bookmark.tags))
 
         tags = Tag.query.all()
-        self.assertEquals(3, len(tags))
+        self.assertEqual(3, len(tags))
 
         for tag in bookmark.tags:
             assert tag in tags
 
-        self.assertEquals(bookmark, current_user.bookmarks[0])
+        self.assertEqual(bookmark, self.current_user.bookmarks[0])
 
         result = api_utils.get(url_for('library.urls'), headers={'Authentication-Token': self.token})
 
-        content = result.data.decode('utf-8')
-        assert t1.tag in content
-        assert t2.tag in content
-        assert 'new1' in content
+        content = api_utils.loads(result.data)
 
-        assert 'Google' in content
+        self.assertEqual(3, len(content['tags']))
 
-        self.assert_template_used('library/urls.html')
+        assert t1.as_dict() in content['tags']
+        assert t2.as_dict() in content['tags']
+        assert Tag.query.filter_by(tag='new1').first().as_dict() in content['tags']
+
+        self.assertEqual('Google', content['bookmarks'][0]['name'])
 
     def test_add_bookmark_with_new_tag_and_existing_tag(self):
         t1 = Tag(id=uuid.uuid4().hex, tag='existing_1')
@@ -250,25 +265,26 @@ class AddTestCase(BaseTestCase):
         bookmark = BookMark.query.first()
         self.assertIsNotNone(bookmark)
         self.assertIsNotNone(bookmark.img)
-        self.assertEquals(2, len(bookmark.tags))
+        self.assertEqual(2, len(bookmark.tags))
 
         tags = Tag.query.all()
-        self.assertEquals(2, len(tags))
+        self.assertEqual(2, len(tags))
 
         for tag in bookmark.tags:
             assert tag in tags
 
-        self.assertEquals(bookmark, current_user.bookmarks[0])
+        self.assertEqual(bookmark, self.current_user.bookmarks[0])
 
         result = api_utils.get(url_for('library.urls'), headers={'Authentication-Token': self.token})
 
-        content = result.data.decode('utf-8')
-        assert t1.tag in content
-        assert 'new2' in content
+        content = api_utils.loads(result.data)
 
-        assert 'Google' in content
+        self.assertEqual(2, len(content['tags']))
 
-        self.assert_template_used('library/urls.html')
+        assert t1.as_dict() in content['tags']
+        assert Tag.query.filter_by(tag='new2').first().as_dict() in content['tags']
+
+        self.assertEqual('Google', content['bookmarks'][0]['name'])
 
     def test_add_bookmark_with_new_tags_and_existing_tag(self):
         t1 = Tag(id=uuid.uuid4().hex, tag='existing_1')
@@ -281,26 +297,27 @@ class AddTestCase(BaseTestCase):
         bookmark = BookMark.query.first()
         self.assertIsNotNone(bookmark)
         self.assertIsNotNone(bookmark.img)
-        self.assertEquals(3, len(bookmark.tags))
+        self.assertEqual(3, len(bookmark.tags))
 
         tags = Tag.query.all()
-        self.assertEquals(3, len(tags))
+        self.assertEqual(3, len(tags))
 
         for tag in bookmark.tags:
             assert tag in tags
 
-        self.assertEquals(bookmark, current_user.bookmarks[0])
+        self.assertEqual(bookmark, self.current_user.bookmarks[0])
 
         result = api_utils.get(url_for('library.urls'), headers={'Authentication-Token': self.token})
 
-        content = result.data.decode('utf-8')
-        assert t1.tag in content
-        assert 'new1' in content
-        assert 'new2' in content
+        content = api_utils.loads(result.data)
 
-        assert 'Google' in content
+        self.assertEqual(3, len(content['tags']))
 
-        self.assert_template_used('library/urls.html')
+        assert t1.as_dict() in content['tags']
+        assert Tag.query.filter_by(tag='new1').first().as_dict() in content['tags']
+        assert Tag.query.filter_by(tag='new2').first().as_dict() in content['tags']
+
+        self.assertEqual('Google', content['bookmarks'][0]['name'])
 
     def test_change_thumbnail(self):
         file = (io.BytesIO(b"abcdef"), 'test.jpg')
@@ -312,19 +329,22 @@ class AddTestCase(BaseTestCase):
 
         past_img = bookmark.img
 
-        current_user.bookmarks.append(bookmark)
+        self.current_user.bookmarks.append(bookmark)
 
-        db.session.add(current_user)
+        db.session.add(self.current_user)
         db.session.commit()
 
         data = {'thumbnail': file, 'id': BookMark.query.first().id}
-        res = api_utils.post(url_for('library.change_thumbnail'), data=data, headers={'Authentication-Token': self.token})
+        res = self.client.patch(url_for('library.change_thumbnail'),
+                                data=data, headers={'Authentication-Token': self.token,
+                                                    'Content-Type': 'multipart/form-data'
+                                                                                       })
 
         self.assertNotEqual(past_img, bookmark.img)
 
         path = Path(app.config['STORAGE_PATH'] + '/' + bookmark.img)
         self.assertTrue(path.is_file())
-        self.assertRedirects(res, url_for('library.urls'))
+        self.assertStatus(res, 204)
 
     def test_invalid_url(self):
         api_utils.post(url_for_security('login'), data={'email': 'test@test.com', 'password': 'test123'},
@@ -333,18 +353,12 @@ class AddTestCase(BaseTestCase):
         data = {'url': 'yahoo.invalid'}
         res = api_utils.post(url_for('library.add_ele'), data=data)
 
-        self.assertRedirects(res, url_for('library.urls'))
+        self.assert500(res)
         self.assertRaises(InvalidURLException)
 
         bookmark_cnt = BookMark.query.count()
 
         self.assertEqual(0, bookmark_cnt)
-
-    def tearDown(self):
-        shutil.rmtree(app.config['STORAGE_PATH'])
-        os.makedirs(app.config['STORAGE_PATH'])
-        db.session.close()
-        super().tearDown()
 
 
 class ShowTestCase(BaseTestCase):

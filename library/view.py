@@ -1,4 +1,4 @@
-
+import json
 from flask_security import current_user, login_required, auth_token_required
 from . import bp
 from flask import (jsonify, request, g, redirect, url_for)
@@ -6,23 +6,26 @@ from library.models import BookMark, Tag
 from library import contract
 from bookMarkLibrary.exceptions import InvalidURLException
 from utils.url_utils import get_http_format_url
-
+from bookMarkLibrary import const
 
 @auth_token_required
 @bp.route('/add', methods=['POST'])
 def add_ele():
-    bookmark = BookMark(url=get_http_format_url(request.form['url']))
-
-    tag_inputs = Tag.conv_tag_str_to_list(request.form.get('tags', ''))
-
-    tags = [Tag.find_or_make(tag) for idx, tag in enumerate(tag_inputs)]
+    code = const.NO_CONTENT
     try:
+        bookmark = BookMark(url=get_http_format_url(request.json.get('url', '')))
+
+        tag_inputs = Tag.conv_tag_str_to_list(request.json.get('tags', ''))
+
+        tags = [Tag.find_or_make(tag) for idx, tag in enumerate(tag_inputs)]
         bookmark.makeup()
         contract.register_bookmark_and_tag(current_user, bookmark, *tags)
-    except InvalidURLException:
-        pass
 
-    return redirect(url_for('library.urls'))
+    except InvalidURLException:
+        code = const.SERVER_ERROR
+    finally:
+
+        return json.dumps({}), code, {'ContentType': 'application/json'}
 
 
 @bp.route('/urls')
@@ -46,14 +49,21 @@ def urls(tag=None):
     return jsonify({'tags': tag_json, 'bookmarks': bookmarks_json})
 
 
-@bp.route('/thumbnail', methods=['POST'])
-@login_required
+@bp.route('/thumbnail', methods=['PATCH'])
+@auth_token_required
 def change_thumbnail():
-    file = request.files['thumbnail']
-    id = request.form['id']
+    code = const.NO_CONTENT
 
-    bookmark = BookMark.query.get(id)
+    try:
+        file = request.files['thumbnail']
+        id = request.form['id']
 
-    contract.change_thumbnail(bookmark, file)
+        bookmark = BookMark.query.get(id)
 
-    return redirect(url_for('library.urls'))
+        contract.change_thumbnail(bookmark, file)
+    except:
+        code = const.SERVER_ERROR
+
+    finally:
+
+        return json.dumps({}), code, {'ContentType': 'application/json'}
