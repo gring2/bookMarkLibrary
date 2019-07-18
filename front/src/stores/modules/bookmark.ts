@@ -12,7 +12,7 @@ export interface IUserState {
 }
 
 
-@Module({dynamic: true, store, name:'bookmarkMod',})
+@Module({dynamic: true, store, namespaced: true, name:'bookmarkMod'})
 export default class BookMarkModule extends VuexModule implements IUserState {
   public bookmarks: BookMark[] = []
   public tags: Tag[] = []
@@ -38,10 +38,14 @@ export default class BookMarkModule extends VuexModule implements IUserState {
       data['params'] = {'q': tags}
 
     }
+    try {
+      const resp = await axios.get('/api/library/urls', data)
+      this.context.commit('SET_BOOKMARKS', resp.data['bookmarks'])
+      this.context.commit('SET_TAGS', resp.data['tags'])
 
-    const resp = await axios.get('/api/library/urls', data)
-    this.context.commit('SET_BOOKMARKS', resp.data['bookmarks'])
-    this.context.commit('SET_TAGS', resp.data['tags'])
+    }catch (e) {
+
+    }
   }
 }
 export const bookmarkMod = getModule(BookMarkModule)

@@ -26,7 +26,7 @@ export default class UserModule extends VuexModule implements IUserState {
   }
 
   @Mutation
-  public SET_USER(user: User) {
+  public SET_USER(user: User | null) {
       this.user = user
   }
 
@@ -105,9 +105,14 @@ export default class UserModule extends VuexModule implements IUserState {
     const headers = {
                       'Authentication-Token': token.token
                       }
-    const resp = await axios.get('/api/current/', {headers})
-    const data = resp.data
-    return new User(data.email);
+    try {
+      const resp = await axios.get('/api/current/', {headers})
+      const data = resp.data
+      return new User(data.email);
+
+    }catch (e) {
+      return null
+    }
   }
 
   @Mutation

@@ -1,11 +1,12 @@
-import { VuexModule } from 'vuex-module-decorators';
-import { createLocalVue } from '@vue/test-utils';
+import {VuexModule} from 'vuex-module-decorators';
+import {createLocalVue, mount} from '@vue/test-utils';
 import Vuex from 'vuex'
 import BookMark from "@/vo/BookMark";
-import BookMarkModule, { bookmarkMod } from '@/stores/modules/bookmark'
-import UserModule, { userMod } from '@/stores/modules/user'
+import BookMarkModule, {bookmarkMod} from '@/stores/modules/bookmark'
 import axios from 'axios'
 import Tag from "@/vo/Tag";
+import Library from '@/views/Library.vue'
+
 jest.mock('axios')
 
 jest.mock('@/stores/modules/user', () => {
@@ -123,7 +124,6 @@ describe('action test', () => {
         return new Promise((resolve) => {
           url = _url
           headers = _config
-          console.log(_config)
           resolve({data: {bookmarks, tags}})
         })
       }
@@ -167,10 +167,80 @@ describe('action test', () => {
 
    })
 
+  it('register bookmarks', () => {
+    fail('implemented')
+  })
+
 })
 
 describe('integrate test', () => {
-  it('render bookmark state', () => {
-    fail('need to be implemented')
+  const localVue = createLocalVue()
+  localVue.use(Vuex)
+
+  it('render bookmarks state', () => {
+    const bookmark1 = new BookMark('test1', 'testUrl1', 'testThumbnail1')
+    const bookmark2 = new BookMark('test2', 'testUrl2', 'testThumbnail2')
+
+    bookmarkMod.SET_BOOKMARKS([bookmark1, bookmark2])
+
+    const wrapper = mount(Library, {
+
+    })
+    const aTags = wrapper.findAll('a')
+    const first = aTags.at(0)
+    const second = aTags.at(1)
+
+    expect(first.text()).toBe('test1')
+    expect(second.text()).toBe('test2')
+
   })
+
+    it('render tags state', () => {
+    const tag1 = new Tag(1, 'test1')
+    const tag2 = new Tag(2, 'test2')
+
+    bookmarkMod.SET_TAGS([tag1, tag2])
+
+    const wrapper = mount(Library, {
+
+    })
+
+    const spanTags = wrapper.findAll('span')
+    const first = spanTags.at(0)
+    const second = spanTags.at(1)
+
+    expect(first.text()).toBe('test1')
+    expect(second.text()).toBe('test2')
+
+  })
+
+  it('snapshot' , () => {
+    const tag1 = new Tag(1, 'test1')
+    const tag2 = new Tag(2, 'test2')
+
+    bookmarkMod.SET_TAGS([tag1, tag2])
+
+    const bookmark1 = new BookMark('test1', 'testUrl1', 'testThumbnail1')
+    const bookmark2 = new BookMark('test2', 'testUrl2', 'testThumbnail2')
+
+    bookmarkMod.SET_BOOKMARKS([bookmark1, bookmark2])
+
+    const wrapper = mount(Library, {
+
+    })
+
+    expect(wrapper).toMatchSnapshot()
+  })
+
+  it('call bookmark store GET_BOOKMARKS action', () => {
+    bookmarkMod.GET_BOOKMARKS = jest.fn()
+
+    const wrapper = mount(Library, {
+
+    })
+
+    expect(bookmarkMod.GET_BOOKMARKS).toBeCalled()
+
+  })
+
 })
