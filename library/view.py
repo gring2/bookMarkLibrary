@@ -9,7 +9,7 @@ from utils.url_utils import get_http_format_url
 from bookMarkLibrary import const
 
 @auth_token_required
-@bp.route('/add', methods=['POST'])
+@bp.route('/urls', methods=['POST'])
 def add_ele():
     code = const.NO_CONTENT
     try:
@@ -49,13 +49,13 @@ def urls(tag=None):
     return jsonify({'tags': tag_json, 'bookmarks': bookmarks_json})
 
 
-@bp.route('/thumbnail', methods=['PATCH'])
+@bp.route('/urls', methods=['PATCH'])
 @auth_token_required
 def change_thumbnail():
     code = const.NO_CONTENT
 
     try:
-        file = request.files['thumbnail']
+        file = request.files['img']
         id = request.form['id']
 
         bookmark = BookMark.query.get(id)

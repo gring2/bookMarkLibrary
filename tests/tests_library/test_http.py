@@ -334,7 +334,7 @@ class AddTestCase(BaseTestCase):
         db.session.add(self.current_user)
         db.session.commit()
 
-        data = {'thumbnail': file, 'id': BookMark.query.first().id}
+        data = {'img': file, 'id': BookMark.query.first().id}
         res = self.client.patch(url_for('library.change_thumbnail'),
                                 data=data, headers={'Authentication-Token': self.token,
                                                     'Content-Type': 'multipart/form-data'
