@@ -1,10 +1,7 @@
 import os
 import traceback
-
 from flask import Flask, render_template, send_from_directory, jsonify
 from flask_security import Security, SQLAlchemyUserDatastore, auth_token_required, current_user
-from werkzeug.routing import Rule
-
 from models import User
 from bookMarkLibrary.send_storage_file import SendStorageFileHandler
 from flask_wtf.csrf import CSRFProtect
@@ -20,13 +17,14 @@ class CustomSessionInterface(SecureCookieSessionInterface):
         return
 
 
+# app config objects
 send_storage_handler = SendStorageFileHandler()
 csrf = CSRFProtect()
 user_datastore = SQLAlchemyUserDatastore(db, User, None)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# testing envs
 env = os.getenv('ENV', 'production')
-
 if env == 'testing':
     from dotenv import load_dotenv
     load_dotenv()
@@ -52,13 +50,7 @@ def create_app(test_config=None):
         SECURITY_URL_PREFIX='/api'
     )
 
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-        set_db_config(app)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
+    __config_app(app, test_config)
 
     init_db(app)
 
@@ -73,7 +65,7 @@ def create_app(test_config=None):
     __config_storage(app)
 
     # Setup Flask-Security
-    security = Security(app, user_datastore)
+    Security(app, user_datastore)
 
     app.config['WTF_CSRF_ENABLED'] = False
 
@@ -85,6 +77,39 @@ def create_app(test_config=None):
     app.session_interface = CustomSessionInterface()
 
     return app
+
+
+def __setup_logging(test_config=None):
+    if test_config is None:
+        import logging.config
+        import yaml
+
+        config = yaml.safe_load(open(ROOT_DIR + '/logging.conf'))
+
+        def __set_root_path_to_filename(handlers):
+            for k, handler in handlers.items():
+                if 'filename' in handler:
+                    handler['filename'] = handler['filename'].replace('$ROOT_PATH', ROOT_DIR + '/..')
+                    handlers[k] = handler
+
+        __set_root_path_to_filename(config['handlers'])
+
+        logging.config.dictConfig(config)
+
+
+def __config_app(app, test_config):
+    if test_config is None:
+        # load the instance config, if it exists, when not testing
+        app.config.from_pyfile('config.py', silent=True)
+        set_db_config(app)
+    else:
+        # load the test config if passed in
+        app.config.from_mapping(test_config)
+
+
+def __graceful_create_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def __config_routes(app):
@@ -115,25 +140,3 @@ def __config_storage(app):
     app.add_url_rule('/storage/<path:filename>', endpoint='storage',
                      view_func=send_storage_file)
 
-
-def __setup_logging(test_config=None):
-    if test_config is None:
-        import logging.config
-        import yaml
-
-        config = yaml.safe_load(open(ROOT_DIR + '/logging.conf'))
-
-        def __set_root_path_to_filename(handlers):
-            for k, handler in handlers.items():
-                if 'filename' in handler:
-                    handler['filename'] = handler['filename'].replace('$ROOT_PATH', ROOT_DIR + '/..')
-                    handlers[k] = handler
-
-        __set_root_path_to_filename(config['handlers'])
-
-        logging.config.dictConfig(config)
-
-
-def __graceful_create_dir(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
