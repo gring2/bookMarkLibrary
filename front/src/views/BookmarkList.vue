@@ -21,8 +21,6 @@
     }
   })
   export default class BookmarkList extends Vue {
-    // private bookmarks: BookMarkModel[] = [new BookMarkModel('title', '#',
-    //     'https://cdn.qiita.com/assets/qiita-fb-2887e7b4aad86fd8c25cea84846f2236.png')]
     get bookmarks (): BookMarkModel[]  {
       return bookmarkMod.bookmarks
     }
@@ -46,11 +44,12 @@
 
     flex-wrap: wrap;
     -webkit-flex-flow: row wrap;
-    justify-content: space-between;
-  li{
-    display: block;
-    margin-bottom: 2rem;
-  }
+    justify-content: left;
+      li{
+        display: block;
+        margin-bottom: 2rem;
+        padding: 1rem;
+      }
   }
   }
 </style>
