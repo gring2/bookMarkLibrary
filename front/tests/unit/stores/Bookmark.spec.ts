@@ -1,11 +1,12 @@
 import {VuexModule} from 'vuex-module-decorators';
-import {createLocalVue, mount} from '@vue/test-utils';
+import {createLocalVue, mount, shallowMount} from '@vue/test-utils';
 import Vuex from 'vuex'
 import BookMark from "@/vo/BookMark";
 import BookMarkModule, {bookmarkMod} from '@/stores/modules/bookmark'
 import axios from 'axios'
 import Tag from "@/vo/Tag";
 import Library from '@/views/Library.vue'
+import RegisterBookMark from '@/components/RegisterBookMark.vue'
 
 jest.mock('axios')
 
@@ -167,8 +168,31 @@ describe('action test', () => {
 
    })
 
-  it('register bookmarks', () => {
-    fail('implemented')
+  it('register bookmarks', async () => {
+    const commit = jest.fn()
+    const dispatch = jest.fn()
+    await bookmarkModObj.actions.POST_BOOKMARK({commit, dispatch}, {'url': 'test_url', 'tags': 'test-tags'})
+
+    expect(url).toBe('/api/library/urls')
+    await expect(dispatch).toBeCalledWith('GET_BOOKMARKS')
+  })
+
+  it('POST_BOOKMARK do not call GET_BOOKMARKS', async () => {
+    myAxios.post.mockImplementation(
+      (_url: string, _body: string, _headers:{}) => {
+        return new Promise((resolve, reject) => {
+          url = _url
+          reject()
+        })
+      }
+    )
+
+    const commit = jest.fn()
+    const dispatch = jest.fn()
+    await bookmarkModObj.actions.POST_BOOKMARK({commit, dispatch}, {'url': 'test_url', 'tags': 'test-tags'})
+
+    expect(url).toBe('/api/library/urls')
+    await expect(dispatch).toBeCalledTimes(0)
   })
 
 })
@@ -195,7 +219,7 @@ describe('integrate test', () => {
 
   })
 
-    it('render tags state', () => {
+  it('render tags state', () => {
     const tag1 = new Tag(1, 'test1')
     const tag2 = new Tag(2, 'test2')
 
@@ -241,6 +265,40 @@ describe('integrate test', () => {
 
     expect(bookmarkMod.GET_BOOKMARKS).toBeCalled()
 
+  })
+
+  it('call POST_BOOKMARK if submit is clicked', () => {
+    bookmarkMod.POST_BOOKMARK = jest.fn()
+    const data = {
+        'url': 'test-url',
+        'tags': 'test-url',
+
+      }
+    const wrapper = mount(RegisterBookMark, {
+      data: () => data
+    })
+    wrapper.find('.submit').trigger('click')
+
+    expect(bookmarkMod.POST_BOOKMARK).toBeCalledWith(data)
+
+  })
+
+  it('alert Pop ups if url is null', () => {
+    window.alert = jest.fn()
+
+    const data = {
+        'url': null,
+        'tags': 'test-url',
+
+      }
+
+    const wrapper = mount(RegisterBookMark, {
+      data: () => data
+    })
+
+    wrapper.find('.submit').trigger('click')
+
+    expect(window.alert).toBeCalled()
   })
 
 })

@@ -16,6 +16,8 @@
 
     />
     <Button
+        :click="(e) => { postDatas()}"
+
         :class="'submit'"
         :styles="{
         fontWeight: 'normal',
@@ -29,7 +31,7 @@
   import { Component, Vue } from 'vue-property-decorator'
   import Input from '@/components/Input.vue'
   import Button from '@/components/Button.vue'
-
+  import {bookmarkMod} from '@/stores/modules/bookmark'
 
   @Component({
     components: {
@@ -39,17 +41,25 @@
   })
   export default class RegisterBookMark extends Vue {
     private url?: string
-    private tag?: string
+    private tags?: string
 
     private setTag( value: string ) {
-      this.tag = value
-      console.log(this.tag)
+      this.tags = value
     }
 
     private setUrl( value: string ) {
       this.url = value
-      console.log(this.url)
 
+    }
+
+    private postDatas() {
+      if(this.url){
+        bookmarkMod.POST_BOOKMARK({'url': this.url, 'tags': this.tags})
+
+      }else{
+        alert('Please enter URLS')
+
+      }
     }
   }
 
