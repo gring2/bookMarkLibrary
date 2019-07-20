@@ -83,12 +83,11 @@ describe('state test', () => {
     const user = new User('test@email.com')
     user.token = 'test token'
 
-    const state = {
+    userModObj.state = {
       token: null,
       user
     }
 
-    userModObj.state = state
     const actual = userModObj.state.user
     expect(actual).toBe(user)
 
@@ -137,19 +136,44 @@ describe('action test', () => {
     const dispatch = jest.fn()
 
     const user = new User('test@email.com')
-    user.token = 'test_token'
 
     await userModObj.actions.SIGN_UP({commit, dispatch}, user)
 
     expect(url).toBe('/api/register')
-    //await expect(dispatch).toBeCalledWith('GET_USER', {user})
-    await expect(commit).toHaveBeenCalledWith(
-      'AUTHENTICATE', new Auth_Token(authentication_token))
 
-    await expect(dispatch).toHaveBeenCalledWith(
-      'GET_USER', new Auth_Token(authentication_token))
+    await expect(commit).toHaveBeenCalledWith('AUTHENTICATE', new Auth_Token(authentication_token))
+
+    await expect(dispatch).toHaveBeenCalledWith('GET_USER', new Auth_Token(authentication_token))
 
     expect(userModObj.state.error).toBe(false)
+
+  })
+
+  it('sign up commit AUTHENTICATE with NULL IF response is error', async () => {
+    let url = ''
+
+    const myAxios: jest.Mocked<any> = axios as any
+    myAxios.post.mockImplementation(
+      (_url: string, _body: string) => {
+        return new Promise((resolve, reject) => {
+          url = _url
+
+          reject()
+        })
+      }
+    )
+
+    const commit = jest.fn()
+    const dispatch = jest.fn()
+
+    const user = new User('test@email.com')
+
+    await userModObj.actions.SIGN_UP({commit, dispatch}, user)
+
+    expect(url).toBe('/api/register')
+    await expect(commit).toHaveBeenCalledTimes(1)
+
+    await expect(commit).toHaveBeenCalledWith('AUTHENTICATE', null)
 
   })
 
@@ -182,17 +206,40 @@ describe('action test', () => {
     await userModObj.actions.SIGN_IN({commit, dispatch}, user)
 
     expect(url).toBe('/api/login')
-    await expect(dispatch).toHaveBeenCalledWith(
-      'GET_USER', new Auth_Token(authentication_token))
+    await expect(dispatch).toHaveBeenCalledWith('GET_USER', new Auth_Token(authentication_token))
 
-    await expect(commit).toHaveBeenCalledWith(
-      'AUTHENTICATE', new Auth_Token(authentication_token))
+    await expect(commit).toHaveBeenCalledWith('AUTHENTICATE', new Auth_Token(authentication_token))
 
 
     expect(userModObj.state.error).toBe(false)
 
   })
 
+  it('sign in commit AUTHENTICATE with NULL IF response is error', async () => {
+    let url = ''
+    const myAxios: jest.Mocked<any> = axios as any
+
+    myAxios.post.mockImplementation(
+      (_url: string, _body: string) => {
+        return new Promise((resolve ,reject) => {
+          url = _url
+          reject()
+        })
+      }
+    )
+    const dispatch = jest.fn()
+    const commit = jest.fn()
+
+    const user = new User('test@email.com')
+    await userModObj.actions.SIGN_IN({commit, dispatch}, user)
+
+    expect(url).toBe('/api/login')
+
+    await expect(commit).toHaveBeenCalledTimes(1)
+
+    await expect(commit).toHaveBeenCalledWith('AUTHENTICATE', null)
+
+  })
 
   it('log out works', async () => {
     let url = ''

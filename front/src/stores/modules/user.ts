@@ -19,9 +19,7 @@ export default class UserModule extends VuexModule implements IUserState {
   private error: boolean = false
 
   get authTokenHeader() {
-    return {
-      'Authentication-Token': this.token
-      }
+    return { 'Authentication-Token': this.token }
 
   }
 
@@ -41,6 +39,12 @@ export default class UserModule extends VuexModule implements IUserState {
     } else {
       this.error = true
     }
+  }
+
+  @Mutation
+  private expire() {
+    this.token = null
+    this.user = null
   }
 
  @Action({commit: 'AUTHENTICATE'})
@@ -102,9 +106,7 @@ export default class UserModule extends VuexModule implements IUserState {
 
   @Action({commit: 'SET_USER'})
   public async GET_USER(token: Auth_Token) {
-    const headers = {
-                      'Authentication-Token': token.token
-                      }
+    const headers = { 'Authentication-Token': token.token }
     try {
       const resp = await axios.get('/api/current/', {headers})
       const data = resp.data
@@ -113,12 +115,6 @@ export default class UserModule extends VuexModule implements IUserState {
     }catch (e) {
       return null
     }
-  }
-
-  @Mutation
-  private expire() {
-    this.token = null
-    this.user = null
   }
 
 }
