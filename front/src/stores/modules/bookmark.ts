@@ -16,7 +16,7 @@ export interface IUserState {
 export default class BookMarkModule extends VuexModule implements IUserState {
   public bookmarks: BookMark[] = []
   public tags: Tag[] = []
-
+  public loading: boolean = false
 
   @Mutation
   SET_BOOKMARKS(bookmarks: BookMark[]){
@@ -28,7 +28,17 @@ export default class BookMarkModule extends VuexModule implements IUserState {
     this.tags = tags
   }
 
-  @Action
+  @Mutation
+  LOADING_START() {
+    this.loading = true
+  }
+
+  @Mutation
+  LOADING_END() {
+    this.loading = false
+  }
+
+  @Action({ rawError: true })
   public async GET_BOOKMARKS(tags: string[] | null= null){
     const data:{[key: string]: any} = {}
 
@@ -38,17 +48,22 @@ export default class BookMarkModule extends VuexModule implements IUserState {
 
     }
     try {
+      this.context.commit('LOADING_START')
+
       const resp = await axios.get(api, data)
       this.context.commit('SET_BOOKMARKS', resp.data['bookmarks'])
       this.context.commit('SET_TAGS', resp.data['tags'])
 
     }catch (e) {
 
+    }finally {
+      this.context.commit('LOADING_END')
+
     }
   }
 
   @Action
-  public async POST_BOOKMARK(data: {'url': string, 'tags'?: string}) {
+  public async POST_BOOKMARK(data: {'url': string, 'tags'?: string| null}) {
     try{
       await axios.post(api, data, {headers: userMod.authTokenHeader})
       this.context.dispatch('GET_BOOKMARKS')

@@ -6,6 +6,9 @@ import BookMarkModule, {bookmarkMod} from '@/stores/modules/bookmark'
 import axios from 'axios'
 import Tag from "@/vo/Tag";
 import Library from '@/views/Library.vue'
+import BookmarksPanel from '@/views/BookmarksPanel.vue'
+import BookmarkList from '@/views/BookmarkList.vue'
+
 import RegisterBookMark from '@/components/RegisterBookMark.vue'
 
 jest.mock('axios')
@@ -137,9 +140,16 @@ describe('action test', () => {
     const dispatch = jest.fn()
     await bookmarkModObj.actions.GET_BOOKMARKS({commit, dispatch})
 
+    await expect(commit).toHaveBeenCalledWith(
+      'LOADING_START')
+
     expect(url).toBe('/api/library/urls')
+
     await expect(commit).toHaveBeenCalledWith(
       'SET_BOOKMARKS', bookmarks)
+
+    await expect(commit).toHaveBeenCalledWith(
+      'LOADING_END')
 
     expect(headers).toEqual({headers:
       {
@@ -195,6 +205,10 @@ describe('action test', () => {
     await expect(dispatch).toBeCalledTimes(0)
   })
 
+  it('Change thumbnail', () => {
+    fail()
+  })
+
 })
 
 describe('integrate test', () => {
@@ -207,9 +221,25 @@ describe('integrate test', () => {
 
     bookmarkMod.SET_BOOKMARKS([bookmark1, bookmark2])
 
-    const wrapper = mount(Library, {
+    const bookmarkPanelStub = mount(BookmarksPanel, {
+      stubs: {
+            BookmarkList: mount(BookmarkList, {
+              computed: {
+                isLoading: ()=> {
+                  return false
+                }
 
+              }
+            }).html()
+        }
     })
+
+    const wrapper = mount(Library, {
+        stubs: {
+            BookmarksPanel: bookmarkPanelStub.html()
+        }
+    })
+
     const aTags = wrapper.findAll('a')
     const first = aTags.at(0)
     const second = aTags.at(1)
@@ -238,48 +268,27 @@ describe('integrate test', () => {
 
   })
 
-  it('snapshot' , () => {
-    const tag1 = new Tag(1, 'test1')
-    const tag2 = new Tag(2, 'test2')
-
-    bookmarkMod.SET_TAGS([tag1, tag2])
-
-    const bookmark1 = new BookMark('test1', 'testUrl1', 'testThumbnail1')
-    const bookmark2 = new BookMark('test2', 'testUrl2', 'testThumbnail2')
-
-    bookmarkMod.SET_BOOKMARKS([bookmark1, bookmark2])
-
-    const wrapper = mount(Library, {
-
-    })
-
-    expect(wrapper).toMatchSnapshot()
-  })
-
   it('call bookmark store GET_BOOKMARKS action', () => {
     bookmarkMod.GET_BOOKMARKS = jest.fn()
 
     const wrapper = mount(Library, {
-
     })
 
     expect(bookmarkMod.GET_BOOKMARKS).toBeCalled()
 
   })
 
-  it('call POST_BOOKMARK if submit is clicked', () => {
+  it('call POST_BOOKMARK if submit is clicked', async () => {
     bookmarkMod.POST_BOOKMARK = jest.fn()
-    const data = {
-        'url': 'test-url',
-        'tags': 'test-url',
-
-      }
+    const datas = { 'url': 'test-url', 'tags': 'test-url',}
     const wrapper = mount(RegisterBookMark, {
-      data: () => data
+      data: () => {
+        return datas
+      }
     })
     wrapper.find('.submit').trigger('click')
 
-    expect(bookmarkMod.POST_BOOKMARK).toBeCalledWith(data)
+    await expect(bookmarkMod.POST_BOOKMARK).toBeCalledWith(datas)
 
   })
 

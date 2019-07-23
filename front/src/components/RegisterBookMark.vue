@@ -40,8 +40,8 @@
     }
   })
   export default class RegisterBookMark extends Vue {
-    private url?: string
-    private tags?: string
+    private url?: string | null
+    private tags?: string | null
 
     private setTag( value: string ) {
       this.tags = value
@@ -52,10 +52,12 @@
 
     }
 
-    private postDatas() {
+    private async postDatas() {
       if(this.url){
-        bookmarkMod.POST_BOOKMARK({'url': this.url, 'tags': this.tags})
 
+        await bookmarkMod.POST_BOOKMARK({'url': this.url, 'tags': this.tags})
+        this.url = null
+        this.tags = null
       }else{
         alert('Please enter URLS')
 

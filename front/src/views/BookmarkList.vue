@@ -1,10 +1,14 @@
 <template>
     <div :class="$style.container">
-      <ul >
+      <ul v-if="!isLoading">
         <li v-for="bookmark in bookmarks">
           <BookMark :bookmark="bookmark" ></BookMark>
         </li>
       </ul>
+      <Loading v-else>
+
+      </Loading>
+
 
     </div>
 </template>
@@ -12,18 +16,25 @@
 <script lang=ts>
   import { Component, Vue } from 'vue-property-decorator'
   import BookMark from '@/components/BookMark.vue'
+  import Loading from '@/views/Loading.vue'
+
   import BookMarkModel from '@/vo/BookMark'
   import {bookmarkMod} from '@/stores/modules/bookmark'
 
   @Component({
     components: {
-      BookMark
+      BookMark, Loading
     }
   })
   export default class BookmarkList extends Vue {
     get bookmarks (): BookMarkModel[]  {
       return bookmarkMod.bookmarks
     }
+
+    get isLoading (): boolean {
+      return bookmarkMod.loading
+    }
+
   }
 
 </script>

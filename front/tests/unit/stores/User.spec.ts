@@ -63,6 +63,14 @@ describe('mutation test', () => {
 
   })
 
+  it('AUTHENTICATE set token cookies', () => {
+    fail()
+  })
+
+  it('expire delete token cookies', () => {
+    fail()
+  })
+
 })
 
 describe('state test', () => {
