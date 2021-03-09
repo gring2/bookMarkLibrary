@@ -23,7 +23,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
-          branch: ${{ steps.get_branch.outputs.branch }}
+          branch: master
           title: Release-${{ steps.date.outputs.date }}
           reviewers: |
             gring2
