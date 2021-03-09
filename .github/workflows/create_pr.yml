@@ -10,6 +10,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: release
+      - name: Date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: Reset release branch
         run: |
           git fetch origin master:master
@@ -18,3 +21,6 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           branch: master
+          title: Release-${{ steps.date.outputs.date }}
+          reviewers: |
+            gring2
