@@ -6,7 +6,7 @@ name: Create Release PR
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-
+    - example-patches
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -15,7 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
+        with:
+          ref: ${ GITHUB_REF }
       - name: Make changes to pull request
         run: date +%s > report.txt
 
@@ -28,7 +29,7 @@ jobs:
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          branch: example-patches
+          base: master
           delete-branch: true
           title: '[Example] Update report'
           body: |
