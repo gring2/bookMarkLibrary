@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-          with:
+        with:
           ref: release
       - name: Make changes to pull request
         id: date
