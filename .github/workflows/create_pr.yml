@@ -27,6 +27,3 @@ jobs:
           title: Release-${{ steps.date.outputs.date }}
           reviewers: |
             gring2
-            nisshiy30
-            SeungMin0628
-            diaphragm
