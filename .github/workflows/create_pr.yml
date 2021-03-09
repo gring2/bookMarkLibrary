@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${ GITHUB_REF }
+          ref: example-patches
       - name: Make changes to pull request
         run: date +%s > report.txt
 
