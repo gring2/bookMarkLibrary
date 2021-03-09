@@ -1,314 +1,12 @@
+from sqlalchemy.exc import IntegrityError
+
 from models import User
 from tests.base import BaseTestCase
-from handlers.image_handler import OgImageHandler, FaviconHandler
-from unittest import mock
+
 from library.models import BookMark, Tag
 from bookMarkLibrary.database import db
 from library import contract
-
-
-class OGHandlerTest(BaseTestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.mock_res = mock.patch('requests.Response')
-
-    def test_has_og_image_meta(self):
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta property="og:image" content="testmeta"/>
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-
-        handler = OgImageHandler(self.mock_res)
-
-        result = handler.has_og_image_meta()
-        self.assertTrue(result)
-
-    def test_has_no_og_image_meta(self):
-        # meta tag does not exist
-        self.mock_res.text = """
-            <html>
-                <head>
-
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = OgImageHandler(self.mock_res)
-        result = handler.has_og_image_meta()
-        self.assertFalse(result)
-
-        # meta:porperty does not exist
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta charset="utf8" content="testmeta"/>
-
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = OgImageHandler(self.mock_res)
-        result = handler.has_og_image_meta()
-        self.assertFalse(result)
-
-        # meta:porperty's value is not og:image
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta property="utf8" content="testmeta"/>
-
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = OgImageHandler(self.mock_res)
-        result = handler.has_og_image_meta()
-        self.assertFalse(result)
-
-        # meta has property attribute but does not have content attribute
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta property="og:image" />
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = OgImageHandler(self.mock_res)
-        result = handler.has_og_image_meta()
-        self.assertFalse(result)
-
-        # meta content attribute has not value
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta property="og:image" content=""/>
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = OgImageHandler(self.mock_res)
-        result = handler.has_og_image_meta()
-        self.assertFalse(result)
-
-
-class FaviconHandlerTest(BaseTestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.mock_res = mock.patch('requests.Response')
-
-    def test_has_favicon_image_link_tag(self):
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <link rel="icon" href="test.com"/>
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-
-        result = handler.has_favicon_image_link_tag()
-        self.assertTrue(result)
-
-    def test_has_no_favicon_link_tag(self):
-        # link tag does not exist
-        self.mock_res.text = """
-            <html>
-                <head>
-
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_favicon_image_link_tag()
-        self.assertFalse(result)
-
-        # link:rel does not exist
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <link test="test"/>
-
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_favicon_image_link_tag()
-        self.assertFalse(result)
-
-        # link:ref's value is not icon
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <link rel="stylesheet" href="test.icon"/>
-
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_favicon_image_link_tag()
-        self.assertFalse(result)
-
-        # link has rel attribute but does not have href attribute
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <link rel="icon" />
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_favicon_image_link_tag()
-        self.assertFalse(result)
-
-        # link href attribute has not value
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <link rel="icon" href=""/>
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_favicon_image_link_tag()
-        self.assertFalse(result)
-
-    def test_has_itemprop_meta_tag(self):
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta itemprop="image" content="testmeta"/>
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_image_meta_tag()
-        self.assertTrue(result)
-
-    def test_has_no_itemprop_meta_tag(self):
-        # meta tag does not exist
-        self.mock_res.text = """
-            <html>
-                <head>
-
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_image_meta_tag()
-        self.assertFalse(result)
-
-        # meta:itemprop does not exist
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta charset="utf8" content="testmeta"/>
-
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_image_meta_tag()
-        self.assertFalse(result)
-
-        # meta:itemprop's value is not image
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta itemprop="test" content="testmeta.icon"/>
-
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_image_meta_tag()
-        self.assertFalse(result)
-
-        # meta has itemprop attribute but does not have content attribute
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta itemprop="image"/>
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_image_meta_tag()
-        self.assertFalse(result)
-
-        # meta content attribute has not value
-        self.mock_res.text = """
-            <html>
-                <head>
-                    <meta itemprop="image" content=""/>
-                </head>
-                <body>
-                </body>
-            </html>
-        """
-        handler = FaviconHandler(self.mock_res)
-        result = handler.has_image_meta_tag()
-        self.assertFalse(result)
-
-    def test_set_name_with_title_tag(self):
-        bookmark = BookMark()
-        bookmark.url = 'https://google.com'
-        bookmark.makeup()
-
-        self.assertEqual('Google', bookmark.name)
-
-    def test_blank_page_thumbnail(self):
-        u1 = User()
-        bookmark = BookMark()
-        bookmark.url = 'https://google.com'
-        bookmark.makeup()
-        bookmark.img = None
-        u1.create_bookmarks(bookmark)
-        db.session.commit()
-        self.assertEqual('/static/img/blank.png', bookmark.thumbnail)
-
-    def test_google_favicon(self):
-        bookmark = BookMark()
-        bookmark.url = 'https://www.google.com/search?' + \
-                       'source=hp&ei=RT3VXIXyJfSMr7wPjI6M6Ac&q=' + \
-                       'urlparse&oq=urlp&gs_l=psy-ab.1.1.0l5j0i10j0l4.2477.3781..5473...2.0..0.87.451.6......0....1..gws-wiz.....0.FWwWVpuif-g'
-        bookmark.makeup()
-        self.assertIsNotNone(bookmark.img)
-        self.assertTrue('google.com' in bookmark.img)
+from unittest.mock import patch
 
 
 class BookmarkTagRelTest(BaseTestCase):
@@ -333,8 +31,79 @@ class BookmarkTagRelTest(BaseTestCase):
         self.assertEqual(1, len(b2.tags))
         self.assertEqual(1, len(t1.bookmarks))
 
+    def test_blank_page_thumbnail(self):
+        bookmark = BookMark()
+        bookmark.url = 'https://google.com'
+        bookmark.makeup()
+        bookmark.img = None
+        self.assertEqual('/static/img/blank.png', bookmark.thumbnail)
 
-class LibraryContactTest(BaseTestCase):
+    def test_thumbnail_return_img_value_on_default(self):
+        bookmark = BookMark()
+        bookmark.url = 'https://google.com'
+        bookmark.makeup()
+        bookmark.img = 'test'
+        self.assertEqual('test', bookmark.thumbnail)
+
+    def test_thumbnail_return_img_path_when_exist(self):
+        with patch('library.models.os') as mock_os:
+            mock_os.path.exists.return_value = True
+            bookmark = BookMark()
+            bookmark.url = 'https://google.com'
+            bookmark.makeup()
+            bookmark.img = 'test'
+            self.assertEqual('/storage/test', bookmark.thumbnail)
+
+
+class ContractTest(BaseTestCase):
+
+    @patch('werkzeug.datastructures.FileStorage')
+    @patch('library.contract.resize_img')
+    def test_change_thumbnail(self, mock_resize_img, file):
+        with patch('library.contract.db') as mock_db:
+            b = BookMark()
+
+            file.filename = 'test.png'
+            file.save.return_value =True
+            mock_resize_img.return_value = True
+            # mock_db.session.add.return_value = True
+            # mock_db.session.commit.return_value = True
+
+            contract.change_thumbnail(b, file)
+
+            file.save.assert_called_once()
+            mock_resize_img.assert_called_once()
+            mock_db.session.add.assert_called_once_with(b)
+
+            assert 'test.png' in b.img
+
+    @patch('werkzeug.datastructures.FileStorage')
+    @patch('library.contract.resize_img')
+    @patch('library.contract.os')
+    def test_change_thumbnail_rollback_when_error_occured(self, mock_os, mock_resize_img, file):
+        with patch('library.contract.db') as mock_db:
+            b = BookMark()
+
+            file.filename = 'test.png'
+            file.save.return_value =True
+            mock_resize_img.return_value = True
+
+            mock_db.session.add.return_value = True
+            mock_db.session.rollback.return_value = True
+
+            mock_db.session.commit.side_effect = IntegrityError
+
+            mock_os.remove.return_value = True
+
+            contract.change_thumbnail(b, file)
+
+            file.save.assert_called_once()
+            mock_resize_img.assert_called_once()
+            mock_db.session.add.assert_called_once_with(b)
+            mock_db.session.rollback.assert_called_once()
+
+            mock_os.remove.assert_called_once()
+
     def test_register_bookmark_and_tag(self):
         u1 = User()
         b1 = BookMark(url='google.com')
@@ -345,15 +114,23 @@ class LibraryContactTest(BaseTestCase):
         self.assertEqual(b1, u1.bookmarks[0])
         self.assertEqual(2, len(u1.bookmarks[0].tags))
 
-    def test_register_bookmark_and_tag_rollback(self):
-        u1 = User()
-        b1 = BookMark(url='google.com')
-        t1 = Tag()
-        t2 = Tag(tag='tag2')
+    def test_register_bookmark_and_tag_rollback_on_error(self):
+        with patch('library.contract.db', wraps=db) as mock_db:
 
-        contract.register_bookmark_and_tag(u1, b1, t1, t2)
-        self.assertIsNone(u1.bookmarks[0].id)
-        self.assertEqual(0, Tag.query.count())
-        self.assertEqual(0, BookMark.query.count())
+          #  mock_db.session.rollback.return_value = None
 
+            mock_db.session.commit.side_effect = IntegrityError
+
+            u1 = User()
+            b1 = BookMark(url='google.com')
+            t = Tag(tag='tag2')
+
+            t2 = Tag()
+
+            contract.register_bookmark_and_tag(u1, b1, t, t2)
+            mock_db.session.rollback.assert_called_once()
+
+            self.assertIsNone(u1.bookmarks[0].id, u1.bookmarks[0].id)
+            self.assertEqual(0, Tag.query.count())
+            self.assertEqual(0, BookMark.query.count())
 

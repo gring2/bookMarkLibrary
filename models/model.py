@@ -48,3 +48,6 @@ class User(db.Model, UserMixin):
                 import logging
                 logging.error('seeror', e)
             db.session.add(self)
+
+    def as_dict(self):
+        return {'email': self.email}

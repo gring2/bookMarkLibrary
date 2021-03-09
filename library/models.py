@@ -1,18 +1,13 @@
 from __future__ import annotations
 import os
-import traceback
-import time
-import logging
 from flask import url_for, current_app as app
 from flask_security import current_user
 from bookMarkLibrary.database import db
 from handlers.thumbnail_handler import ThumbnailHandler
-from bookMarkLibrary.const import ALLOWED_EXTENSIONS
-from handlers.screenshot_handler import resize_img
 from utils.url_utils import get_http_format_url
 from sqlalchemy_utils import UUIDType
 import uuid
-from sqlalchemy import Table
+from sqlalchemy import Table, text
 from sqlalchemy.orm import relationship
 
 
@@ -78,29 +73,8 @@ class BookMark(db.Model):
     def save(self):
         current_user.create_bookmarks(self)
 
-    # need to be moved
-    def change_thumbnail(self, file):
-        if file and self.__allowed_file(file.filename):
-            ts = time.time()
-            img_name = str(int(ts)) + file.filename
-            path = os.path.join(app.config['STORAGE_PATH'], img_name)
-            file.save(path)
-            resize_img(path)
-
-            try:
-
-                self.img = img_name
-
-                db.session.add(self)
-                db.session.commit()
-
-            except Exception:
-                os.remove(path)
-                db.session.rollback()
-
-    def __allowed_file(self, filename):
-        return '.' in filename and \
-               filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    def as_dict(self):
+        return {'id': self.id, 'url': self.url, 'name': self.name, 'img': self.img}
 
 
 class Tag(db.Model):
@@ -126,3 +100,25 @@ class Tag(db.Model):
         tag_inputs.pop(0)
 
         return tag_inputs
+
+    def as_dict(self):
+        return {'id': self.id.__str__(), 'tag': self.tag}
+
+    @classmethod
+    def get_lists(cls, ids):
+        params = {str(idx): id for idx, id in enumerate(ids)}
+        stmt = text('SELECT tags.id as id, tags.tag as tag FROM tags'
+                    ' '
+                    'JOIN bookmark_tag_rel btr on tags.id = btr.tags'
+                    ' '
+                    'WHERE btr.bookmarks in (%s)'
+                    ' '
+                    'GROUP BY tags.id'
+                    ' '
+                    'ORDER BY tags.id' % ','.join([":" + key for key in params.keys()]))
+
+        stmt = stmt.columns(cls.id, cls.tag)
+
+        stmt = stmt.bindparams(**params)
+
+        return db.session.query(cls).from_statement(stmt).all()

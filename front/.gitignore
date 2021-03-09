@@ -1,0 +1,15 @@
+src/*.vue.js
+src/*.vue.js.map
+src/*.js
+src/*.js.map
+src/*/*.vue.js
+src/*/*.vue.js.map
+src/*/*.js
+src/*/*.js.map
+src/*/*/*.js
+src/*/*/*.js.map
+
+tests/unit/*/*.spec.js
+tests/unit/*/*.spec.js.map
+tests/unit/*.spec.js
+tests/unit/*.spec.js.map

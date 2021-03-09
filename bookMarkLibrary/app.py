@@ -1,20 +1,33 @@
 import os
 import traceback
-
-from flask import Flask, render_template, send_from_directory, g
-from flask_security import Security, SQLAlchemyUserDatastore
-
+from flask import Flask, render_template, send_from_directory, jsonify
+from flask_security import Security, SQLAlchemyUserDatastore, auth_token_required, current_user
 from models import User
 from bookMarkLibrary.send_storage_file import SendStorageFileHandler
 from flask_wtf.csrf import CSRFProtect
 from bookMarkLibrary.database import init_db, db, set_db_config
 from bookMarkLibrary.const import register_const
 import logging
+from flask.sessions import SecureCookieSessionInterface
 
+
+class CustomSessionInterface(SecureCookieSessionInterface):
+    """Prevent creating session from API requests."""
+    def save_session(self, *args, **kwargs):
+        return
+
+
+# app config objects
 send_storage_handler = SendStorageFileHandler()
 csrf = CSRFProtect()
 user_datastore = SQLAlchemyUserDatastore(db, User, None)
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# testing envs
+env = os.getenv('ENV', 'production')
+if env == 'testing':
+    from dotenv import load_dotenv
+    load_dotenv()
 
 
 def create_app(test_config=None):
@@ -29,20 +42,15 @@ def create_app(test_config=None):
         SECRET_KEY='dev',
         STORAGE_PATH=app.root_path + '/storage',
     )
+
     # flask-security configuration mapping
     app.config.from_mapping(
         SECURITY_REGISTERABLE=True,
         SECURITY_SEND_REGISTER_EMAIL=False,
-        SECURITY_TOKEN_MAX_AGE=1
+        SECURITY_URL_PREFIX='/api'
     )
 
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-        set_db_config(app)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
+    __config_app(app, test_config)
 
     init_db(app)
 
@@ -52,36 +60,22 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    @app.before_request
-    def register_g_value():
-        register_const()
+    __config_routes(app)
 
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
+    __config_storage(app)
 
-    @app.route('/')
-    def home():
-        return render_template('index.html')
-    import library
-    app.register_blueprint(library.bp)
-
-    def send_storage_file(filename):
-        cache_timeout = send_storage_handler.get_send_file_max_age(filename)
-        return send_from_directory(app.config['STORAGE_PATH'], filename,
-                                   cache_timeout=cache_timeout)
-
-    app.add_url_rule('/storage/<path:filename>', endpoint='storage',
-                     view_func=send_storage_file)
     # Setup Flask-Security
-    security = Security(app, user_datastore)
+    Security(app, user_datastore)
 
-    # app.config['WTF_CSRF_ENABLED'] = False
+    app.config['WTF_CSRF_ENABLED'] = False
+
     @app.errorhandler(Exception)
     def handle_http_exception(e):
         logging.error(traceback.format_exc())
         return e
+
+    app.session_interface = CustomSessionInterface()
+
     return app
 
 
@@ -103,6 +97,46 @@ def __setup_logging(test_config=None):
         logging.config.dictConfig(config)
 
 
+def __config_app(app, test_config):
+    if test_config is None:
+        # load the instance config, if it exists, when not testing
+        app.config.from_pyfile('config.py', silent=True)
+        set_db_config(app)
+    else:
+        # load the test config if passed in
+        app.config.from_mapping(test_config)
+
+
 def __graceful_create_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+
+def __config_routes(app):
+    @app.before_request
+    def register_g_value():
+        register_const()
+
+    @app.route('/api')
+    def home():
+        return render_template('index.html')
+
+    @app.route('/api/current/')
+    @auth_token_required
+    def user():
+        user = User.query.get(current_user.id)
+        return jsonify(user.as_dict())
+
+    import library
+    app.register_blueprint(library.bp)
+
+
+def __config_storage(app):
+    def send_storage_file(filename):
+        cache_timeout = send_storage_handler.get_send_file_max_age(filename)
+        return send_from_directory(app.config['STORAGE_PATH'], filename,
+                                   cache_timeout=cache_timeout)
+
+    app.add_url_rule('/storage/<path:filename>', endpoint='storage',
+                     view_func=send_storage_file)
+

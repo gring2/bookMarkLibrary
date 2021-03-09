@@ -1,0 +1,15 @@
+.content > div {
+  display: flex; }
+
+div.content > form {
+  width: 50%; }
+  div.content > form div.label {
+    justify-content: space-between; }
+  div.content > form div:not(.label) {
+    margin-bottom: 3%;
+    display: block; }
+    div.content > form div:not(.label) label {
+      margin-right: 2%;
+      display: block; }
+    div.content > form div:not(.label) input {
+      width: 100%; }
