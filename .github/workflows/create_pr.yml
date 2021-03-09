@@ -15,7 +15,7 @@ jobs:
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
       - name: Get branch name
         id: get_branch
-        run: echo "::set-output name=VERSION::${GITHUB_REF}"
+        run: echo "::set-output name=branch::${GITHUB_REF}"
       - name: Reset release branch
         run: |
           git fetch origin master:master
@@ -23,7 +23,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
-          branch: ${{ steps.date.outputs.get_branch }}
+          branch: ${{ steps.get_branch.outputs.branch }}
           title: Release-${{ steps.date.outputs.date }}
           reviewers: |
             gring2
