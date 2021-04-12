@@ -1,6 +1,5 @@
 # librarized bookmark in web.
 
-Access http://gring2.pw
 
 ## reqiured
 1. library must be tree-structured. (can make subdirectory.)
